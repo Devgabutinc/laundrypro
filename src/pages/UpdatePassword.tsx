@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,31 +12,92 @@ const UpdatePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hashPresent, setHashPresent] = useState(false);
+  const [recoveryToken, setRecoveryToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const { session } = useAuth();
 
-  // Check if we have a hash parameter in the URL
+  // Extract tokens from URL
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes("type=recovery")) {
-      setHashPresent(true);
-    } else {
-      // If there's no hash and the user is not logged in, redirect to login
-      if (!session) {
-        toast({
-          title: "Access denied",
-          description: "You need a valid reset link to access this page.",
-          variant: "destructive",
-        });
-        navigate("/auth", { replace: true });
+    // Function to extract parameters from URL
+    const extractParamFromUrl = (url: string, param: string): string | null => {
+      try {
+        // Try to parse URL as URL object first
+        const urlObj = new URL(url);
+        
+        // Check parameter in query string
+        const queryParam = urlObj.searchParams.get(param);
+        if (queryParam) return queryParam;
+        
+        // If not in query string, check in hash fragment
+        if (urlObj.hash) {
+          // Remove # at start of hash
+          const hashParams = new URLSearchParams(urlObj.hash.substring(1));
+          const hashParam = hashParams.get(param);
+          if (hashParam) return hashParam;
+        }
+        
+        // Fallback to regex method if above methods fail
+        const regex = new RegExp(`[#&?]${param}=([^&#]*)`);
+        const match = regex.exec(url);
+        return match ? decodeURIComponent(match[1]) : null;
+      } catch (e) {
+        console.error('Error parsing URL:', e);
+        
+        // Fallback to regex method if URL parsing fails
+        try {
+          const regex = new RegExp(`[#&?]${param}=([^&#]*)`);
+          const match = regex.exec(url);
+          return match ? decodeURIComponent(match[1]) : null;
+        } catch (e) {
+          console.error('Regex extraction failed:', e);
+          return null;
+        }
       }
-    }
-  }, [session, navigate, toast]);
+    };
 
-  // If user is already logged in and not using a recovery link, redirect to home
-  if (session && !hashPresent) {
+    // Check for token in URL
+    const fullUrl = window.location.href;
+    console.log('Current URL:', fullUrl);
+    
+    // Check for recovery token in query params or hash
+    const token = extractParamFromUrl(fullUrl, 'token');
+    if (token) {
+      console.log('Found recovery token in URL');
+      setRecoveryToken(token);
+    }
+    
+    // Check for access token
+    const access_token = extractParamFromUrl(fullUrl, 'access_token');
+    if (access_token) {
+      console.log('Found access token in URL');
+      setAccessToken(access_token);
+    }
+    
+    // Check for type=recovery
+    const type = extractParamFromUrl(fullUrl, 'type');
+    if (type === 'recovery') {
+      console.log('URL confirms this is a recovery flow');
+    } else {
+      console.log('URL type parameter:', type);
+    }
+    
+    // If no token found and user not logged in, redirect to login
+    if (!token && !access_token && !session) {
+      console.log('No recovery token or access token found, and user not logged in');
+      toast({
+        title: "Access denied",
+        description: "You need a valid reset link to access this page.",
+        variant: "destructive",
+      });
+      navigate("/auth", { replace: true });
+    }
+  }, [location, navigate, toast, session]);
+
+  // If user is already logged in and not in recovery flow, redirect to home
+  if (session && !recoveryToken && !accessToken) {
     return <Navigate to="/" replace />;
   }
 
@@ -64,24 +125,69 @@ const UpdatePassword = () => {
     }
     
     setLoading(true);
+    console.log('Attempting to update password');
     
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password,
-      });
+      let result;
       
-      if (error) throw error;
+      // If we have a recovery token, we need to use it
+      if (recoveryToken) {
+        console.log('Using recovery token to update password');
+        // First try to exchange the token for a session
+        try {
+          const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({
+            token_hash: recoveryToken,
+            type: 'recovery',
+          });
+          
+          if (sessionError) {
+            console.error('Error verifying OTP:', sessionError);
+            throw sessionError;
+          }
+          
+          console.log('OTP verification successful:', sessionData);
+          
+          // Now update the password
+          result = await supabase.auth.updateUser({
+            password: password,
+          });
+        } catch (tokenError) {
+          console.error('Error with token verification:', tokenError);
+          // Fallback to direct password update
+          result = await supabase.auth.updateUser({
+            password: password,
+          });
+        }
+      } else {
+        // Standard password update
+        console.log('Using standard password update');
+        result = await supabase.auth.updateUser({
+          password: password,
+        });
+      }
       
+      const { error } = result || {};
+      
+      if (error) {
+        console.error('Error updating password:', error);
+        throw error;
+      }
+      
+      console.log('Password updated successfully');
       toast({
         title: "Password updated successfully",
         description: "Your password has been updated. You can now log in with your new password.",
       });
+      
+      // Sign out the user to ensure they log in with the new password
+      await supabase.auth.signOut();
       
       // Redirect to login page after successful password update
       setTimeout(() => {
         navigate("/auth", { replace: true });
       }, 2000);
     } catch (error: any) {
+      console.error('Exception during password update:', error);
       toast({
         title: "Failed to update password",
         description: error.message || "An unexpected error occurred.",
