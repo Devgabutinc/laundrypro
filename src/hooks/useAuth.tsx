@@ -117,76 +117,156 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Platform: ' + (isNative ? 'Native' : 'Web'));
       
       if (isNative) {
-        // Untuk aplikasi native (Android/iOS), gunakan pendekatan yang lebih langsung
+        // Untuk aplikasi native (Android/iOS), gunakan pendekatan yang lebih baik
         // Hapus semua listener untuk menghindari duplikasi
         Browser.removeAllListeners();
+        App.removeAllListeners();
+        
+        // Setup deep link handler untuk menangkap callback dari OAuth
+        const handleAppUrlChange = async ({ url }: { url: string }) => {
+          console.log('Deep link detected:', url);
+          
+          // Periksa apakah URL mengandung token atau kode autentikasi
+          if (url.includes('access_token') || url.includes('code=') || url.includes('token_type=')) {
+            console.log('Auth callback URL terdeteksi:', url);
+            
+            try {
+              // Jika URL berisi kode, gunakan exchangeCodeForSession
+              if (url.includes('code=')) {
+                const code = extractParamFromUrl(url, 'code');
+                console.log('Kode OAuth terdeteksi:', code);
+                
+                if (code) {
+                  // Gunakan kode untuk mendapatkan session
+                  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                  console.log('Exchange code result:', { data, error });
+                  
+                  if (data.session) {
+                    console.log('Session berhasil dibuat dengan kode');
+                    window.location.reload();
+                    return;
+                  } else if (error) {
+                    console.error('Error saat exchange code:', error);
+                  }
+                }
+              } 
+              // Jika URL berisi access_token, gunakan setSession
+              else if (url.includes('access_token')) {
+                const access_token = extractParamFromUrl(url, 'access_token');
+                const refresh_token = extractParamFromUrl(url, 'refresh_token');
+                
+                console.log('Token terdeteksi:', { access_token, refresh_token });
+                
+                if (access_token && refresh_token) {
+                  const { data, error } = await supabase.auth.setSession({
+                    access_token,
+                    refresh_token
+                  });
+                  
+                  console.log('Set session result:', { data, error });
+                  
+                  if (data.session) {
+                    console.log('Session berhasil dibuat dengan token');
+                    window.location.reload();
+                    return;
+                  } else if (error) {
+                    console.error('Error saat set session:', error);
+                  }
+                }
+              }
+              
+              // Jika tidak berhasil dengan metode di atas, coba refresh session
+              const { data: refreshData } = await supabase.auth.refreshSession();
+              console.log('Hasil refresh session:', refreshData);
+              
+              if (refreshData.session) {
+                console.log('Session berhasil di-refresh');
+                window.location.reload();
+                return;
+              }
+            } catch (e) {
+              console.error('Error saat memproses callback URL:', e);
+            }
+          }
+        };
+        
+        // Register URL open listener
+        App.addListener('appUrlOpen', handleAppUrlChange);
         
         // Tambahkan listener untuk menangkap ketika browser ditutup
         Browser.addListener('browserFinished', async () => {
           console.log('Browser ditutup, memulai proses login manual...');
           
           try {
-            // Dapatkan URL saat ini untuk debugging
-            console.log('Mencoba login manual dengan Supabase...');
-            
-            // Coba login langsung dengan token yang mungkin sudah ada di storage
-            const { data, error } = await supabase.auth.signInWithOAuth({
-              provider: 'google',
-              options: {
-                skipBrowserRedirect: true,
-                redirectTo: window.location.origin,
-              },
-            });
-            
-            console.log('Hasil login manual:', { data, error });
-            
-            // Periksa session setelah upaya login
-            const { data: sessionData } = await supabase.auth.getSession();
-            console.log('Session setelah login manual:', sessionData);
-            
-            if (sessionData.session) {
-              console.log('Session ditemukan, user berhasil login');
-              // Refresh halaman untuk menerapkan state login baru
-              window.location.reload();
-            } else {
-              console.log('Session tidak ditemukan, mencoba refresh...');
-              // Coba refresh session
-              const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-              console.log('Hasil refresh session:', { refreshData, refreshError });
+            // Tunggu sebentar untuk memastikan callback URL sudah diproses
+            setTimeout(async () => {
+              // Periksa session setelah browser ditutup
+              const { data: sessionData } = await supabase.auth.getSession();
+              console.log('Session setelah browser ditutup:', sessionData);
               
-              if (refreshData.session) {
-                console.log('Session berhasil di-refresh');
+              if (sessionData.session) {
+                console.log('Session ditemukan, user berhasil login');
                 window.location.reload();
               } else {
-                console.log('Gagal mendapatkan session setelah refresh');
-                // Tampilkan pesan error ke user
-                alert('Gagal login dengan Google. Silakan coba lagi.');
+                console.log('Session tidak ditemukan, mencoba login manual...');
+                
+                // Coba login manual sebagai fallback
+                try {
+                  // Gunakan metode manual sebagai fallback
+                  const { data: manualData, error: manualError } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: window.location.origin, // Gunakan origin biasa
+                    },
+                  });
+                  
+                  console.log('Hasil login manual:', { manualData, manualError });
+                  
+                  if (manualError) {
+                    console.error('Error login manual:', manualError);
+                    alert('Gagal login dengan Google. Silakan coba lagi.');
+                  }
+                  
+                  // Coba refresh session sekali lagi
+                  const { data: refreshData } = await supabase.auth.refreshSession();
+                  console.log('Hasil refresh session:', refreshData);
+                } catch (e) {
+                  console.error('Error saat login manual:', e);
+                  alert('Terjadi kesalahan saat login. Silakan coba lagi.');
+                }
               }
-            }
+            }, 1500); // Tunggu 1.5 detik
           } catch (e) {
             console.error('Error saat proses login manual:', e);
             alert('Terjadi kesalahan saat login. Silakan coba lagi.');
           }
         });
         
-        // Gunakan URL Vercel untuk autentikasi
+        // Gunakan URL callback yang sesuai dengan skema aplikasi dan konfigurasi deep link
         console.log('Memulai proses OAuth dengan Google...');
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
             skipBrowserRedirect: true,
-            redirectTo: 'https://laundrypro.vercel.app',
+            // Gunakan format URL yang sesuai dengan konfigurasi intent filter
+            redirectTo: 'com.laundrypro.app://login-callback',
+            queryParams: {
+              // Tambahkan parameter untuk memastikan callback berfungsi dengan baik
+              access_type: 'offline',
+              prompt: 'consent',
+            }
           },
         });
         
-        console.log('Hasil OAuth init:', { data, error });
+        console.log('Hasil OAuth init:', data);
         
         if (data?.url) {
           console.log('Membuka browser dengan URL:', data.url);
-          // Buka URL autentikasi dengan opsi standar
+          // Buka URL autentikasi dengan opsi yang lebih baik
           await Browser.open({
             url: data.url,
             windowName: 'Google Login',
+            presentationStyle: 'fullscreen', // Gunakan fullscreen untuk pengalaman lebih baik
           });
         } else {
           console.error('Tidak ada URL untuk OAuth:', error);
@@ -225,6 +305,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+// Helper function to extract parameters from URL dengan penanganan yang lebih baik
+const extractParamFromUrl = (url: string, param: string): string | null => {
+  try {
+    // Coba parse URL sebagai URL object terlebih dahulu
+    const urlObj = new URL(url);
+    
+    // Cek parameter di query string
+    const queryParam = urlObj.searchParams.get(param);
+    if (queryParam) return queryParam;
+    
+    // Jika tidak ada di query string, cek di hash fragment
+    if (urlObj.hash) {
+      // Hapus # di awal hash
+      const hashParams = new URLSearchParams(urlObj.hash.substring(1));
+      const hashParam = hashParams.get(param);
+      if (hashParam) return hashParam;
+    }
+    
+    // Fallback ke metode regex jika metode di atas gagal
+    const regex = new RegExp(`[#&?]${param}=([^&#]*)`); 
+    const match = regex.exec(url);
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch (e) {
+    console.error('Error parsing URL:', e);
+    
+    // Fallback ke metode regex jika URL parsing gagal
+    try {
+      const regex = new RegExp(`[#&?]${param}=([^&#]*)`); 
+      const match = regex.exec(url);
+      return match ? decodeURIComponent(match[1]) : null;
+    } catch (e) {
+      console.error('Regex extraction failed:', e);
+      return null;
+    }
+  }
 };
 
 export const useAuth = () => {
