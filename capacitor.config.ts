@@ -23,7 +23,9 @@ const config: CapacitorConfig = {
     GoogleAuth: {
       scopes: ['profile', 'email'],
       serverClientId: '797305778832-ice71hkgkf9q0uvv2sna9a8ro5rm59dh.apps.googleusercontent.com',
-      forceCodeForRefreshToken: true
+      androidClientId: '797305778832-ice71hkgkf9q0uvv2sna9a8ro5rm59dh.apps.googleusercontent.com',
+      forceCodeForRefreshToken: true,
+      webClientId: '797305778832-666lnk7r0fkeivamvd0llo1oshq76kqs.apps.googleusercontent.com'
     }
   },
   // Konfigurasi yang lebih lengkap untuk deep linking

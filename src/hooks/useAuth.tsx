@@ -125,6 +125,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           // Inisialisasi GoogleAuth jika belum
           console.log('Inisialisasi GoogleAuth...');
+          console.log('Client ID yang digunakan:', '797305778832-ice71hkgkf9q0uvv2sna9a8ro5rm59dh.apps.googleusercontent.com');
+          console.log('Package name:', 'com.laundrypro.app');
+          
+          // Coba log info platform
+          console.log('Platform info:', {
+            platform: Capacitor.getPlatform(),
+            isNative: Capacitor.isNativePlatform(),
+            isAndroid: Capacitor.getPlatform() === 'android'
+          });
+          
           GoogleAuth.initialize({
             clientId: '797305778832-ice71hkgkf9q0uvv2sna9a8ro5rm59dh.apps.googleusercontent.com',
             scopes: ['profile', 'email'],
@@ -133,8 +143,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           // Login dengan Google Auth native
           console.log('Memulai login dengan GoogleAuth native...');
-          const googleUser = await GoogleAuth.signIn();
-          console.log('Google Auth berhasil:', googleUser);
+          let googleUser;
+          try {
+            googleUser = await GoogleAuth.signIn();
+            console.log('Google Auth berhasil:', googleUser);
+          } catch (signInError) {
+            console.error('Error detail saat Google Auth signIn:', signInError);
+            if (signInError instanceof Error) {
+              console.error('Error name:', signInError.name);
+              console.error('Error message:', signInError.message);
+              console.error('Error stack:', signInError.stack);
+            } else {
+              console.error('Non-Error object thrown:', typeof signInError, JSON.stringify(signInError));
+            }
+            throw signInError; // Re-throw untuk ditangkap oleh catch di luar
+          }
           
           if (!googleUser || !googleUser.authentication || !googleUser.authentication.idToken) {
             throw new Error('Tidak mendapatkan token dari Google Auth');
