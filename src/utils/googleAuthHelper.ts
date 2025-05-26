@@ -46,12 +46,20 @@ let GoogleAuthInstance: IGoogleAuth;
 // Cek apakah berjalan di lingkungan mobile
 if (Capacitor.isNativePlatform()) {
   try {
-    // Import Google Auth plugin hanya jika di mobile
-    require('@codetrix-studio/capacitor-google-auth');
-    const { GoogleAuth } = require('@codetrix-studio/capacitor-google-auth');
-    GoogleAuthInstance = GoogleAuth as IGoogleAuth;
+    // Import langsung untuk Android/iOS
+    // Gunakan import langsung, bukan require
+    import('@codetrix-studio/capacitor-google-auth')
+      .then((module) => {
+        // Setelah modul dimuat, gunakan GoogleAuth dari modul tersebut
+        const { GoogleAuth } = module;
+        GoogleAuthInstance = GoogleAuth as unknown as IGoogleAuth;
+      })
+      .catch((e) => {
+        console.error('Error loading GoogleAuth:', e);
+        GoogleAuthInstance = WebGoogleAuth;
+      });
   } catch (e) {
-    console.error('Error loading GoogleAuth:', e);
+    console.error('Error during import GoogleAuth:', e);
     GoogleAuthInstance = WebGoogleAuth;
   }
 } else {
@@ -59,4 +67,18 @@ if (Capacitor.isNativePlatform()) {
   GoogleAuthInstance = WebGoogleAuth;
 }
 
-export const GoogleAuth = GoogleAuthInstance;
+// Karena import adalah asynchronous, kita perlu membuat proxy
+const GoogleAuthProxy = new Proxy({} as IGoogleAuth, {
+  get: (target, prop) => {
+    return (...args: any[]) => {
+      if (GoogleAuthInstance) {
+        return (GoogleAuthInstance as any)[prop](...args);
+      } else {
+        console.warn(`GoogleAuth belum diinisialisasi, menggunakan fallback untuk ${String(prop)}`);
+        return WebGoogleAuth[prop as keyof IGoogleAuth](...args);
+      }
+    };
+  }
+});
+
+export const GoogleAuth = GoogleAuthProxy;
