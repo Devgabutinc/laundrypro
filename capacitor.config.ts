@@ -19,6 +19,11 @@ const config: CapacitorConfig = {
       toolbarColor: '#3880ff',
       browserCloseButtonPosition: 'end',
       showTitle: true
+    },
+    GoogleAuth: {
+      scopes: ['profile', 'email'],
+      serverClientId: '1043175099828-bfgdj6e1vqcfnqj7kgdkvvdnvvqv6aqb.apps.googleusercontent.com',
+      forceCodeForRefreshToken: true
     }
   },
   // Konfigurasi yang lebih lengkap untuk deep linking
