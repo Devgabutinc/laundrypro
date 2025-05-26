@@ -98,14 +98,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ? 'https://laundrypro.vercel.app' 
         : window.location.origin;
       
-      // Use the exact URL format that matches our route
+      // Ensure we're using the correct URL format
+      // The token will be appended as a query parameter by Supabase
       const redirectUrl = `${baseUrl}/updatepassword`;
       console.log('Using redirect URL for password reset:', redirectUrl);
       
-      // Use redirectTo option to ensure the token is properly passed
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // Send the reset password email
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl
       });
+      
+      console.log('Reset password response:', data);
       
       if (error) {
         console.error('Error sending reset password email:', error);

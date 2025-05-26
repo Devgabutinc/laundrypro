@@ -21,23 +21,36 @@ const ResetPassword = () => {
     const url = window.location.href;
     console.log("Current URL:", url);
 
-    // Extract token from URL
-    const tokenRegex = /token=([^&]+)/;
+    // Extract token from URL - try multiple approaches
+    // First try query parameter
+    const urlObj = new URL(url);
+    const queryToken = urlObj.searchParams.get('token');
+    
+    // Then try regex as fallback
+    const tokenRegex = /token=([^&#]+)/;
     const match = url.match(tokenRegex);
     
-    if (match && match[1]) {
+    if (queryToken) {
+      console.log("Found token in query params:", queryToken);
+      setToken(queryToken);
+    } else if (match && match[1]) {
       const extractedToken = match[1];
-      console.log("Found token:", extractedToken);
+      console.log("Found token via regex:", extractedToken);
       setToken(extractedToken);
     } else {
       console.log("No token found in URL");
       toast({
         title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired.",
+        description: "This password reset link is invalid or has expired. Please request a new password reset link from the login page.",
         variant: "destructive",
       });
+      
+      // After 3 seconds, redirect to login page
+      setTimeout(() => {
+        navigate("/auth", { replace: true });
+      }, 3000);
     }
-  }, [toast]);
+  }, [toast, navigate]);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
