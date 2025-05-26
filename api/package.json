@@ -1,0 +1,7 @@
+{
+    "name": "laundrypro-fcm-broadcast",
+    "dependencies": {
+        "googleapis": "^127.0.0",
+        "node-fetch": "^2.6.7"
+    }
+}

@@ -1,0 +1,148 @@
+push app android studio
+
+npm run build
+npx cap sync
+npx cap copy
+npx cap open android
+
+npm run build
+npx cap sync
+
+
+##pushapi github
+git add api
+git commit -m "fix: force redeploy CORS for broadcastDevNotification API"
+git push
+
+supabase functions deploy broadcast_dev_notification --use-api
+
+
+####environment varcel
+SUPABASE_URL = https://igogxmfqfsxubjbtrguf.supabase.co
+SUPABASE_SERVICE_ROLE_KEY =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlnb2d4bWZxZnN4dWJqYnRyZ3VmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njg4NzY1MywiZXhwIjoyMDYyNDYzNjUzfQ.rvCcqQnJweCQTtuBo3_YM7H5HzK6GdTZAQtWfIYi46E
+NEXT_PUBLIC_FIREBASE_PROJECT_NUMBER = 797305778832
+NEXT_PUBLIC_FIREBASE_PROJECT_ID = laundrypro-dc029
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET =NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+NEXT_PUBLIC_FIREBASE_APP_ID = 1:797305778832:android:5296c4b1d8044434521e15
+NEXT_PUBLIC_FIREBASE_PACKAGE_NAME =com.laundrypro.app 
+NEXT_PUBLIC_FIREBASE_API_KEY = AIzaSyAhC9y1qu9hwzApcPWQDzg7fM5V1OWGFjg
+NEXT_PUBLIC_FIREBASE_CONFIG_VERSION = 1
+
+
+Email field:
+resource-id: "email"
+class: "android.widget.EditText"
+bounds: [82,779][638,861]
+Password field:
+resource-id: "password"
+class: "android.widget.EditText"
+bounds: [82,955][638,1037]
+Login button:
+text: "Login"
+class: "android.widget.Button"
+bounds: [82,1067][638,1149]
+
+
+Username Resource Name: isi dengan email
+Username Value: isi dengan devgabutinc@gmail.com
+Password Resource Name: isi dengan password
+Password Value: isi dengan admin123
+
+
+oba tambahkan di Robo directives dengan:
+Resource action: Enter text
+Resource Name: Login
+Resource Value: click
+Atau bisa juga coba dengan:
+Resource action: Click
+Resource Name: android:id/button1 atau .MainActivity/Login
+redmi 6A
+
+######catatan perbaikan
+- card users info + button lihat detail
+
+####
+[x]button export pelanggan tidak berfungsi di android  
+[x]batasan users POS free dan premium PRIORITAS
+[x]card users besarin sedikit + button lihat detail
+[x]button bantuan belum berfungsi 
+[x] seting profile belum ada >>>>. testing  edit  
+[ ]testing platformadmin setting besok !
+[ ]finish to deploy  
+[x]tabel belum dibayar masih kebesaran
+[x]tabel arsip order masih kebesaran
+[x] untuk produk belum sycron dengan POS sisa produk 8 di beli 5 stok sisa 7 aneh
+button batalkan tidak ada ketika jenis order bayar
+
+
+fitur setting
+###
+Manajemen Batasan Pengguna
+Maksimal Pengguna (Free): Mengontrol berapa banyak pengguna yang bisa ditambahkan ke akun gratis (saat ini diatur ke 3)
+Maksimal Pengguna (Premium): Mengontrol berapa banyak pengguna yang bisa ditambahkan ke akun premium (saat ini diatur ke 20)
+soon
+
+###
+Batasan Penggunaan POS
+Maksimal Penggunaan POS per Hari (Free): Membatasi berapa kali pengguna gratis dapat menggunakan sistem POS setiap hari (saat ini diatur ke 10)
+Maksimal Penggunaan POS per Hari (Premium): Mengontrol batasan penggunaan POS untuk pengguna premium (0 berarti tidak terbatas)
+done
+
+###3. Kontrol Akses Fitur
+a. Manajemen Pesanan ##done 
+Rak & Lokasi Penyimpanan (racks): Memungkinkan pengguna untuk menetapkan dan mengelola lokasi penyimpanan cucian pada rak
+Saat ini: Free = MATI, Premium = AKTIF
+fitur rak di order detial dan menu 
+
+b. point of Sale ##DONE
+Cetak Struk (print_receipt): Fitur untuk mencetak struk transaksi dengan format yang bersih dan profesional
+Saat ini: Free = AKTIF, Premium = AKTIF
+logo usaha 
+
+c. Laporan & Analitik ##DONE
+Laporan Keuangan (financial_reports): Akses ke laporan keuangan detail dan kemampuan untuk mengekspor data
+Saat ini: Free = MATI, Premium = AKTIF
+Catatan: Ini adalah fitur yang Anda sebutkan tentang "laporan keuangan = export laporan"
+export laporan button
+
+d. Notifikasi WhatsApp (wa_notification_clean) ##DONE BELUM FS
+: Kirim notifikasiotomatis ke pelanggan melalui WhatsApp saat cucian selesai
+Saat ini: Free = MATI, Premium = AKTIF
+ini hanya button menu notifikasi yang disable 
+
+
+
+
+[X]Rak & Lokasi Penyimpanan (racks)
+[X]Logo Pada Struk (print_receipt)
+[X]Export Laporan Keuangan (financial_reports)
+[X]Export Data Pelanggan & Arsip (export_data)
+[X]Forum Diskusi (discussion)
+
+[ ] menu tutorial penggunaan aplikasi 
+# list card 
+-totrial perbandingan free vs premium    
+- cara setting kostumisasi struk
+- cara konfigurasi manajemen rak 
+- cara menggunakan fitur pos 
+- dst soon 
+
+di masing masing card ketika di klik muncul modal seperti artikel
+a. struk free vs struk premium 
+ isi : gambar perbandingan struk free dan struk premium 
+ isi : vidio zoom in zoom out 
+ isi : penjelasa 
+ dll
+b. dst nya 
+
+
+list perbaikan console
+- console di dashboard x
+- console payment orders
+- console order detail  
+- console print struk   
+- console preview struk
+- console cetak label
+- console nota antar
+
+
