@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const handleAppUrlOpen = async ({ url }: { url: string }) => {
           console.log('Deep link terdeteksi:', url);
           
-          if (url.includes('code=')) {
+          if (url.includes('code=') || url.includes('token=') || url.includes('access_token=')) {
             // Tutup browser jika masih terbuka
             try {
               await Browser.close();
@@ -137,28 +137,76 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               console.log('Browser mungkin sudah ditutup');
             }
             
-            // Ekstrak kode dari URL
-            const code = extractParamFromUrl(url, 'code');
-            console.log('Kode otentikasi ditemukan:', code);
-            
-            if (code) {
-              try {
-                // Tukar kode dengan session
-                const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-                console.log('Hasil exchange code:', { data, error });
-                
-                if (data?.session) {
-                  console.log('Login berhasil! Memuat ulang aplikasi...');
-                  window.location.reload();
-                } else if (error) {
-                  console.error('Error saat exchange code:', error);
-                  alert('Gagal login: ' + error.message);
+            // Coba ekstrak kode dari URL
+            if (url.includes('code=')) {
+              const code = extractParamFromUrl(url, 'code');
+              console.log('Kode otentikasi ditemukan:', code);
+              
+              if (code) {
+                try {
+                  // Tukar kode dengan session
+                  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                  console.log('Hasil exchange code:', { data, error });
+                  
+                  if (data?.session) {
+                    console.log('Login berhasil! Memuat ulang aplikasi...');
+                    window.location.reload();
+                    return;
+                  } else if (error) {
+                    console.error('Error saat exchange code:', error);
+                  }
+                } catch (e) {
+                  console.error('Error saat proses kode:', e);
                 }
-              } catch (e) {
-                console.error('Error saat proses kode:', e);
-                alert('Terjadi kesalahan saat proses login');
               }
             }
+            
+            // Jika kode tidak berhasil, coba cek token
+            if (url.includes('access_token=')) {
+              const access_token = extractParamFromUrl(url, 'access_token');
+              const refresh_token = extractParamFromUrl(url, 'refresh_token');
+              
+              console.log('Token ditemukan:', { access_token, refresh_token });
+              
+              if (access_token) {
+                try {
+                  // Set session dengan token
+                  const { data, error } = await supabase.auth.setSession({
+                    access_token: access_token,
+                    refresh_token: refresh_token || ''
+                  });
+                  
+                  console.log('Hasil set session:', { data, error });
+                  
+                  if (data?.session) {
+                    console.log('Login berhasil dengan token! Memuat ulang aplikasi...');
+                    window.location.reload();
+                    return;
+                  } else if (error) {
+                    console.error('Error saat set session:', error);
+                  }
+                } catch (e) {
+                  console.error('Error saat proses token:', e);
+                }
+              }
+            }
+            
+            // Jika semua metode di atas gagal, coba refresh session
+            try {
+              const { data, error } = await supabase.auth.refreshSession();
+              console.log('Hasil refresh session:', { data, error });
+              
+              if (data?.session) {
+                console.log('Login berhasil dengan refresh! Memuat ulang aplikasi...');
+                window.location.reload();
+                return;
+              }
+            } catch (e) {
+              console.error('Error saat refresh session:', e);
+            }
+            
+            // Jika semua gagal, tampilkan pesan error
+            alert('Terjadi kesalahan saat proses login. Silakan coba lagi.');
           }
         };
         
@@ -179,19 +227,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               console.log('Session ditemukan, login berhasil!');
               window.location.reload();
             } else {
-              console.log('Session tidak ditemukan, login gagal');
-              // Tidak perlu mencoba lagi di sini, biarkan user mencoba lagi secara manual
+              console.log('Session tidak ditemukan, mencoba refresh...');
+              
+              // Coba refresh session
+              try {
+                const { data: refreshData } = await supabase.auth.refreshSession();
+                console.log('Hasil refresh setelah browser ditutup:', refreshData);
+                
+                if (refreshData?.session) {
+                  console.log('Session ditemukan setelah refresh, login berhasil!');
+                  window.location.reload();
+                  return;
+                }
+              } catch (e) {
+                console.error('Error saat refresh:', e);
+              }
+              
+              // Jika masih tidak ada session, coba login dengan URL web
+              console.log('Mencoba login dengan URL web sebagai fallback...');
+              try {
+                const { data: webData, error: webError } = await supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: {
+                    redirectTo: 'https://laundrypro.vercel.app/auth/v1/callback'
+                  }
+                });
+                
+                console.log('Hasil login web fallback:', { webData, webError });
+                
+                if (webError) {
+                  console.error('Error saat login web fallback:', webError);
+                }
+              } catch (e) {
+                console.error('Error saat login web fallback:', e);
+              }
             }
           }, 1000);
         });
         
         // 3. Mulai proses login dengan Google
         console.log('Memulai proses login Google...');
+        
+        // Gunakan URL redirect yang valid untuk web (https)
+        // Ini akan di-intercept oleh deep link handler di Android
+        const redirectUrl = 'https://laundrypro.vercel.app/auth/v1/callback';
+        console.log('Menggunakan URL redirect:', redirectUrl);
+        
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
             skipBrowserRedirect: true,
-            redirectTo: 'com.laundrypro.app://login-callback',
+            redirectTo: redirectUrl,
             // Pastikan mendapatkan refresh token
             queryParams: {
               access_type: 'offline',
@@ -228,6 +314,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           try {
             await Browser.close();
             console.log('Browser ditutup oleh timeout');
+            
+            // Cek session setelah timeout
+            const { data: timeoutData } = await supabase.auth.getSession();
+            if (timeoutData?.session) {
+              console.log('Session ditemukan setelah timeout, login berhasil!');
+              window.location.reload();
+            }
           } catch (e) {
             console.log('Browser mungkin sudah ditutup');
           }
@@ -237,7 +330,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin,
+            redirectTo: 'https://laundrypro.vercel.app/auth/v1/callback',
           },
         });
         
