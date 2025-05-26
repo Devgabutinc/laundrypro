@@ -4,10 +4,9 @@ const config: CapacitorConfig = {
   appId: 'com.laundrypro.app',
   appName: 'LaundryPro',
   webDir: 'dist',
-  // Konfigurasi server dengan deep linking
+  // Kembali ke konfigurasi server yang aman
   server: {
-    androidScheme: 'laundrypro',
-    hostname: 'app',
+    androidScheme: 'https',
     cleartext: true
   },
   plugins: {

@@ -116,44 +116,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const isNative = Capacitor.isNativePlatform();
       
       if (isNative) {
-        // Untuk aplikasi native (Android/iOS), gunakan pendekatan langsung
+        // Untuk aplikasi native (Android/iOS), gunakan pendekatan sederhana
         // Hapus listener lama jika ada untuk menghindari duplikasi
         Browser.removeAllListeners();
-        App.removeAllListeners();
-        
-        // Setup listener untuk mendeteksi ketika aplikasi dibuka kembali via deep link
-        App.addListener('appUrlOpen', async ({ url }) => {
-          console.log('App URL dibuka:', url);
-          if (url.includes('auth/callback')) {
-            // Tutup browser jika masih terbuka
-            try {
-              await Browser.close();
-            } catch (e) {
-              console.log('Browser mungkin sudah tertutup');
-            }
-            
-            // Refresh session setelah callback
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-              console.log('Login berhasil via deep link');
-              // Refresh halaman untuk menerapkan state login baru
-              window.location.reload();
-            }
-          }
-        });
         
         // Tambahkan listener untuk menangkap ketika browser ditutup
         Browser.addListener('browserFinished', async () => {
           console.log('Browser ditutup, cek session...');
-          // Tunggu sebentar untuk memastikan session sudah diperbarui
-          setTimeout(async () => {
+          // Cek session setelah browser ditutup
+          for (let i = 0; i < 5; i++) {
+            // Coba beberapa kali dengan jeda waktu
+            await new Promise(resolve => setTimeout(resolve, 1000));
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
               console.log('Session ditemukan, user berhasil login');
               // Refresh halaman untuk menerapkan state login baru
               window.location.reload();
+              break;
             }
-          }, 1000);
+            console.log(`Percobaan ${i+1}: Session belum tersedia`);
+          }
         });
         
         // Gunakan URL Vercel untuk autentikasi
@@ -161,7 +143,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           provider: 'google',
           options: {
             skipBrowserRedirect: true,
-            redirectTo: 'https://laundrypro.vercel.app/auth/v1/callback',
+            redirectTo: 'https://laundrypro.vercel.app',
           },
         });
         
@@ -169,7 +151,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Buka URL autentikasi dengan opsi yang lebih terintegrasi
           await Browser.open({
             url: data.url,
-            presentationStyle: 'popover', // Gunakan popover untuk pengalaman yang lebih terintegrasi
             toolbarColor: '#3880ff', // Warna toolbar yang sesuai dengan tema aplikasi
           });
         }
