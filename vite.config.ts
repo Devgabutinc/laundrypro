@@ -24,22 +24,21 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Jika di Vercel, buat alias untuk plugin Capacitor ke modul dummy
+      ...(isVercel ? {
+        '@codetrix-studio/capacitor-google-auth': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/browser': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/app': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/filesystem': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/local-notifications': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/push-notifications': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/share': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
+        '@capacitor/toast': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js')
+      } : {})
     },
   },
   build: {
-    rollupOptions: {
-      // Mengabaikan plugin Capacitor saat build di Vercel
-      external: isVercel ? [
-        '@codetrix-studio/capacitor-google-auth',
-        '@capacitor/browser',
-        '@capacitor/app',
-        '@capacitor/core',
-        '@capacitor/filesystem',
-        '@capacitor/local-notifications',
-        '@capacitor/push-notifications',
-        '@capacitor/share',
-        '@capacitor/toast'
-      ] : []
-    }
+    // Tidak perlu menggunakan external lagi karena kita menggunakan alias
+    rollupOptions: {}
   }
 }));
