@@ -24,7 +24,7 @@ export const FilesystemDirectory = Directory;
 export default {
   // Common methods
   initialize: async () => console.log('Capacitor plugin shim: initialize called'),
-  addListener: () => ({ remove: () => {} }),
+  addListener: () => Promise.resolve({ remove: () => {} }),
   removeAllListeners: () => {},
   
   // Browser
@@ -76,13 +76,13 @@ export const GoogleAuth = {
 export const Browser = {
   open: async () => console.log('Capacitor plugin shim: Browser.open called'),
   close: async () => console.log('Capacitor plugin shim: Browser.close called'),
-  addListener: () => ({ remove: () => {} }),
+  addListener: () => Promise.resolve({ remove: () => {} }),
   removeAllListeners: () => {},
 };
 
 export const App = {
   exitApp: () => console.log('Capacitor plugin shim: App.exitApp called'),
-  addListener: () => ({ remove: () => {} }),
+  addListener: () => Promise.resolve({ remove: () => {} }),
   removeAllListeners: () => {},
 };
 
@@ -93,7 +93,7 @@ export const Capacitor = {
 
 export const PushNotifications = {
   register: async () => console.log('Capacitor plugin shim: PushNotifications.register called'),
-  addListener: () => ({ remove: () => {} }),
+  addListener: () => Promise.resolve({ remove: () => {} }),
   removeAllListeners: () => {},
   checkPermissions: async () => ({ receive: 'granted' }),
   requestPermissions: async () => ({ receive: 'granted' }),
@@ -123,7 +123,7 @@ export const Filesystem = {
 
 export const LocalNotifications = {
   schedule: async () => console.log('Capacitor plugin shim: LocalNotifications.schedule called'),
-  addListener: () => ({ remove: () => {} }),
+  addListener: () => Promise.resolve({ remove: () => {} }),
   removeAllListeners: () => {},
   checkPermissions: async () => ({ display: 'granted' }),
   requestPermissions: async () => ({ display: 'granted' }),
