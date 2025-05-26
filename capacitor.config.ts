@@ -15,7 +15,7 @@ const config: CapacitorConfig = {
     },
     Browser: {
       // Konfigurasi Browser plugin untuk pengalaman yang lebih terintegrasi
-      presentationStyle: 'fullscreen', // Ubah ke fullscreen untuk pengalaman lebih baik
+      presentationStyle: 'fullscreen', // Gunakan fullscreen untuk pengalaman lebih baik
       toolbarColor: '#3880ff',
       browserCloseButtonPosition: 'end',
       showTitle: true
@@ -28,15 +28,22 @@ const config: CapacitorConfig = {
         action: 'VIEW',
         autoVerify: true,
         data: [
+          // Skema kustom untuk deep link
           {
             scheme: 'com.laundrypro.app',
             host: '*',
           },
-          // Tambahkan format alternatif untuk memastikan semua URL callback ditangkap
+          // URL callback dari Supabase/Google OAuth
           {
             scheme: 'https',
             host: 'laundrypro.vercel.app',
-            pathPrefix: '/login-callback'
+            pathPrefix: '/auth/v1/callback'
+          },
+          // URL alternatif dari Supabase
+          {
+            scheme: 'https',
+            host: 'igogxmfqfsxubjbtrguf.supabase.co',
+            pathPrefix: '/auth/v1/callback'
           }
         ],
         categories: ['DEFAULT', 'BROWSABLE'],
