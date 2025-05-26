@@ -114,32 +114,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signInWithGoogle = async () => {
     try {
       const isNative = Capacitor.isNativePlatform();
+      console.log('Platform: ' + (isNative ? 'Native' : 'Web'));
       
       if (isNative) {
-        // Untuk aplikasi native (Android/iOS), gunakan pendekatan sederhana
-        // Hapus listener lama jika ada untuk menghindari duplikasi
+        // Untuk aplikasi native (Android/iOS), gunakan pendekatan yang lebih langsung
+        // Hapus semua listener untuk menghindari duplikasi
         Browser.removeAllListeners();
         
         // Tambahkan listener untuk menangkap ketika browser ditutup
         Browser.addListener('browserFinished', async () => {
-          console.log('Browser ditutup, cek session...');
-          // Cek session setelah browser ditutup
-          for (let i = 0; i < 5; i++) {
-            // Coba beberapa kali dengan jeda waktu
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
+          console.log('Browser ditutup, memulai proses login manual...');
+          
+          try {
+            // Dapatkan URL saat ini untuk debugging
+            console.log('Mencoba login manual dengan Supabase...');
+            
+            // Coba login langsung dengan token yang mungkin sudah ada di storage
+            const { data, error } = await supabase.auth.signInWithOAuth({
+              provider: 'google',
+              options: {
+                skipBrowserRedirect: true,
+                redirectTo: window.location.origin,
+              },
+            });
+            
+            console.log('Hasil login manual:', { data, error });
+            
+            // Periksa session setelah upaya login
+            const { data: sessionData } = await supabase.auth.getSession();
+            console.log('Session setelah login manual:', sessionData);
+            
+            if (sessionData.session) {
               console.log('Session ditemukan, user berhasil login');
               // Refresh halaman untuk menerapkan state login baru
               window.location.reload();
-              break;
+            } else {
+              console.log('Session tidak ditemukan, mencoba refresh...');
+              // Coba refresh session
+              const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+              console.log('Hasil refresh session:', { refreshData, refreshError });
+              
+              if (refreshData.session) {
+                console.log('Session berhasil di-refresh');
+                window.location.reload();
+              } else {
+                console.log('Gagal mendapatkan session setelah refresh');
+                // Tampilkan pesan error ke user
+                alert('Gagal login dengan Google. Silakan coba lagi.');
+              }
             }
-            console.log(`Percobaan ${i+1}: Session belum tersedia`);
+          } catch (e) {
+            console.error('Error saat proses login manual:', e);
+            alert('Terjadi kesalahan saat login. Silakan coba lagi.');
           }
         });
         
         // Gunakan URL Vercel untuk autentikasi
-        const { data } = await supabase.auth.signInWithOAuth({
+        console.log('Memulai proses OAuth dengan Google...');
+        const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
             skipBrowserRedirect: true,
@@ -147,12 +179,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           },
         });
         
+        console.log('Hasil OAuth init:', { data, error });
+        
         if (data?.url) {
-          // Buka URL autentikasi dengan opsi yang lebih terintegrasi
+          console.log('Membuka browser dengan URL:', data.url);
+          // Buka URL autentikasi dengan opsi standar
           await Browser.open({
             url: data.url,
-            toolbarColor: '#3880ff', // Warna toolbar yang sesuai dengan tema aplikasi
+            windowName: 'Google Login',
           });
+        } else {
+          console.error('Tidak ada URL untuk OAuth:', error);
+          alert('Gagal memulai proses login. Silakan coba lagi.');
         }
       } else {
         // Untuk web, gunakan flow OAuth normal
