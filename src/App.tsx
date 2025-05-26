@@ -97,30 +97,41 @@ function AppRoutes() {
     };
   }, [location, navigate]);
 
+  // Check if this is a password reset flow by looking at the URL
+  const isPasswordResetFlow = () => {
+    const url = window.location.href;
+    return (
+      url.includes('type=recovery') || 
+      url.includes('token=') || 
+      location.pathname === "/update-password"
+    );
+  };
+
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
+  // If this is a password reset flow, don't redirect
+  if (isPasswordResetFlow() && location.pathname === "/update-password") {
+    console.log("Password reset flow detected, allowing access to update-password page");
+    // Continue to the routes without redirection
+  } 
   // Jika belum login, redirect ke /auth
-  if (!session && location.pathname !== "/auth") {
+  else if (!session && location.pathname !== "/auth") {
     return <Navigate to="/auth" replace />;
   }
-
   // Jika sudah login tapi belum punya bisnis, redirect ke setup bisnis
-  if (session && !businessId && location.pathname !== "/setup-business") {
+  else if (session && !businessId && location.pathname !== "/setup-business") {
     return <Navigate to="/setup-business" replace />;
   }
-
   // Jika sudah punya bisnis, jangan bisa akses halaman setup bisnis lagi
-  if (businessId && location.pathname === "/setup-business") {
+  else if (businessId && location.pathname === "/setup-business") {
     return <Navigate to="/" replace />;
   }
-
   // Jika role superadmin dan di root, redirect ke /platform-admin
-  if (profile && profile.role === "superadmin" && location.pathname === "/") {
+  else if (profile && profile.role === "superadmin" && location.pathname === "/") {
     return <Navigate to="/platform-admin" replace />;
   }
-
   // Jika role owner dan di root, redirect ke /owner
-  if (profile && profile.role === "owner" && location.pathname === "/") {
+  else if (profile && profile.role === "owner" && location.pathname === "/") {
     return <Navigate to="/owner" replace />;
   }
 
