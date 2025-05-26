@@ -46,6 +46,7 @@ import OrderArchive from "./pages/OrderArchive";
 import ProfileSettings from "./pages/ProfileSettings";
 import ReceiptSettings from "./pages/ReceiptSettings";
 import UpdatePassword from "./pages/UpdatePassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 const queryClient = new QueryClient();
@@ -97,23 +98,13 @@ function AppRoutes() {
     };
   }, [location, navigate]);
 
-  // Check if this is a password reset flow by looking at the URL
-  const isPasswordResetFlow = () => {
-    const url = window.location.href;
-    return (
-      url.includes('type=recovery') || 
-      url.includes('token=') || 
-      location.pathname === "/update-password"
-    );
-  };
-
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // If this is a password reset flow, don't redirect
-  if (isPasswordResetFlow() && location.pathname === "/update-password") {
-    console.log("Password reset flow detected, allowing access to update-password page");
+  // Allow access to reset password page without any redirection
+  if (location.pathname === "/updatepassword") {
+    console.log("Reset password page accessed, bypassing auth checks");
     // Continue to the routes without redirection
-  } 
+  }
   // Jika belum login, redirect ke /auth
   else if (!session && location.pathname !== "/auth") {
     return <Navigate to="/auth" replace />;
@@ -139,6 +130,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/auth" element={<Auth />} />
       <Route path="/update-password" element={<UpdatePassword />} />
+      <Route path="/updatepassword" element={<ResetPassword />} />
       <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
       <Route path="/orders" element={<PrivateRoute><AppLayout><Orders /></AppLayout></PrivateRoute>} />
       <Route path="/orders/:orderId" element={<PrivateRoute><AppLayout><OrderDetail /></AppLayout></PrivateRoute>} />

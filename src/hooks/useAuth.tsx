@@ -98,8 +98,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ? 'https://laundrypro.vercel.app' 
         : window.location.origin;
       
-      // Make sure we use the exact path that matches our route
-      const redirectUrl = `${baseUrl}/update-password`;
+      // Use the exact URL format that matches our route
+      const redirectUrl = `${baseUrl}/updatepassword`;
       console.log('Using redirect URL for password reset:', redirectUrl);
       
       // Use redirectTo option to ensure the token is properly passed
