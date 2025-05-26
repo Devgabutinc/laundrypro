@@ -5,6 +5,9 @@ import { updateFcmTokenToProfile } from '@/utils/pushNotifications';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+// Import Google Auth plugin
+import '@codetrix-studio/capacitor-google-auth';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 
 type AuthContextType = {
   session: Session | null;
@@ -117,208 +120,240 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Platform: ' + (isNative ? 'Native' : 'Web'));
       
       if (isNative) {
-        // PENDEKATAN BARU: Gunakan metode yang lebih sederhana untuk mobile
-        console.log('Menggunakan pendekatan sederhana untuk login di mobile');
-        
-        // Bersihkan semua listener yang ada untuk menghindari duplikasi
-        Browser.removeAllListeners();
-        App.removeAllListeners();
-        
-        // 1. Siapkan handler untuk deep link
-        const handleAppUrlOpen = async ({ url }: { url: string }) => {
-          console.log('Deep link terdeteksi:', url);
-          
-          if (url.includes('code=') || url.includes('token=') || url.includes('access_token=')) {
-            // Tutup browser jika masih terbuka
-            try {
-              await Browser.close();
-              console.log('Browser ditutup dari deep link handler');
-            } catch (e) {
-              console.log('Browser mungkin sudah ditutup:', e);
-            }
-            
-            // Coba ekstrak kode dari URL
-            if (url.includes('code=')) {
-              const code = extractParamFromUrl(url, 'code');
-              console.log('Kode otentikasi ditemukan:', code);
-              
-              if (code) {
-                try {
-                  // Tukar kode dengan session
-                  console.log('Mencoba exchange code untuk session...');
-                  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-                  console.log('Hasil exchange code:', data, 'Error:', error);
-                  
-                  if (data?.session) {
-                    console.log('Login berhasil dengan code! Session:', data.session);
-                    // Simpan session ke localStorage untuk memastikan
-                    localStorage.setItem('supabase.auth.token', JSON.stringify({
-                      currentSession: data.session,
-                      expiresAt: data.session.expires_at
-                    }));
-                    setTimeout(() => window.location.reload(), 500);
-                    return;
-                  } else if (error) {
-                    console.error('Error saat exchange code:', error.message, error.stack);
-                  }
-                } catch (e) {
-                  console.error('Exception saat proses kode:', e);
-                }
-              }
-            }
-            
-            // Jika kode tidak berhasil, coba cek token
-            if (url.includes('access_token=')) {
-              const access_token = extractParamFromUrl(url, 'access_token');
-              const refresh_token = extractParamFromUrl(url, 'refresh_token');
-              
-              console.log('Token ditemukan dalam URL:', { access_token, refresh_token });
-              
-              if (access_token) {
-                try {
-                  // Set session dengan token
-                  console.log('Mencoba set session dengan token...');
-                  const { data, error } = await supabase.auth.setSession({
-                    access_token: access_token,
-                    refresh_token: refresh_token || ''
-                  });
-                  
-                  console.log('Hasil set session:', data, 'Error:', error);
-                  
-                  if (data?.session) {
-                    console.log('Login berhasil dengan token! Session:', data.session);
-                    // Simpan session ke localStorage untuk memastikan
-                    localStorage.setItem('supabase.auth.token', JSON.stringify({
-                      currentSession: data.session,
-                      expiresAt: data.session.expires_at
-                    }));
-                    setTimeout(() => window.location.reload(), 500);
-                    return;
-                  } else if (error) {
-                    console.error('Error saat set session:', error.message, error.stack);
-                  }
-                } catch (e) {
-                  console.error('Exception saat proses token:', e);
-                }
-              }
-            }
-            
-            // Jika semua metode di atas gagal, coba refresh session
-            try {
-              console.log('Mencoba refresh session sebagai fallback...');
-              const { data, error } = await supabase.auth.refreshSession();
-              console.log('Hasil refresh session:', data, 'Error:', error);
-              
-              if (data?.session) {
-                console.log('Login berhasil dengan refresh! Session:', data.session);
-                // Simpan session ke localStorage untuk memastikan
-                localStorage.setItem('supabase.auth.token', JSON.stringify({
-                  currentSession: data.session,
-                  expiresAt: data.session.expires_at
-                }));
-                setTimeout(() => window.location.reload(), 500);
-                return;
-              } else {
-                console.error('Tidak ada session setelah refresh');
-              }
-            } catch (e) {
-              console.error('Exception saat refresh session:', e);
-            }
-            
-            // Jika semua gagal, tampilkan pesan error
-            console.error('Semua metode login gagal, menampilkan alert');
-            alert('Terjadi kesalahan saat proses login. Silakan coba lagi.');
-          } else {
-            console.log('URL tidak mengandung kode atau token auth');
-          }
-        };
-        
-        // Daftarkan handler untuk deep link
-        console.log('Mendaftarkan handler untuk appUrlOpen');
-        App.addListener('appUrlOpen', handleAppUrlOpen);
-        
-        // 2. Siapkan handler untuk browser ditutup
-        console.log('Mendaftarkan handler untuk browserFinished');
-        Browser.addListener('browserFinished', async () => {
-          console.log('Browser ditutup, memeriksa status login...');
-          
-          // Tunggu sejenak untuk memastikan proses auth selesai
-          setTimeout(async () => {
-            try {
-              // Cek apakah sudah ada session
-              console.log('Memeriksa session setelah browser ditutup...');
-              const { data } = await supabase.auth.getSession();
-              console.log('Session setelah browser ditutup:', data);
-              
-              if (data?.session) {
-                console.log('Session ditemukan, login berhasil! Session:', data.session);
-                // Simpan session ke localStorage untuk memastikan
-                localStorage.setItem('supabase.auth.token', JSON.stringify({
-                  currentSession: data.session,
-                  expiresAt: data.session.expires_at
-                }));
-                setTimeout(() => window.location.reload(), 500);
-                return;
-              } else {
-                console.log('Session tidak ditemukan, mencoba refresh...');
-                
-                // Coba refresh session
-                try {
-                  console.log('Mencoba refresh session...');
-                  const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-                  console.log('Hasil refresh setelah browser ditutup:', refreshData, 'Error:', refreshError);
-                  
-                  if (refreshData?.session) {
-                    console.log('Session ditemukan setelah refresh, login berhasil! Session:', refreshData.session);
-                    // Simpan session ke localStorage untuk memastikan
-                    localStorage.setItem('supabase.auth.token', JSON.stringify({
-                      currentSession: refreshData.session,
-                      expiresAt: refreshData.session.expires_at
-                    }));
-                    setTimeout(() => window.location.reload(), 500);
-                    return;
-                  } else {
-                    console.log('Tidak ada session setelah refresh, error:', refreshError);
-                  }
-                } catch (e) {
-                  console.error('Exception saat refresh:', e);
-                }
-                
-                // Jika masih tidak ada session, coba login dengan URL web
-                console.log('Mencoba login dengan URL web sebagai fallback...');
-                try {
-                  const { data: webData, error: webError } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                      redirectTo: 'https://laundrypro.vercel.app/auth/v1/callback'
-                    }
-                  });
-                  
-                  console.log('Hasil login web fallback:', webData, 'Error:', webError);
-                  
-                  if (webError) {
-                    console.error('Error saat login web fallback:', webError.message, webError.stack);
-                  }
-                } catch (e) {
-                  console.error('Exception saat login web fallback:', e);
-                }
-              }
-            } catch (e) {
-              console.error('Exception saat memeriksa session:', e);
-            }
-          }, 1000);
-        });
-        
-        // 3. Mulai proses login dengan Google
-        console.log('Memulai proses login Google...');
-        
-        // Gunakan URL redirect yang valid untuk web (https)
-        // Ini akan di-intercept oleh deep link handler di Android
-        const redirectUrl = 'https://laundrypro.vercel.app/auth/v1/callback';
-        console.log('Menggunakan URL redirect:', redirectUrl);
+        // PENDEKATAN BARU: Gunakan native Google Auth tanpa browser
+        console.log('Menggunakan native Google Auth tanpa browser');
         
         try {
-          console.log('Inisiasi OAuth dengan Supabase...');
+          // Inisialisasi GoogleAuth jika belum
+          console.log('Inisialisasi GoogleAuth...');
+          GoogleAuth.initialize({
+            clientId: '1048243846987-mhbh2j5q4o6j1c2lv5lfvs6u3gp6cjnm.apps.googleusercontent.com',
+            scopes: ['profile', 'email'],
+            grantOfflineAccess: true,
+          });
+          
+          // Login dengan Google Auth native
+          console.log('Memulai login dengan GoogleAuth native...');
+          const googleUser = await GoogleAuth.signIn();
+          console.log('Google Auth berhasil:', googleUser);
+          
+          if (!googleUser || !googleUser.authentication || !googleUser.authentication.idToken) {
+            throw new Error('Tidak mendapatkan token dari Google Auth');
+          }
+          
+          // Login ke Supabase dengan token Google
+          console.log('Login ke Supabase dengan token Google...');
+          const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: googleUser.authentication.idToken,
+          });
+          
+          console.log('Hasil login Supabase:', data, 'Error:', error);
+          
+          if (error) {
+            console.error('Error saat login Supabase:', error.message, error.stack);
+            alert('Gagal login ke Supabase: ' + error.message);
+            return { success: false, error };
+          }
+          
+          if (data?.session) {
+            console.log('Login berhasil! Session:', data.session);
+            // Simpan session ke localStorage untuk memastikan
+            localStorage.setItem('supabase.auth.token', JSON.stringify({
+              currentSession: data.session,
+              expiresAt: data.session.expires_at
+            }));
+            setTimeout(() => window.location.reload(), 500);
+            return { success: true, error: null };
+          } else {
+            console.error('Tidak ada session setelah login');
+            alert('Tidak mendapatkan session setelah login. Silakan coba lagi.');
+            return { success: false, error: new Error('No session after login') };
+          }
+        } catch (e) {
+          console.error('Error saat Google Auth native:', e);
+          
+          // Fallback ke metode browser jika native gagal
+          console.log('Native Google Auth gagal, mencoba dengan browser sebagai fallback...');
+          
+          // Bersihkan semua listener yang ada untuk menghindari duplikasi
+          Browser.removeAllListeners();
+          App.removeAllListeners();
+          
+          // 1. Siapkan handler untuk deep link
+          const handleAppUrlOpen = async ({ url }: { url: string }) => {
+            console.log('Deep link terdeteksi:', url);
+            
+            if (url.includes('code=') || url.includes('token=') || url.includes('access_token=')) {
+              // Tutup browser jika masih terbuka
+              try {
+                await Browser.close();
+                console.log('Browser ditutup dari deep link handler');
+              } catch (e) {
+                console.log('Browser mungkin sudah ditutup:', e);
+              }
+              
+              // Coba ekstrak kode dari URL
+              if (url.includes('code=')) {
+                const code = extractParamFromUrl(url, 'code');
+                console.log('Kode otentikasi ditemukan:', code);
+                
+                if (code) {
+                  try {
+                    // Tukar kode dengan session
+                    console.log('Mencoba exchange code untuk session...');
+                    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                    console.log('Hasil exchange code:', data, 'Error:', error);
+                    
+                    if (data?.session) {
+                      console.log('Login berhasil dengan code! Session:', data.session);
+                      // Simpan session ke localStorage untuk memastikan
+                      localStorage.setItem('supabase.auth.token', JSON.stringify({
+                        currentSession: data.session,
+                        expiresAt: data.session.expires_at
+                      }));
+                      setTimeout(() => window.location.reload(), 500);
+                      return;
+                    } else if (error) {
+                      console.error('Error saat exchange code:', error.message, error.stack);
+                    }
+                  } catch (e) {
+                    console.error('Exception saat proses kode:', e);
+                  }
+                }
+              }
+              
+              // Jika kode tidak berhasil, coba cek token
+              if (url.includes('access_token=')) {
+                const access_token = extractParamFromUrl(url, 'access_token');
+                const refresh_token = extractParamFromUrl(url, 'refresh_token');
+                
+                console.log('Token ditemukan dalam URL:', { access_token, refresh_token });
+                
+                if (access_token) {
+                  try {
+                    // Set session dengan token
+                    console.log('Mencoba set session dengan token...');
+                    const { data, error } = await supabase.auth.setSession({
+                      access_token: access_token,
+                      refresh_token: refresh_token || ''
+                    });
+                    
+                    console.log('Hasil set session:', data, 'Error:', error);
+                    
+                    if (data?.session) {
+                      console.log('Login berhasil dengan token! Session:', data.session);
+                      // Simpan session ke localStorage untuk memastikan
+                      localStorage.setItem('supabase.auth.token', JSON.stringify({
+                        currentSession: data.session,
+                        expiresAt: data.session.expires_at
+                      }));
+                      setTimeout(() => window.location.reload(), 500);
+                      return;
+                    } else if (error) {
+                      console.error('Error saat set session:', error.message, error.stack);
+                    }
+                  } catch (e) {
+                    console.error('Exception saat proses token:', e);
+                  }
+                }
+              }
+              
+              // Jika semua metode di atas gagal, coba refresh session
+              try {
+                console.log('Mencoba refresh session sebagai fallback...');
+                const { data, error } = await supabase.auth.refreshSession();
+                console.log('Hasil refresh session:', data, 'Error:', error);
+                
+                if (data?.session) {
+                  console.log('Login berhasil dengan refresh! Session:', data.session);
+                  // Simpan session ke localStorage untuk memastikan
+                  localStorage.setItem('supabase.auth.token', JSON.stringify({
+                    currentSession: data.session,
+                    expiresAt: data.session.expires_at
+                  }));
+                  setTimeout(() => window.location.reload(), 500);
+                  return;
+                } else {
+                  console.error('Tidak ada session setelah refresh');
+                }
+              } catch (e) {
+                console.error('Exception saat refresh session:', e);
+              }
+              
+              // Jika semua gagal, tampilkan pesan error
+              console.error('Semua metode login gagal, menampilkan alert');
+              alert('Terjadi kesalahan saat proses login. Silakan coba lagi.');
+            } else {
+              console.log('URL tidak mengandung kode atau token auth');
+            }
+          };
+          
+          // Daftarkan handler untuk deep link
+          console.log('Mendaftarkan handler untuk appUrlOpen');
+          App.addListener('appUrlOpen', handleAppUrlOpen);
+          
+          // 2. Siapkan handler untuk browser ditutup
+          console.log('Mendaftarkan handler untuk browserFinished');
+          Browser.addListener('browserFinished', async () => {
+            console.log('Browser ditutup, memeriksa status login...');
+            
+            // Tunggu sejenak untuk memastikan proses auth selesai
+            setTimeout(async () => {
+              try {
+                // Cek apakah sudah ada session
+                console.log('Memeriksa session setelah browser ditutup...');
+                const { data } = await supabase.auth.getSession();
+                console.log('Session setelah browser ditutup:', data);
+                
+                if (data?.session) {
+                  console.log('Session ditemukan, login berhasil! Session:', data.session);
+                  // Simpan session ke localStorage untuk memastikan
+                  localStorage.setItem('supabase.auth.token', JSON.stringify({
+                    currentSession: data.session,
+                    expiresAt: data.session.expires_at
+                  }));
+                  setTimeout(() => window.location.reload(), 500);
+                  return;
+                } else {
+                  console.log('Session tidak ditemukan, mencoba refresh...');
+                  
+                  // Coba refresh session
+                  try {
+                    console.log('Mencoba refresh session...');
+                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+                    console.log('Hasil refresh setelah browser ditutup:', refreshData, 'Error:', refreshError);
+                    
+                    if (refreshData?.session) {
+                      console.log('Session ditemukan setelah refresh, login berhasil! Session:', refreshData.session);
+                      // Simpan session ke localStorage untuk memastikan
+                      localStorage.setItem('supabase.auth.token', JSON.stringify({
+                        currentSession: refreshData.session,
+                        expiresAt: refreshData.session.expires_at
+                      }));
+                      setTimeout(() => window.location.reload(), 500);
+                      return;
+                    } else {
+                      console.log('Tidak ada session setelah refresh, error:', refreshError);
+                    }
+                  } catch (e) {
+                    console.error('Exception saat refresh:', e);
+                  }
+                }
+              } catch (e) {
+                console.error('Exception saat memeriksa session:', e);
+              }
+            }, 1000);
+          });
+          
+          // 3. Mulai proses login dengan Google
+          console.log('Memulai proses login Google dengan browser...');
+          
+          // Gunakan URL redirect yang valid untuk web (https)
+          // Ini akan di-intercept oleh deep link handler di Android
+          const redirectUrl = 'https://laundrypro.vercel.app/auth/v1/callback';
+          console.log('Menggunakan URL redirect:', redirectUrl);
+          
           const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
@@ -382,10 +417,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               console.log('Exception saat menutup browser:', e);
             }
           }, 60000); // 1 menit timeout
-        } catch (e) {
-          console.error('Exception saat proses OAuth:', e);
-          alert('Terjadi kesalahan: ' + (e as Error).message);
-          return { success: false, error: e as Error };
+          
+          return { success: true, error: null };
         }
       } else {
         // Untuk web, gunakan flow OAuth normal
