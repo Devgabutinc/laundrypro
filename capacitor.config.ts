@@ -16,6 +16,12 @@ const config: CapacitorConfig = {
       // Konfigurasi Browser plugin
       presentationStyle: 'fullscreen'
     }
+  },
+  // Konfigurasi App URL untuk deep linking
+  app: {
+    appUrl: 'laundrypro://app',
+    appUrlScheme: 'laundrypro',
+    appUrlHost: 'app'
   }
 };
 
