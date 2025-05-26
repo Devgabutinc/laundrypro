@@ -5,9 +5,8 @@ import { updateFcmTokenToProfile } from '@/utils/pushNotifications';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
-// Import Google Auth plugin
-import '@codetrix-studio/capacitor-google-auth';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+// Import Google Auth dari helper
+import { GoogleAuth } from '@/utils/googleAuthHelper';
 
 type AuthContextType = {
   session: Session | null;
