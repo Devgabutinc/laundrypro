@@ -93,8 +93,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const resetPassword = async (email: string) => {
     try {
+      // Gunakan URL Vercel untuk redirect password reset
+      const redirectUrl = 'https://laundrypro.vercel.app/update-password';
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/update-password',
+        redirectTo: redirectUrl,
       });
       
       if (error) {
@@ -117,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           provider: 'google',
           options: {
             skipBrowserRedirect: true, // Penting: jangan redirect browser
-            redirectTo: 'https://igogxmfqfsxubjbtrguf.supabase.co/auth/v1/callback',
+            redirectTo: 'https://laundrypro.vercel.app/auth/v1/callback', // Gunakan URL Vercel
           },
         });
         
