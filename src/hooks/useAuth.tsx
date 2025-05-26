@@ -89,19 +89,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const resetPassword = async (email: string) => {
     try {
-      // Gunakan URL Vercel untuk redirect password reset
-      const redirectUrl = 'https://laundrypro.vercel.app/update-password';
+      // Gunakan URL yang sesuai untuk redirect password reset
+      // Deteksi apakah aplikasi berjalan di produksi atau development
+      const isProduction = window.location.hostname === 'laundrypro.vercel.app';
+      
+      // Gunakan URL yang sesuai berdasarkan environment
+      const baseUrl = isProduction 
+        ? 'https://laundrypro.vercel.app' 
+        : window.location.origin;
+      
+      const redirectUrl = `${baseUrl}/update-password`;
+      console.log('Using redirect URL for password reset:', redirectUrl);
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
       
       if (error) {
+        console.error('Error sending reset password email:', error);
         return { success: false, error };
       }
       
       return { success: true, error: null };
     } catch (error) {
+      console.error('Exception during reset password:', error);
       return { success: false, error };
     }
   };

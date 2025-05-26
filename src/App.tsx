@@ -45,6 +45,7 @@ import Customers from "./pages/Customers";
 import OrderArchive from "./pages/OrderArchive";
 import ProfileSettings from "./pages/ProfileSettings";
 import ReceiptSettings from "./pages/ReceiptSettings";
+import UpdatePassword from "./pages/UpdatePassword";
 
 
 const queryClient = new QueryClient();
@@ -126,6 +127,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
+      <Route path="/update-password" element={<UpdatePassword />} />
       <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
       <Route path="/orders" element={<PrivateRoute><AppLayout><Orders /></AppLayout></PrivateRoute>} />
       <Route path="/orders/:orderId" element={<PrivateRoute><AppLayout><OrderDetail /></AppLayout></PrivateRoute>} />
