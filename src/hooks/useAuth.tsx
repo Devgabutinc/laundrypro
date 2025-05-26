@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Inisialisasi GoogleAuth jika belum
           console.log('Inisialisasi GoogleAuth...');
           GoogleAuth.initialize({
-            clientId: '1048243846987-mhbh2j5q4o6j1c2lv5lfvs6u3gp6cjnm.apps.googleusercontent.com',
+            clientId: '797305778832-ice71hkgkf9q0uvv2sna9a8ro5rm59dh.apps.googleusercontent.com',
             scopes: ['profile', 'email'],
             grantOfflineAccess: true,
           });
