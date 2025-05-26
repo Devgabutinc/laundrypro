@@ -4,8 +4,10 @@ const config: CapacitorConfig = {
   appId: 'com.laundrypro.app',
   appName: 'LaundryPro',
   webDir: 'dist',
+  // Konfigurasi server dengan deep linking
   server: {
-    androidScheme: 'https',
+    androidScheme: 'laundrypro',
+    hostname: 'app',
     cleartext: true
   },
   plugins: {
@@ -13,15 +15,12 @@ const config: CapacitorConfig = {
       // konfigurasi tambahan jika diperlukan
     },
     Browser: {
-      // Konfigurasi Browser plugin
-      presentationStyle: 'fullscreen'
+      // Konfigurasi Browser plugin untuk pengalaman yang lebih terintegrasi
+      presentationStyle: 'popover',
+      toolbarColor: '#3880ff',
+      browserCloseButtonPosition: 'end',
+      showTitle: true
     }
-  },
-  // Konfigurasi App URL untuk deep linking
-  app: {
-    appUrl: 'laundrypro://app',
-    appUrlScheme: 'laundrypro',
-    appUrlHost: 'app'
   }
 };
 

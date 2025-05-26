@@ -116,50 +116,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const isNative = Capacitor.isNativePlatform();
       
       if (isNative) {
-        // Untuk aplikasi native (Android/iOS), gunakan Capacitor Browser dan deep linking
-        const { data } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            skipBrowserRedirect: true, // Penting: jangan redirect browser
-            redirectTo: 'laundrypro://app/auth/callback', // Gunakan deep link URL
-          },
+        // Untuk aplikasi native (Android/iOS), gunakan pendekatan langsung
+        // Hapus listener lama jika ada untuk menghindari duplikasi
+        Browser.removeAllListeners();
+        App.removeAllListeners();
+        
+        // Setup listener untuk mendeteksi ketika aplikasi dibuka kembali via deep link
+        App.addListener('appUrlOpen', async ({ url }) => {
+          console.log('App URL dibuka:', url);
+          if (url.includes('auth/callback')) {
+            // Tutup browser jika masih terbuka
+            try {
+              await Browser.close();
+            } catch (e) {
+              console.log('Browser mungkin sudah tertutup');
+            }
+            
+            // Refresh session setelah callback
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              console.log('Login berhasil via deep link');
+              // Refresh halaman untuk menerapkan state login baru
+              window.location.reload();
+            }
+          }
         });
         
-        if (data?.url) {
-          // Hapus listener lama jika ada untuk menghindari duplikasi
-          Browser.removeAllListeners();
-          
-          // Tambahkan listener untuk menangkap ketika browser ditutup
-          Browser.addListener('browserFinished', async () => {
-            console.log('Browser ditutup, cek session...');
-            // Cek apakah user sudah login setelah browser ditutup
+        // Tambahkan listener untuk menangkap ketika browser ditutup
+        Browser.addListener('browserFinished', async () => {
+          console.log('Browser ditutup, cek session...');
+          // Tunggu sebentar untuk memastikan session sudah diperbarui
+          setTimeout(async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
               console.log('Session ditemukan, user berhasil login');
               // Refresh halaman untuk menerapkan state login baru
               window.location.reload();
             }
+          }, 1000);
+        });
+        
+        // Gunakan URL Vercel untuk autentikasi
+        const { data } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            skipBrowserRedirect: true,
+            redirectTo: 'https://laundrypro.vercel.app/auth/v1/callback',
+          },
+        });
+        
+        if (data?.url) {
+          // Buka URL autentikasi dengan opsi yang lebih terintegrasi
+          await Browser.open({
+            url: data.url,
+            presentationStyle: 'popover', // Gunakan popover untuk pengalaman yang lebih terintegrasi
+            toolbarColor: '#3880ff', // Warna toolbar yang sesuai dengan tema aplikasi
           });
-          
-          // Tambahkan listener untuk URL yang dibuka
-          App.addListener('appUrlOpen', async ({ url }) => {
-            console.log('App URL dibuka:', url);
-            if (url.startsWith('laundrypro://app/auth/callback')) {
-              // Tutup browser saat callback URL dibuka
-              await Browser.close();
-              
-              // Refresh session setelah callback
-              const { data: { session } } = await supabase.auth.getSession();
-              if (session) {
-                console.log('Login berhasil via deep link');
-                // Refresh halaman untuk menerapkan state login baru
-                window.location.reload();
-              }
-            }
-          });
-          
-          // Buka URL autentikasi di browser Capacitor
-          await Browser.open({ url: data.url });
         }
       } else {
         // Untuk web, gunakan flow OAuth normal
