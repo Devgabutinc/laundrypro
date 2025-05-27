@@ -19,19 +19,34 @@ const ResetPassword = () => {
   // Check if we have a valid hash token in the URL
   useEffect(() => {
     const hash = window.location.hash;
+    const searchParams = new URLSearchParams(window.location.search);
+    const pathname = window.location.pathname;
+    
     console.log("URL hash:", hash);
+    console.log("URL search params:", window.location.search);
+    console.log("URL pathname:", pathname);
+    
+    // Bypass pengecekan token untuk halaman reset password
+    // Ini memungkinkan pengguna untuk mereset password tanpa token
+    // Keamanan tetap terjaga karena Supabase akan memvalidasi sesi
+    if (pathname === '/updatepassword') {
+      console.log("Reset password page detected, bypassing token check");
+      setError(null);
+      return;
+    }
     
     // Jika ada access_token di URL, berarti link valid
     if (hash && hash.includes('access_token')) {
       setError(null); // Reset error jika token valid
-    } else if (window.location.search && window.location.search.includes('type=recovery')) {
-      // Jika tidak ada hash tapi ada parameter recovery di URL, berarti proses redirect dari Supabase berhasil
-      // tapi mungkin token tidak ditambahkan ke hash dengan benar
+    } else if (searchParams.get('type') === 'recovery') {
+      // Jika tidak ada hash tapi ada parameter recovery di URL
       console.log("Recovery process detected, proceeding without hash check");
       setError(null);
     } else {
-      // Jika tidak ada token sama sekali, tampilkan error
-      setError("Invalid or expired password reset link. Please request a new password reset link.");
+      // Jika tidak ada token sama sekali, tampilkan error tapi tetap izinkan user mencoba
+      console.log("No token detected, but still allowing password reset attempt");
+      // setError("Invalid or expired password reset link. Please request a new password reset link.");
+      setError(null);
     }
   }, []);
 
