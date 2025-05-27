@@ -19,27 +19,15 @@ const config: CapacitorConfig = {
       toolbarColor: '#3880ff',
       browserCloseButtonPosition: 'end',
       showTitle: true
-    },
-    // Konfigurasi App untuk URL handling dan deep linking
-    App: {
-      // Konfigurasi URL scheme untuk deep linking
-      appUrlOpen: {
-        // Skema kustom untuk deep link
-        schemes: ['laundrypro']
-      }
     }
   },
-  // Konfigurasi untuk deep linking di Android
   android: {
-    // Konfigurasi untuk app links dan deep links
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: true
   },
-  // Konfigurasi untuk deep linking di iOS
   ios: {
-    scheme: 'laundrypro',
-    contentInset: 'always'
+    scheme: 'com.laundrypro.app'
   }
 };
 

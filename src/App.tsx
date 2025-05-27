@@ -48,7 +48,6 @@ import ReceiptSettings from "./pages/ReceiptSettings";
 import UpdatePassword from "@/pages/UpdatePassword";
 import ResetPassword from "@/pages/ResetPassword";
 import EmailConfirmation from "@/pages/EmailConfirmation";
-// Deep linking akan diimpor secara dinamis di useEffect
 
 
 const queryClient = new QueryClient();
@@ -59,17 +58,7 @@ function AppRoutes() {
   const navigate = useNavigate();
   const backHandlerRef = useRef<any>(null);
   
-  // Inisialisasi deep linking
-  useEffect(() => {
-    // Import secara dinamis untuk menghindari error di web
-    import('./utils/deepLinking').then(({ initDeepLinks }) => {
-      // Inisialisasi deep linking dengan fungsi navigate
-      initDeepLinks((path) => navigate(path));
-      console.log('Deep linking initialized');
-    }).catch(err => {
-      console.error('Failed to initialize deep linking:', err);
-    });
-  }, [navigate]);
+  // Inisialisasi aplikasi
 
   useEffect(() => {
     // Pasang listener FCM sebelum register

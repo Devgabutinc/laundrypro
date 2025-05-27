@@ -15,36 +15,24 @@ const EmailConfirmation = () => {
   useEffect(() => {
     const confirmEmail = async () => {
       try {
-        // Cek apakah ada token di URL
-        const hash = window.location.hash;
+        // Cek parameter di URL
         const searchParams = new URLSearchParams(window.location.search);
         const pathname = window.location.pathname;
         
-        console.log("URL hash:", hash);
         console.log("URL search params:", window.location.search);
         console.log("URL pathname:", pathname);
         
         // Jika ini adalah halaman konfirmasi email, coba verifikasi
         if (pathname === '/confirm-email') {
-          // Supabase akan menangani verifikasi secara otomatis
-          // Kita hanya perlu memeriksa apakah pengguna sudah terautentikasi
-          const { data, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            console.error("Error checking session:", error);
-            setError("Gagal memverifikasi email. Silakan coba lagi atau hubungi dukungan.");
-            setVerifying(false);
-            return;
-          }
-          
-          if (data?.session) {
-            console.log("User is authenticated after email confirmation");
+          // Cek apakah ada parameter sukses atau error
+          if (searchParams.get('success') === 'true') {
+            // Konfirmasi berhasil
             setSuccess(true);
             setVerifying(false);
             
             toast({
               title: "Email berhasil dikonfirmasi",
-              description: "Akun Anda telah diaktifkan. Anda sekarang dapat login.",
+              description: "Akun Anda telah diaktifkan. Silakan login di aplikasi mobile.",
             });
             
             // Redirect ke halaman login setelah 3 detik
@@ -52,10 +40,36 @@ const EmailConfirmation = () => {
               navigate('/auth');
             }, 3000);
           } else {
-            // Jika tidak ada sesi, mungkin ada masalah dengan token
-            console.log("No session found after email confirmation");
-            setError("Link konfirmasi email tidak valid atau sudah kedaluwarsa. Silakan coba lagi.");
-            setVerifying(false);
+            // Coba verifikasi dengan Supabase
+            const { data, error } = await supabase.auth.getSession();
+            
+            if (error) {
+              console.error("Error checking session:", error);
+              setError("Gagal memverifikasi email. Silakan coba lagi atau hubungi dukungan.");
+              setVerifying(false);
+              return;
+            }
+            
+            if (data?.session) {
+              console.log("User is authenticated after email confirmation");
+              setSuccess(true);
+              setVerifying(false);
+              
+              toast({
+                title: "Email berhasil dikonfirmasi",
+                description: "Akun Anda telah diaktifkan. Silakan login di aplikasi mobile.",
+              });
+              
+              // Redirect ke halaman login setelah 3 detik
+              setTimeout(() => {
+                navigate('/auth');
+              }, 3000);
+            } else {
+              // Jika tidak ada sesi, mungkin ada masalah dengan token
+              console.log("No session found after email confirmation");
+              setError("Link konfirmasi email tidak valid atau sudah kedaluwarsa. Silakan coba lagi.");
+              setVerifying(false);
+            }
           }
         } else {
           // Jika bukan halaman konfirmasi email, tampilkan error
@@ -114,7 +128,7 @@ const EmailConfirmation = () => {
                 </div>
               </div>
               <p className="text-sm text-gray-500">
-                Anda akan diarahkan ke halaman login dalam beberapa detik...
+                Email Anda telah dikonfirmasi. Silakan login di aplikasi mobile LaundryPro.
               </p>
               <Button 
                 className="mt-4"
