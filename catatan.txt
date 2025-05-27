@@ -97,7 +97,7 @@ list perbaikan console
 ### 2. PERBAIKAN KEAMANAN KONFIGURASI
 [X] Nonaktifkan allowMixedContent di capacitor.config.ts (ubah menjadi false)
 [X] Nonaktifkan webContentsDebuggingEnabled untuk build produksi
-[X] Nonaktifkan cleartext di konfigurasi server (jika memungkinkan)
+[✓] Hapus konfigurasi cleartext di server karena menyebabkan masalah dengan fungsi printing
 [✓] Menonaktifkan minifyEnabled di build.gradle (diubah dari aktif ke nonaktif karena menyebabkan masalah pada fungsi printing)
 [✓] Tambahkan konfigurasi ProGuard untuk obfuskasi kode (tetap ada sebagai referensi jika dibutuhkan di masa depan)
 
