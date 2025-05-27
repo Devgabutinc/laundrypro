@@ -6,9 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   // Konfigurasi server yang aman
   server: {
-    androidScheme: 'https',
-    // cleartext dinonaktifkan untuk keamanan di build produksi
-    cleartext: false
+    androidScheme: 'https'
   },
   plugins: {
     BluetoothSerial: {
