@@ -47,6 +47,7 @@ import ProfileSettings from "./pages/ProfileSettings";
 import ReceiptSettings from "./pages/ReceiptSettings";
 import UpdatePassword from "@/pages/UpdatePassword";
 import ResetPassword from "@/pages/ResetPassword";
+import EmailConfirmation from "@/pages/EmailConfirmation";
 
 
 const queryClient = new QueryClient();
@@ -100,9 +101,9 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // Allow access to reset password page without any redirection
-  if (location.pathname === "/updatepassword") {
-    console.log("Reset password page accessed, bypassing auth checks");
+  // Allow access to reset password and email confirmation pages without any redirection
+  if (location.pathname === "/updatepassword" || location.pathname === "/confirm-email") {
+    console.log("Auth bypass page accessed: " + location.pathname);
     // Continue to the routes without redirection
   }
   // Jika belum login, redirect ke /auth
@@ -131,6 +132,7 @@ function AppRoutes() {
       <Route path="/auth" element={<Auth />} />
       <Route path="/update-password" element={<UpdatePassword />} />
       <Route path="/updatepassword" element={<ResetPassword />} />
+      <Route path="/confirm-email" element={<EmailConfirmation />} />
       <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
       <Route path="/orders" element={<PrivateRoute><AppLayout><Orders /></AppLayout></PrivateRoute>} />
       <Route path="/orders/:orderId" element={<PrivateRoute><AppLayout><OrderDetail /></AppLayout></PrivateRoute>} />
