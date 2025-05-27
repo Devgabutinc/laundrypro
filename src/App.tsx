@@ -45,8 +45,8 @@ import Customers from "./pages/Customers";
 import OrderArchive from "./pages/OrderArchive";
 import ProfileSettings from "./pages/ProfileSettings";
 import ReceiptSettings from "./pages/ReceiptSettings";
-import UpdatePassword from "./pages/UpdatePassword";
-import ResetPassword from "./pages/ResetPassword";
+import UpdatePassword from "@/pages/UpdatePassword";
+import ResetPassword from "@/pages/ResetPassword";
 
 
 const queryClient = new QueryClient();
