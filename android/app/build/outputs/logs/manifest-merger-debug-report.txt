@@ -1,0 +1,791 @@
+-- Merging decision tree log ---
+provider#androidx.core.content.FileProvider
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:36:9-44:20
+	android:grantUriPermissions
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:40:13-47
+	android:authorities
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:38:13-64
+	android:exported
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:39:13-37
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:37:13-62
+manifest
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:2:1-73:12
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:2:1-73:12
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:2:1-73:12
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:2:1-73:12
+MERGED from [:capacitor-app] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/app/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-21:12
+MERGED from [:capacitor-filesystem] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/filesystem/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-26:12
+MERGED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-17:12
+MERGED from [:capacitor-share] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/share/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-toast] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/toast/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-android] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/android/capacitor/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-34:12
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/dc1cd3dda5da3adcbd96d2eacf83d7dc/transformed/appcompat-resources-1.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.appcompat:appcompat:1.7.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8665219cfb2d9a443c799e9a97ed5fbf/transformed/appcompat-1.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/a5e8625df1d2d4443860c1ab330542d7/transformed/legacy-support-v4-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1819c3cf5d4a8aed44a3df3acf11e5bd/transformed/legacy-support-core-ui-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/202f79065a0231eed4fa601d4b1ddec1/transformed/coordinatorlayout-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core-splashscreen:1.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/273b397ce22fd10277daa96b96365fee/transformed/core-splashscreen-1.0.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:17:1-66:12
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:15:1-31:12
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:15:1-37:12
+MERGED from [com.google.firebase:firebase-encoders-json:18.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0291005eacc45394456b838c315d4653/transformed/firebase-encoders-json-18.0.0/AndroidManifest.xml:15:1-23:12
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:15:1-41:12
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:2:1-24:12
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:2:1-18:12
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:15:1-41:12
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:16:1-24:12
+MERGED from [com.google.firebase:firebase-iid-interop:17.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0df4913d30ec47b979e2516ac52c3467/transformed/firebase-iid-interop-17.1.0/AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed18eca817f394b12043ebec5dbe4761/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:17:1-25:12
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:2:1-13:12
+MERGED from [com.google.android.gms:play-services-stats:17.0.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3a2afa0c9a85a6fa4d7deb3ae284da08/transformed/play-services-stats-17.0.2/AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e83f490ffcd4c95a286644616b1e3e78/transformed/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/f913a0aa0cc9b75611bb023a1b168b4f/transformed/emoji2-views-helper-1.3.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6221b067987f68cae678df3e407ab27f/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed9220909a870739387d8907040f9b52/transformed/slidingpanelayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/2987dbeaae4023bccc1165ec76f4117c/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.webkit:webkit:1.12.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e5f0bb1bf89f307eaf0df71a978efb9e/transformed/webkit-1.12.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.browser:browser:1.8.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b5637580faed25c2fd7368f367f1456e/transformed/browser-1.8.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.media:media:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/38b7c15a348e17090cb53d7e3eb018bd/transformed/media-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b1f22622a31f5925a961b143de64ae01/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/5181422d608f4283ba0c7eb7fcf5d83b/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3abdf3ac473ebaa9f1249dd4f8986f73/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core-ktx:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/374ea191c5cf95f95d1ce0f51356ee91/transformed/core-ktx-1.15.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.loader:loader:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/a8eb204cce3f3e0f3428511052d973db/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1e429590caa03f0d4962652270cad7d5/transformed/swiperefreshlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3e8b91e5e4b3c033adf9ffe890e825d9/transformed/asynclayoutinflater-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/593dcc5e540df3d528ec60d4d791cc64/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bcbaca31de4afb4676495eb59c03de4c/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6c433560908530fa5a5abadf8b1de997/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1a12c75ca75715e92c6c73a5b3b7e6fe/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1d846b67adea16ee8e9f6d7cf0d59fa3/transformed/lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6cef27a4e88cfcbb2583bc293a6ffea2/transformed/savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.firebase:firebase-installations-interop:17.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b81c0dbd4224b84a18b63b28eef6c5e1/transformed/firebase-installations-interop-17.1.1/AndroidManifest.xml:15:1-19:12
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3aef2a8a8218a343e329455ae5e4fbbd/transformed/play-services-tasks-18.1.0/AndroidManifest.xml:2:1-6:12
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:16:1-26:12
+MERGED from [androidx.fragment:fragment:1.8.4] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0a34bb0f0c896c46938a532470c352c8/transformed/fragment-1.8.4/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity:1.9.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/05f68ec5315dc1851097b3750cd07054/transformed/activity-1.9.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9c12ff23fd871eb64dd6457b13588303/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4cfa9203a8e4b82a62f635a0d4098f45/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.tracing:tracing:1.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/fe703810cbdc2f6fb8022389a3d2716c/transformed/tracing-1.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95293cb186aeab9090d518997559a00a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [com.google.firebase:firebase-components:18.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ba6381266bd6ebbfa47177ac92a850eb/transformed/firebase-components-18.0.0/AndroidManifest.xml:15:1-20:12
+MERGED from [com.google.android.datatransport:transport-api:3.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9c0acddf92b014f5539661a4cc47ce1/transformed/transport-api-3.1.0/AndroidManifest.xml:15:1-20:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/246b87acb83122cc192857be781f8d2b/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/aee227d388cd895b49b2885c55336630/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/7407f9cca4e22d35eeacd235ac6d232d/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bae0b0a429eb3ee06079ae71d4890166/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/521af01958af874d22b5d8345ff78902/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:2:1-7:12
+MERGED from [org.apache.cordova:framework:10.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/efe4c165b8ad80396f64001dbd6c0f47/transformed/framework-10.1.1/AndroidManifest.xml:20:1-27:12
+	package
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:5:5-50:19
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:5:5-50:19
+MERGED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:5-19:19
+MERGED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:5-19:19
+MERGED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:5-24:19
+MERGED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:5-24:19
+MERGED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-15:19
+MERGED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-15:19
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:5-32:19
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:5-32:19
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:28:5-64:19
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:28:5-64:19
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:21:5-29:19
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:21:5-29:19
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:27:5-35:19
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:27:5-35:19
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:25:5-39:19
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:25:5-39:19
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:11:5-22:19
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:11:5-22:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:8:5-16:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:8:5-16:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:22:5-39:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:22:5-39:19
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.firebase:firebase-iid-interop:17.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0df4913d30ec47b979e2516ac52c3467/transformed/firebase-iid-interop-17.1.0/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-iid-interop:17.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0df4913d30ec47b979e2516ac52c3467/transformed/firebase-iid-interop-17.1.0/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed18eca817f394b12043ebec5dbe4761/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed18eca817f394b12043ebec5dbe4761/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.google.android.gms:play-services-stats:17.0.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3a2afa0c9a85a6fa4d7deb3ae284da08/transformed/play-services-stats-17.0.2/AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-stats:17.0.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3a2afa0c9a85a6fa4d7deb3ae284da08/transformed/play-services-stats-17.0.2/AndroidManifest.xml:7:5-20
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:23:5-33:19
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3aef2a8a8218a343e329455ae5e4fbbd/transformed/play-services-tasks-18.1.0/AndroidManifest.xml:5:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3aef2a8a8218a343e329455ae5e4fbbd/transformed/play-services-tasks-18.1.0/AndroidManifest.xml:5:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:20:5-24:19
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:20:5-24:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95293cb186aeab9090d518997559a00a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95293cb186aeab9090d518997559a00a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:10:9-35
+	android:label
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:8:9-41
+	android:roundIcon
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:9:9-54
+	android:icon
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:7:9-43
+	android:allowBackup
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:6:9-35
+	android:theme
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:11:9-40
+	android:usesCleartextTraffic
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:18-53
+activity#com.laundrypro.app.MainActivity
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:13:9-34:20
+	android:label
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:16:13-56
+	android:launchMode
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:18:13-44
+	android:exported
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:19:13-36
+	android:configChanges
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:14:13-140
+	android:theme
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:17:13-62
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:15:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:21:13-24:29
+action#android.intent.action.MAIN
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:22:17-69
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:22:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:23:17-77
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:23:27-74
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:scheme:@string/custom_url_scheme
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:27:13-32:29
+action#android.intent.action.VIEW
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:28:17-69
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:28:25-66
+category#android.intent.category.DEFAULT
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:29:17-76
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:29:27-73
+category#android.intent.category.BROWSABLE
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:30:17-78
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:30:27-75
+data
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:31:17-68
+	android:scheme
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:31:23-65
+meta-data#com.google.android.gms.version
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:47:9-49:69
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:21:9-23:69
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:21:9-23:69
+	android:value
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:49:13-66
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:48:13-58
+uses-permission#android.permission.INTERNET
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:54:5-67
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:25:5-67
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:8:5-67
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:8:5-67
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:8:5-67
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:8:5-67
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:54:22-64
+uses-permission#android.permission.BLUETOOTH
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:55:5-68
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:5-68
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:5-68
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:55:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:56:5-74
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:5-74
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:5-74
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:56:22-71
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:57:5-79
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:57:22-76
+uses-permission#android.permission.BLUETOOTH_SCAN
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:58:5-73
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:58:22-70
+uses-permission#android.permission.BLUETOOTH_CONNECT
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:59:5-76
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:59:22-73
+uses-permission#android.permission.BLUETOOTH_ADVERTISE
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:60:5-78
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:60:22-75
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:61:5-81
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:5-81
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:5-81
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:61:22-78
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:63:5-81
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:5-81
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:5-81
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:63:22-78
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:64:5-107
+	android:maxSdkVersion
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:64:78-104
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:64:22-77
+uses-permission#android.permission.MANAGE_EXTERNAL_STORAGE
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:67:5-111
+	tools:ignore
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:67:80-108
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:67:22-79
+uses-permission#android.permission.READ_MEDIA_IMAGES
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:70:5-76
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:70:22-73
+uses-permission#android.permission.READ_MEDIA_VIDEO
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:71:5-75
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:71:22-72
+uses-permission#android.permission.READ_MEDIA_AUDIO
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:72:5-75
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:72:22-72
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:41:13-43:64
+	android:resource
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:43:17-51
+	android:name
+		ADDED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml:42:17-67
+uses-sdk
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+MERGED from [:capacitor-app] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/app/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-app] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/app/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-filesystem] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/filesystem/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-filesystem] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/filesystem/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-share] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/share/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-share] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/share/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-toast] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/toast/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-toast] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/toast/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-android] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/android/capacitor/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-android] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/android/capacitor/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:6:5-44
+MERGED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:6:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/dc1cd3dda5da3adcbd96d2eacf83d7dc/transformed/appcompat-resources-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.7.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/dc1cd3dda5da3adcbd96d2eacf83d7dc/transformed/appcompat-resources-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat:1.7.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8665219cfb2d9a443c799e9a97ed5fbf/transformed/appcompat-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.appcompat:appcompat:1.7.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8665219cfb2d9a443c799e9a97ed5fbf/transformed/appcompat-1.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/a5e8625df1d2d4443860c1ab330542d7/transformed/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/a5e8625df1d2d4443860c1ab330542d7/transformed/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1819c3cf5d4a8aed44a3df3acf11e5bd/transformed/legacy-support-core-ui-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1819c3cf5d4a8aed44a3df3acf11e5bd/transformed/legacy-support-core-ui-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/202f79065a0231eed4fa601d4b1ddec1/transformed/coordinatorlayout-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/202f79065a0231eed4fa601d4b1ddec1/transformed/coordinatorlayout-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-splashscreen:1.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/273b397ce22fd10277daa96b96365fee/transformed/core-splashscreen-1.0.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-splashscreen:1.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/273b397ce22fd10277daa96b96365fee/transformed/core-splashscreen-1.0.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.firebase:firebase-encoders-json:18.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0291005eacc45394456b838c315d4653/transformed/firebase-encoders-json-18.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.firebase:firebase-encoders-json:18.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0291005eacc45394456b838c315d4653/transformed/firebase-encoders-json-18.0.0/AndroidManifest.xml:19:5-21:41
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:18:5-20:41
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:19:5-44
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:18:5-43
+MERGED from [com.google.firebase:firebase-iid-interop:17.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0df4913d30ec47b979e2516ac52c3467/transformed/firebase-iid-interop-17.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-iid-interop:17.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0df4913d30ec47b979e2516ac52c3467/transformed/firebase-iid-interop-17.1.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed18eca817f394b12043ebec5dbe4761/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-measurement-connector:19.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed18eca817f394b12043ebec5dbe4761/transformed/firebase-measurement-connector-19.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-stats:17.0.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3a2afa0c9a85a6fa4d7deb3ae284da08/transformed/play-services-stats-17.0.2/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-stats:17.0.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3a2afa0c9a85a6fa4d7deb3ae284da08/transformed/play-services-stats-17.0.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e83f490ffcd4c95a286644616b1e3e78/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e83f490ffcd4c95a286644616b1e3e78/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/f913a0aa0cc9b75611bb023a1b168b4f/transformed/emoji2-views-helper-1.3.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/f913a0aa0cc9b75611bb023a1b168b4f/transformed/emoji2-views-helper-1.3.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6221b067987f68cae678df3e407ab27f/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6221b067987f68cae678df3e407ab27f/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed9220909a870739387d8907040f9b52/transformed/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ed9220909a870739387d8907040f9b52/transformed/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/2987dbeaae4023bccc1165ec76f4117c/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/2987dbeaae4023bccc1165ec76f4117c/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.webkit:webkit:1.12.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e5f0bb1bf89f307eaf0df71a978efb9e/transformed/webkit-1.12.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.webkit:webkit:1.12.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e5f0bb1bf89f307eaf0df71a978efb9e/transformed/webkit-1.12.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.8.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b5637580faed25c2fd7368f367f1456e/transformed/browser-1.8.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.8.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b5637580faed25c2fd7368f367f1456e/transformed/browser-1.8.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.media:media:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/38b7c15a348e17090cb53d7e3eb018bd/transformed/media-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/38b7c15a348e17090cb53d7e3eb018bd/transformed/media-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b1f22622a31f5925a961b143de64ae01/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b1f22622a31f5925a961b143de64ae01/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/5181422d608f4283ba0c7eb7fcf5d83b/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/5181422d608f4283ba0c7eb7fcf5d83b/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3abdf3ac473ebaa9f1249dd4f8986f73/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3abdf3ac473ebaa9f1249dd4f8986f73/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-ktx:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/374ea191c5cf95f95d1ce0f51356ee91/transformed/core-ktx-1.15.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/374ea191c5cf95f95d1ce0f51356ee91/transformed/core-ktx-1.15.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/a8eb204cce3f3e0f3428511052d973db/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/a8eb204cce3f3e0f3428511052d973db/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1e429590caa03f0d4962652270cad7d5/transformed/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1e429590caa03f0d4962652270cad7d5/transformed/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3e8b91e5e4b3c033adf9ffe890e825d9/transformed/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3e8b91e5e4b3c033adf9ffe890e825d9/transformed/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/593dcc5e540df3d528ec60d4d791cc64/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/593dcc5e540df3d528ec60d4d791cc64/transformed/lifecycle-livedata-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bcbaca31de4afb4676495eb59c03de4c/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bcbaca31de4afb4676495eb59c03de4c/transformed/lifecycle-viewmodel-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6c433560908530fa5a5abadf8b1de997/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6c433560908530fa5a5abadf8b1de997/transformed/lifecycle-livedata-core-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1a12c75ca75715e92c6c73a5b3b7e6fe/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1a12c75ca75715e92c6c73a5b3b7e6fe/transformed/lifecycle-runtime-2.6.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1d846b67adea16ee8e9f6d7cf0d59fa3/transformed/lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/1d846b67adea16ee8e9f6d7cf0d59fa3/transformed/lifecycle-viewmodel-savedstate-2.6.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6cef27a4e88cfcbb2583bc293a6ffea2/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/6cef27a4e88cfcbb2583bc293a6ffea2/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-installations-interop:17.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b81c0dbd4224b84a18b63b28eef6c5e1/transformed/firebase-installations-interop-17.1.1/AndroidManifest.xml:17:5-44
+MERGED from [com.google.firebase:firebase-installations-interop:17.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b81c0dbd4224b84a18b63b28eef6c5e1/transformed/firebase-installations-interop-17.1.1/AndroidManifest.xml:17:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3aef2a8a8218a343e329455ae5e4fbbd/transformed/play-services-tasks-18.1.0/AndroidManifest.xml:4:5-43
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/3aef2a8a8218a343e329455ae5e4fbbd/transformed/play-services-tasks-18.1.0/AndroidManifest.xml:4:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b7d6516031c883f0591f92e6c84a9642/transformed/play-services-basement-18.3.0/AndroidManifest.xml:18:5-43
+MERGED from [androidx.fragment:fragment:1.8.4] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0a34bb0f0c896c46938a532470c352c8/transformed/fragment-1.8.4/AndroidManifest.xml:5:5-44
+MERGED from [androidx.fragment:fragment:1.8.4] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0a34bb0f0c896c46938a532470c352c8/transformed/fragment-1.8.4/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity:1.9.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/05f68ec5315dc1851097b3750cd07054/transformed/activity-1.9.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.9.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/05f68ec5315dc1851097b3750cd07054/transformed/activity-1.9.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9c12ff23fd871eb64dd6457b13588303/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9c12ff23fd871eb64dd6457b13588303/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4cfa9203a8e4b82a62f635a0d4098f45/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4cfa9203a8e4b82a62f635a0d4098f45/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/fe703810cbdc2f6fb8022389a3d2716c/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/fe703810cbdc2f6fb8022389a3d2716c/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95293cb186aeab9090d518997559a00a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95293cb186aeab9090d518997559a00a/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.firebase:firebase-components:18.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ba6381266bd6ebbfa47177ac92a850eb/transformed/firebase-components-18.0.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-components:18.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ba6381266bd6ebbfa47177ac92a850eb/transformed/firebase-components-18.0.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.android.datatransport:transport-api:3.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9c0acddf92b014f5539661a4cc47ce1/transformed/transport-api-3.1.0/AndroidManifest.xml:18:5-44
+MERGED from [com.google.android.datatransport:transport-api:3.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9c0acddf92b014f5539661a4cc47ce1/transformed/transport-api-3.1.0/AndroidManifest.xml:18:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/246b87acb83122cc192857be781f8d2b/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/246b87acb83122cc192857be781f8d2b/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/aee227d388cd895b49b2885c55336630/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/aee227d388cd895b49b2885c55336630/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/7407f9cca4e22d35eeacd235ac6d232d/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/7407f9cca4e22d35eeacd235ac6d232d/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bae0b0a429eb3ee06079ae71d4890166/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bae0b0a429eb3ee06079ae71d4890166/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/521af01958af874d22b5d8345ff78902/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/521af01958af874d22b5d8345ff78902/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [org.apache.cordova:framework:10.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/efe4c165b8ad80396f64001dbd6c0f47/transformed/framework-10.1.1/AndroidManifest.xml:25:5-44
+MERGED from [org.apache.cordova:framework:10.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/efe4c165b8ad80396f64001dbd6c0f47/transformed/framework-10.1.1/AndroidManifest.xml:25:5-44
+	android:targetSdkVersion
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/app/src/main/AndroidManifest.xml
+queries
+ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-11:15
+intent#action:name:android.support.customtabs.action.CustomTabsService
+ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:9-10:18
+action#android.support.customtabs.action.CustomTabsService
+ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:13-90
+	android:name
+		ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:21-87
+activity#com.capacitorjs.plugins.browser.BrowserControllerActivity
+ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:14:9-18:75
+	android:launchMode
+		ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:17:13-44
+	android:exported
+		ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:16:13-37
+	android:theme
+		ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:18:13-72
+	android:name
+		ADDED from [:capacitor-browser] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/browser/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:13-85
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-81
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:22-78
+uses-permission#android.permission.WAKE_LOCK
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:5-68
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:24:5-68
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:24:5-68
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:9:5-68
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:9:5-68
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:22-65
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:5-77
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:23:5-77
+MERGED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:23:5-77
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:22-74
+receiver#com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:9-106
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:19-103
+receiver#com.capacitorjs.plugins.localnotifications.NotificationDismissReceiver
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:9-107
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:13:19-104
+receiver#com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:14:9-23:20
+	android:exported
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:17:13-37
+	android:directBootAware
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:16:13-43
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:13-103
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.LOCKED_BOOT_COMPLETED+action:name:android.intent.action.QUICKBOOT_POWERON
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:18:13-22:29
+action#android.intent.action.LOCKED_BOOT_COMPLETED
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:19:17-86
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:19:25-83
+action#android.intent.action.BOOT_COMPLETED
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:20:17-79
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:20:25-76
+action#android.intent.action.QUICKBOOT_POWERON
+ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:21:17-82
+	android:name
+		ADDED from [:capacitor-local-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/local-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:21:25-79
+service#com.capacitorjs.plugins.pushnotifications.MessagingService
+ADDED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:9-14:19
+	android:exported
+		ADDED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:13-37
+	android:name
+		ADDED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:9:13-86
+intent-filter#action:name:com.google.firebase.MESSAGING_EVENT
+ADDED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:11:13-13:29
+action#com.google.firebase.MESSAGING_EVENT
+ADDED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:17-78
+	android:name
+		ADDED from [:capacitor-push-notifications] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/node_modules/@capacitor/push-notifications/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:12:25-75
+receiver#nl.xservices.plugins.ShareChooserPendingIntent
+ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:14:9-21:20
+	android:enabled
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:16:13-35
+	android:exported
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:17:13-36
+	android:name
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:15:13-74
+intent-filter#action:name:android.intent.action.SEND
+ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:18:13-20:29
+action#android.intent.action.SEND
+ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:19:17-69
+	android:name
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:19:25-66
+provider#nl.xservices.plugins.FileProvider
+ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:23:9-31:20
+	android:grantUriPermissions
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:27:13-47
+	android:authorities
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:25:13-68
+	android:exported
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:26:13-37
+	android:name
+		ADDED from [:capacitor-cordova-android-plugins] /home/abdulazizurrohman/Desktop/Folder Abdul/laundrypro/laundrypro-tenant-forgetpassword/android/capacitor-cordova-android-plugins/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:24:13-61
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:22:5-79
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:22:5-79
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:22:5-79
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:7:5-79
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:7:5-79
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:7:5-79
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:7:5-79
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:22:22-76
+uses-permission#com.google.android.c2dm.permission.RECEIVE
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:26:5-82
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:11:5-82
+MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0599737287db0c33c67f498dc522a22e/transformed/play-services-cloud-messaging-17.2.0/AndroidManifest.xml:11:5-82
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:26:22-79
+receiver#com.google.firebase.iid.FirebaseInstanceIdReceiver
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:29:9-40:20
+	android:exported
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:31:13-36
+	android:permission
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:32:13-73
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:30:13-78
+intent-filter#action:name:com.google.android.c2dm.intent.RECEIVE
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:33:13-35:29
+action#com.google.android.c2dm.intent.RECEIVE
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:34:17-81
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:34:25-78
+meta-data#com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:37:13-39:40
+	android:value
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:39:17-37
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:38:17-92
+service#com.google.firebase.messaging.FirebaseMessagingService
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:46:9-53:19
+	android:exported
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:49:13-37
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:48:13-43
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:47:13-82
+service#com.google.firebase.components.ComponentDiscoveryService
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:54:9-63:19
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:22:9-28:19
+MERGED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:22:9-28:19
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:12:9-21:19
+MERGED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:12:9-21:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:9:9-15:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:9:9-15:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:30:9-38:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:30:9-38:19
+	android:exported
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:56:13-37
+	tools:targetApi
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:34:13-32
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:32:13-43
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:55:13-84
+meta-data#com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:57:13-59:85
+	android:value
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:59:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:58:17-122
+meta-data#com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar
+ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:60:13-62:85
+	android:value
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:62:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-messaging:24.1.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/bb6514c0c69557b78de979d7e0f7d3a4/transformed/firebase-messaging-24.1.0/AndroidManifest.xml:61:17-119
+meta-data#com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar
+ADDED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:25:13-27:85
+	android:value
+		ADDED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:27:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-datatransport:18.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/c367c3e5b020a39054956bb336f5e9af/transformed/firebase-datatransport-18.2.0/AndroidManifest.xml:26:17-115
+service#com.google.android.datatransport.runtime.backends.TransportBackendDiscovery
+ADDED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:28:9-34:19
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:36:9-38:40
+MERGED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:36:9-38:40
+	android:exported
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:30:13-37
+	android:name
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:29:13-103
+meta-data#backend:com.google.android.datatransport.cct.CctBackendFactory
+ADDED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:31:13-33:39
+	android:value
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:33:17-36
+	android:name
+		ADDED from [com.google.android.datatransport:transport-backend-cct:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/e65291e8af7b4ba72248f88a9e6b2f7d/transformed/transport-backend-cct-3.1.9/AndroidManifest.xml:32:17-94
+service#com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService
+ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:26:9-30:19
+	android:exported
+		ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:28:13-37
+	android:permission
+		ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:29:13-69
+	android:name
+		ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:27:13-117
+receiver#com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver
+ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:32:9-34:40
+	android:exported
+		ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:34:13-37
+	android:name
+		ADDED from [com.google.android.datatransport:transport-runtime:3.1.9] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/9bbb3b82363eee545676367f421b3297/transformed/transport-runtime-3.1.9/AndroidManifest.xml:33:13-132
+meta-data#com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar
+ADDED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:15:13-17:85
+	android:value
+		ADDED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:17:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:16:17-130
+meta-data#com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar
+ADDED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:18:13-20:85
+	android:value
+		ADDED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:20:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-installations:17.2.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/deaf9a74cb339815f1a535372268143d/transformed/firebase-installations-17.2.0/AndroidManifest.xml:19:17-127
+meta-data#com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar
+ADDED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:12:13-14:85
+	android:value
+		ADDED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:14:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-common-ktx:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/0bac1f400362e2eb74eadf7e2600b85f/transformed/firebase-common-ktx-21.0.0/AndroidManifest.xml:13:17-116
+provider#com.google.firebase.provider.FirebaseInitProvider
+ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:23:9-28:39
+	android:authorities
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:25:13-72
+	android:exported
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:27:13-37
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:26:13-43
+	android:initOrder
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:28:13-36
+	android:name
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:24:13-77
+meta-data#com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar
+ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:35:13-37:85
+	android:value
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:37:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-common:21.0.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/8f69416e668964aa961162ade3688bfb/transformed/firebase-common-21.0.0/AndroidManifest.xml:36:17-109
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:20:9-22:45
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:22:19-43
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:21:19-78
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ee654c5b23db584ef1a0cb4834c0f235/transformed/play-services-base-18.0.1/AndroidManifest.xml:20:19-85
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/4a2bd73663956dd237e37d63a236a0fd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/95e1bff8b07737d3ac903152ef1e755e/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:23:9-81
+permission#com.laundrypro.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:26:22-94
+uses-permission#com.laundrypro.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.15.0] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/ef1f180427a0fecf3707e7197b3c342a/transformed/core-1.15.0/AndroidManifest.xml:26:22-94
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.2] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/11761f1ceca3852e938c40f2ce8e6bce/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /home/abdulazizurrohman/.gradle/caches/8.11.1/transforms/b9f752dfdb069bf6a0fa184065e8ae73/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92

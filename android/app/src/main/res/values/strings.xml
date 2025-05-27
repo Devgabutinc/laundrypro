@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LaundryPro</string>
+    <string name="title_activity_main">LaundryPro</string>
+    <string name="package_name">com.laundrypro.app</string>
+    <string name="custom_url_scheme">com.laundrypro.app</string>
+    <string name="server_client_id">797305778832-ice71hkgkf9q0uvv2sna9a8ro5rm59dh.apps.googleusercontent.com</string>
+    <string name="web_client_id">797305778832-666lnk7r0fkeivamvd0llo1oshq76kqs.apps.googleusercontent.com</string>
+</resources>
