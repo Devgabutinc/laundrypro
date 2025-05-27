@@ -19,39 +19,27 @@ const config: CapacitorConfig = {
       toolbarColor: '#3880ff',
       browserCloseButtonPosition: 'end',
       showTitle: true
+    },
+    // Konfigurasi App untuk URL handling dan deep linking
+    App: {
+      // Konfigurasi URL scheme untuk deep linking
+      appUrlOpen: {
+        // Skema kustom untuk deep link
+        schemes: ['laundrypro']
+      }
     }
   },
-  // Konfigurasi yang lebih lengkap untuk deep linking
+  // Konfigurasi untuk deep linking di Android
   android: {
-    intentFilters: [
-      {
-        action: 'VIEW',
-        autoVerify: true,
-        data: [
-          // Skema kustom untuk deep link
-          {
-            scheme: 'com.laundrypro.app',
-            host: '*',
-          },
-          // URL callback dari Supabase/Google OAuth
-          {
-            scheme: 'https',
-            host: 'laundrypro.vercel.app',
-            pathPrefix: '/auth/v1/callback'
-          },
-          // URL alternatif dari Supabase
-          {
-            scheme: 'https',
-            host: 'igogxmfqfsxubjbtrguf.supabase.co',
-            pathPrefix: '/auth/v1/callback'
-          }
-        ],
-        categories: ['DEFAULT', 'BROWSABLE'],
-      },
-    ],
+    // Konfigurasi untuk app links dan deep links
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: true
   },
+  // Konfigurasi untuk deep linking di iOS
   ios: {
-    scheme: 'com.laundrypro.app'
+    scheme: 'laundrypro',
+    contentInset: 'always'
   }
 };
 
