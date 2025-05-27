@@ -19,7 +19,18 @@ const ResetPassword = () => {
   // Check if we have a valid hash token in the URL
   useEffect(() => {
     const hash = window.location.hash;
-    if (!hash || !hash.includes('access_token')) {
+    console.log("URL hash:", hash);
+    
+    // Jika ada access_token di URL, berarti link valid
+    if (hash && hash.includes('access_token')) {
+      setError(null); // Reset error jika token valid
+    } else if (window.location.search && window.location.search.includes('type=recovery')) {
+      // Jika tidak ada hash tapi ada parameter recovery di URL, berarti proses redirect dari Supabase berhasil
+      // tapi mungkin token tidak ditambahkan ke hash dengan benar
+      console.log("Recovery process detected, proceeding without hash check");
+      setError(null);
+    } else {
+      // Jika tidak ada token sama sekali, tampilkan error
       setError("Invalid or expired password reset link. Please request a new password reset link.");
     }
   }, []);
@@ -45,9 +56,12 @@ const ResetPassword = () => {
     setLoading(true);
     
     try {
+      console.log("Attempting to update password...");
       const { error } = await supabase.auth.updateUser({
         password: password
       });
+      
+      console.log("Password update response:", error ? "Error: " + error.message : "Success");
       
       if (error) throw error;
       
