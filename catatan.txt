@@ -102,11 +102,11 @@ list perbaikan console
 [X] Tambahkan konfigurasi ProGuard untuk obfuskasi kode
 
 ### 3. DOKUMEN LEGAL & KEPATUHAN
-[ ] Buat halaman Kebijakan Privasi dalam aplikasi
-[ ] Buat halaman Syarat & Ketentuan dalam aplikasi
-[ ] Tambahkan pengungkapan penanganan data pengguna
-[ ] Pastikan kepatuhan GDPR/perlindungan data
-[ ] Tambahkan opsi persetujuan pengumpulan data
+[X] Buat halaman Kebijakan Privasi dalam aplikasi
+[X] Buat halaman Syarat & Ketentuan dalam aplikasi
+[X] Tambahkan pengungkapan penanganan data pengguna
+[X] Pastikan kepatuhan GDPR/perlindungan data
+[X] Tambahkan opsi persetujuan pengumpulan data
 
 ### 4. KOMPATIBILITAS XIAOMI
 [ ] Evaluasi alternatif untuk Google Services di perangkat Xiaomi China
