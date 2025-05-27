@@ -237,7 +237,7 @@ const Auth = () => {
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 LaundryPro. All rights reserved.
+            © 2025 LaundryPro. Abdul Azizrrohman.
           </p>
         </CardFooter>
       </Card>
