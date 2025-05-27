@@ -10,11 +10,31 @@ export default function PrivacyConsentDialog() {
   
   useEffect(() => {
     // Cek apakah pengguna sudah memberikan persetujuan
-    const hasConsented = localStorage.getItem('privacy_consent');
-    if (!hasConsented) {
+    const consent = localStorage.getItem('privacy_consent');
+    
+    // Jika pengguna belum memberikan persetujuan atau sebelumnya menolak
+    if (consent === null || consent === 'false') {
+      // Tampilkan dialog persetujuan
       setShowConsent(true);
+      
+      // Jika user sudah login tapi belum menyetujui kebijakan privasi
+      if (user) {
+        // Tidak perlu menampilkan alert di sini karena dialog persetujuan akan muncul
+        // Dialog persetujuan sudah cukup untuk menjelaskan situasi
+      }
     }
-  }, []);
+  }, [user]);
+  
+  // Efek terpisah untuk memastikan pengguna tidak bisa menggunakan aplikasi tanpa persetujuan
+  useEffect(() => {
+    // Cek persetujuan setiap kali user berubah (login/logout)
+    if (user) {
+      const consent = localStorage.getItem('privacy_consent');
+      if (consent !== 'true') {
+        setShowConsent(true);
+      }
+    }
+  }, [user]);
   
   const handleConsent = (agreed: boolean) => {
     // Simpan persetujuan di localStorage
