@@ -26,6 +26,7 @@ dist-ssr
 
 # Capacitor/Native app files
 android/
+!android/app/proguard-rules.pro
 ios/
 resources/
 
