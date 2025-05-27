@@ -6,7 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   // Konfigurasi server yang aman
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    cleartext: true
   },
   plugins: {
     BluetoothSerial: {
@@ -20,12 +21,34 @@ const config: CapacitorConfig = {
       showTitle: true
     }
   },
+  // Konfigurasi yang lebih lengkap untuk deep linking
   android: {
-    // allowMixedContent dinonaktifkan untuk keamanan di build produksi
-    allowMixedContent: false,
-    captureInput: true,
-    // webContentsDebuggingEnabled dinonaktifkan untuk build produksi
-    webContentsDebuggingEnabled: process.env.NODE_ENV === 'development'
+    intentFilters: [
+      {
+        action: 'VIEW',
+        autoVerify: true,
+        data: [
+          // Skema kustom untuk deep link
+          {
+            scheme: 'com.laundrypro.app',
+            host: '*',
+          },
+          // URL callback dari Supabase/Google OAuth
+          {
+            scheme: 'https',
+            host: 'laundrypro.vercel.app',
+            pathPrefix: '/auth/v1/callback'
+          },
+          // URL alternatif dari Supabase
+          {
+            scheme: 'https',
+            host: 'igogxmfqfsxubjbtrguf.supabase.co',
+            pathPrefix: '/auth/v1/callback'
+          }
+        ],
+        categories: ['DEFAULT', 'BROWSABLE'],
+      },
+    ],
   },
   ios: {
     scheme: 'com.laundrypro.app'
