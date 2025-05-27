@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 export default function PrivacyConsentDialog() {
   const [showConsent, setShowConsent] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   useEffect(() => {
     // Cek apakah pengguna sudah memberikan persetujuan
@@ -23,8 +23,19 @@ export default function PrivacyConsentDialog() {
     // Jika di masa depan ingin menyimpan di Supabase, bisa tambahkan kode di sini
     // setelah membuat tabel user_consents di database
     
-    // Sembunyikan dialog
-    setShowConsent(false);
+    if (agreed) {
+      // Jika setuju, sembunyikan dialog dan lanjutkan penggunaan aplikasi
+      setShowConsent(false);
+    } else {
+      // Jika tidak setuju, tampilkan pesan dan arahkan ke halaman login
+      alert('Untuk menggunakan aplikasi LaundryPro, Anda perlu menyetujui Kebijakan Privasi kami. Aplikasi tidak dapat digunakan tanpa persetujuan ini.');
+      // Logout jika user sudah login
+      if (user) {
+        logout();
+      }
+      // Arahkan ke halaman login
+      navigate('/auth');
+    }
   };
   
   if (!showConsent) return null;
