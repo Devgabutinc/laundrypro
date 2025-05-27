@@ -98,8 +98,8 @@ list perbaikan console
 [X] Nonaktifkan allowMixedContent di capacitor.config.ts (ubah menjadi false)
 [X] Nonaktifkan webContentsDebuggingEnabled untuk build produksi
 [X] Nonaktifkan cleartext di konfigurasi server (jika memungkinkan)
-[X] Aktifkan minifyEnabled di build.gradle untuk optimasi ukuran aplikasi
-[X] Tambahkan konfigurasi ProGuard untuk obfuskasi kode
+[✓] Menonaktifkan minifyEnabled di build.gradle (diubah dari aktif ke nonaktif karena menyebabkan masalah pada fungsi printing)
+[✓] Tambahkan konfigurasi ProGuard untuk obfuskasi kode (tetap ada sebagai referensi jika dibutuhkan di masa depan)
 
 ### 3. DOKUMEN LEGAL & KEPATUHAN
 [X] Buat halaman Kebijakan Privasi dalam aplikasi
