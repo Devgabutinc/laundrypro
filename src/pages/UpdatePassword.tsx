@@ -1,198 +1,77 @@
 import React, { useState, useEffect } from "react";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [recoveryToken, setRecoveryToken] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { session } = useAuth();
 
-  // Extract tokens from URL
+  // Check if we have a valid hash token in the URL
   useEffect(() => {
-    // Function to extract parameters from URL
-    const extractParamFromUrl = (url: string, param: string): string | null => {
-      try {
-        // Try to parse URL as URL object first
-        const urlObj = new URL(url);
-        
-        // Check parameter in query string
-        const queryParam = urlObj.searchParams.get(param);
-        if (queryParam) return queryParam;
-        
-        // If not in query string, check in hash fragment
-        if (urlObj.hash) {
-          // Remove # at start of hash
-          const hashParams = new URLSearchParams(urlObj.hash.substring(1));
-          const hashParam = hashParams.get(param);
-          if (hashParam) return hashParam;
-        }
-        
-        // Fallback to regex method if above methods fail
-        const regex = new RegExp(`[#&?]${param}=([^&#]*)`);
-        const match = regex.exec(url);
-        return match ? decodeURIComponent(match[1]) : null;
-      } catch (e) {
-        console.error('Error parsing URL:', e);
-        
-        // Fallback to regex method if URL parsing fails
-        try {
-          const regex = new RegExp(`[#&?]${param}=([^&#]*)`);
-          const match = regex.exec(url);
-          return match ? decodeURIComponent(match[1]) : null;
-        } catch (e) {
-          console.error('Regex extraction failed:', e);
-          return null;
-        }
-      }
-    };
+    const hash = window.location.hash;
+    if (!hash || !hash.includes('access_token')) {
+      setError("Invalid or expired password reset link. Please request a new password reset link.");
+    }
+  }, []);
 
-    // Check for token in URL
-    const fullUrl = window.location.href;
-    console.log('Current URL:', fullUrl);
-    
-    // Check for recovery token in query params or hash
-    const token = extractParamFromUrl(fullUrl, 'token');
-    if (token) {
-      console.log('Found recovery token in URL');
-      setRecoveryToken(token);
+  const validatePassword = () => {
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return false;
     }
-    
-    // Check for access token
-    const access_token = extractParamFromUrl(fullUrl, 'access_token');
-    if (access_token) {
-      console.log('Found access token in URL');
-      setAccessToken(access_token);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return false;
     }
-    
-    // Check for type=recovery
-    const type = extractParamFromUrl(fullUrl, 'type');
-    if (type === 'recovery') {
-      console.log('URL confirms this is a recovery flow');
-    } else {
-      console.log('URL type parameter:', type);
-    }
-    
-    // If no token found and user not logged in, redirect to login
-    if (!token && !access_token && !session) {
-      console.log('No recovery token or access token found, and user not logged in');
-      toast({
-        title: "Access denied",
-        description: "You need a valid reset link to access this page.",
-        variant: "destructive",
-      });
-      navigate("/auth", { replace: true });
-    }
-  }, [location, navigate, toast, session]);
-
-  // If user is already logged in and not in recovery flow, redirect to home
-  if (session && !recoveryToken && !accessToken) {
-    return <Navigate to="/" replace />;
-  }
+    setError(null);
+    return true;
+  };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate password
-    if (password.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!validatePassword()) return;
     
     setLoading(true);
-    console.log('Attempting to update password');
     
     try {
-      let result;
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
       
-      // If we have a recovery token, we need to use it
-      if (recoveryToken) {
-        console.log('Using recovery token to update password');
-        // First try to exchange the token for a session
-        try {
-          const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({
-            token_hash: recoveryToken,
-            type: 'recovery',
-          });
-          
-          if (sessionError) {
-            console.error('Error verifying OTP:', sessionError);
-            throw sessionError;
-          }
-          
-          console.log('OTP verification successful:', sessionData);
-          
-          // Now update the password
-          result = await supabase.auth.updateUser({
-            password: password,
-          });
-        } catch (tokenError) {
-          console.error('Error with token verification:', tokenError);
-          // Fallback to direct password update
-          result = await supabase.auth.updateUser({
-            password: password,
-          });
-        }
-      } else {
-        // Standard password update
-        console.log('Using standard password update');
-        result = await supabase.auth.updateUser({
-          password: password,
-        });
-      }
+      if (error) throw error;
       
-      const { error } = result || {};
-      
-      if (error) {
-        console.error('Error updating password:', error);
-        throw error;
-      }
-      
-      console.log('Password updated successfully');
+      setResetSuccess(true);
       toast({
         title: "Password updated successfully",
-        description: "Your password has been updated. You can now log in with your new password.",
+        description: "Your password has been reset. You can now login with your new password.",
       });
       
-      // Sign out the user to ensure they log in with the new password
-      await supabase.auth.signOut();
+      // Clear the hash from the URL to prevent reuse of the token
+      window.history.replaceState(null, '', window.location.pathname);
       
-      // Redirect to login page after successful password update
+      // Automatically redirect to login after 3 seconds
       setTimeout(() => {
-        navigate("/auth", { replace: true });
-      }, 2000);
+        navigate('/auth');
+      }, 3000);
+      
     } catch (error: any) {
-      console.error('Exception during password update:', error);
       toast({
-        title: "Failed to update password",
-        description: error.message || "An unexpected error occurred.",
+        title: "Password update failed",
+        description: error?.message || "Failed to update password",
         variant: "destructive",
       });
+      setError(error?.message || "Failed to update password");
     } finally {
       setLoading(false);
     }
@@ -208,44 +87,69 @@ const UpdatePassword = () => {
               <span className="text-laundry-accent">Pro</span>
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Update Your Password</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            {resetSuccess ? "Password Updated" : "Create New Password"}
+          </CardTitle>
           <CardDescription className="text-center">
-            Create a new secure password for your account
+            {resetSuccess 
+              ? "Your password has been updated successfully."
+              : "Enter your new password below."}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder="••••••••" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+              {error}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                placeholder="••••••••" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+          )}
+          
+          {resetSuccess ? (
+            <div className="text-center space-y-4 mt-4">
+              <p className="text-sm text-gray-500">
+                You will be redirected to the login page in a few seconds...
+              </p>
+              <Button 
+                className="mt-4"
+                onClick={() => navigate('/auth')}
+              >
+                Go to Login
+              </Button>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Updating..." : "Update Password"}
-            </Button>
-          </form>
+          ) : (
+            <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">New Password</Label>
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-gray-500">Password must be at least 6 characters long</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input 
+                  id="confirmPassword" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          )}
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            © 2025 LaundryPro. All rights reserved.
-          </p>
+          <Link to="/auth" className="text-sm text-laundry-primary hover:underline">
+            Back to Login
+          </Link>
         </CardFooter>
       </Card>
     </div>

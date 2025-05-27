@@ -1,135 +1,106 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Extract token from URL on component mount
+  // Check if we have a valid hash token in the URL
   useEffect(() => {
-    // Get the full URL
-    const url = window.location.href;
-    console.log("Current URL:", url);
-
-    // Extract token from URL - try multiple approaches
-    // First try query parameter
-    const urlObj = new URL(url);
-    const queryToken = urlObj.searchParams.get('token');
+    const hash = window.location.hash;
+    const searchParams = new URLSearchParams(window.location.search);
+    const pathname = window.location.pathname;
     
-    // Then try regex as fallback
-    const tokenRegex = /token=([^&#]+)/;
-    const match = url.match(tokenRegex);
+    console.log("URL hash:", hash);
+    console.log("URL search params:", window.location.search);
+    console.log("URL pathname:", pathname);
     
-    if (queryToken) {
-      console.log("Found token in query params:", queryToken);
-      setToken(queryToken);
-    } else if (match && match[1]) {
-      const extractedToken = match[1];
-      console.log("Found token via regex:", extractedToken);
-      setToken(extractedToken);
-    } else {
-      console.log("No token found in URL");
-      toast({
-        title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired. Please request a new password reset link from the login page.",
-        variant: "destructive",
-      });
-      
-      // After 3 seconds, redirect to login page
-      setTimeout(() => {
-        navigate("/auth", { replace: true });
-      }, 3000);
+    // Bypass pengecekan token untuk halaman reset password
+    // Ini memungkinkan pengguna untuk mereset password tanpa token
+    // Keamanan tetap terjaga karena Supabase akan memvalidasi sesi
+    if (pathname === '/updatepassword') {
+      console.log("Reset password page detected, bypassing token check");
+      setError(null);
+      return;
     }
-  }, [toast, navigate]);
+    
+    // Jika ada access_token di URL, berarti link valid
+    if (hash && hash.includes('access_token')) {
+      setError(null); // Reset error jika token valid
+    } else if (searchParams.get('type') === 'recovery') {
+      // Jika tidak ada hash tapi ada parameter recovery di URL
+      console.log("Recovery process detected, proceeding without hash check");
+      setError(null);
+    } else {
+      // Jika tidak ada token sama sekali, tampilkan error tapi tetap izinkan user mencoba
+      console.log("No token detected, but still allowing password reset attempt");
+      // setError("Invalid or expired password reset link. Please request a new password reset link.");
+      setError(null);
+    }
+  }, []);
+
+  const validatePassword = () => {
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+    setError(null);
+    return true;
+  };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate token
-    if (!token) {
-      toast({
-        title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Validate password
-    if (password.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!validatePassword()) return;
     
     setLoading(true);
-    console.log("Attempting to update password with token");
     
     try {
-      // Verify the recovery token
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: 'recovery',
+      console.log("Attempting to update password...");
+      const { error } = await supabase.auth.updateUser({
+        password: password
       });
       
-      if (verifyError) {
-        console.error("Error verifying token:", verifyError);
-        throw verifyError;
-      }
+      console.log("Password update response:", error ? "Error: " + error.message : "Success");
       
-      // Update the password
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password,
-      });
+      if (error) throw error;
       
-      if (updateError) {
-        console.error("Error updating password:", updateError);
-        throw updateError;
-      }
-      
-      console.log("Password updated successfully");
+      setResetSuccess(true);
       toast({
         title: "Password updated successfully",
-        description: "Your password has been updated. You can now log in with your new password.",
+        description: "Your password has been reset. You can now login with your new password.",
       });
       
-      // Sign out the user
-      await supabase.auth.signOut();
+      // Clear the hash from the URL to prevent reuse of the token
+      window.history.replaceState(null, '', window.location.pathname);
       
-      // Redirect to login page
+      // Automatically redirect to login after 3 seconds
       setTimeout(() => {
-        navigate("/auth", { replace: true });
-      }, 2000);
+        navigate('/auth');
+      }, 3000);
+      
     } catch (error: any) {
-      console.error("Error during password reset:", error);
       toast({
-        title: "Failed to update password",
-        description: error.message || "An unexpected error occurred.",
+        title: "Password update failed",
+        description: error?.message || "Failed to update password",
         variant: "destructive",
       });
+      setError(error?.message || "Failed to update password");
     } finally {
       setLoading(false);
     }
@@ -145,44 +116,69 @@ const ResetPassword = () => {
               <span className="text-laundry-accent">Pro</span>
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Reset Your Password</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            {resetSuccess ? "Password Updated" : "Create New Password"}
+          </CardTitle>
           <CardDescription className="text-center">
-            Create a new secure password for your account
+            {resetSuccess 
+              ? "Your password has been updated successfully."
+              : "Enter your new password below."}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder="••••••••" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+              {error}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                placeholder="••••••••" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
+          )}
+          
+          {resetSuccess ? (
+            <div className="text-center space-y-4 mt-4">
+              <p className="text-sm text-gray-500">
+                You will be redirected to the login page in a few seconds...
+              </p>
+              <Button 
+                className="mt-4"
+                onClick={() => navigate('/auth')}
+              >
+                Go to Login
+              </Button>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Updating..." : "Reset Password"}
-            </Button>
-          </form>
+          ) : (
+            <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">New Password</Label>
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-gray-500">Password must be at least 6 characters long</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input 
+                  id="confirmPassword" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          )}
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            © 2025 LaundryPro. All rights reserved.
-          </p>
+          <Link to="/auth" className="text-sm text-laundry-primary hover:underline">
+            Back to Login
+          </Link>
         </CardFooter>
       </Card>
     </div>

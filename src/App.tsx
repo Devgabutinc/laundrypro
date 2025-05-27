@@ -45,8 +45,12 @@ import Customers from "./pages/Customers";
 import OrderArchive from "./pages/OrderArchive";
 import ProfileSettings from "./pages/ProfileSettings";
 import ReceiptSettings from "./pages/ReceiptSettings";
-import UpdatePassword from "./pages/UpdatePassword";
-import ResetPassword from "./pages/ResetPassword";
+import UpdatePassword from "@/pages/UpdatePassword";
+import ResetPassword from "@/pages/ResetPassword";
+import EmailConfirmation from "@/pages/EmailConfirmation";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
+import PrivacyConsentDialog from "./components/PrivacyConsentDialog";
 
 
 const queryClient = new QueryClient();
@@ -56,6 +60,8 @@ function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
   const backHandlerRef = useRef<any>(null);
+  
+  // Inisialisasi aplikasi
 
   useEffect(() => {
     // Pasang listener FCM sebelum register
@@ -100,9 +106,9 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // Allow access to reset password page without any redirection
-  if (location.pathname === "/updatepassword") {
-    console.log("Reset password page accessed, bypassing auth checks");
+  // Allow access to reset password and email confirmation pages without any redirection
+  if (location.pathname === "/updatepassword" || location.pathname === "/confirm-email") {
+    console.log("Auth bypass page accessed: " + location.pathname);
     // Continue to the routes without redirection
   }
   // Jika belum login, redirect ke /auth
@@ -127,40 +133,47 @@ function AppRoutes() {
   }
 
   return (
-    <Routes>
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/update-password" element={<UpdatePassword />} />
-      <Route path="/updatepassword" element={<ResetPassword />} />
-      <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
-      <Route path="/orders" element={<PrivateRoute><AppLayout><Orders /></AppLayout></PrivateRoute>} />
-      <Route path="/orders/:orderId" element={<PrivateRoute><AppLayout><OrderDetail /></AppLayout></PrivateRoute>} />
-      <Route path="/order-archive" element={<PrivateRoute><AppLayout><OrderArchive /></AppLayout></PrivateRoute>} />
-      <Route path="/tracking" element={<PrivateRoute><AppLayout><Tracking /></AppLayout></PrivateRoute>} />
-      <Route path="/notifications" element={<PrivateRoute><AppLayout><Notifications /></AppLayout></PrivateRoute>} />
-      <Route path="/pos" element={<PrivateRoute><AppLayout><POS /></AppLayout></PrivateRoute>} />
-      <Route path="/customers" element={<PrivateRoute><AppLayout><Customers /></AppLayout></PrivateRoute>} />
-      <Route path="/inventory" element={<PrivateRoute><AppLayout><Inventory /></AppLayout></PrivateRoute>} />
-      <Route path="/reports" element={<PrivateRoute><AppLayout><FinancialReports /></AppLayout></PrivateRoute>} />
-      <Route path="/racks" element={<PrivateRoute><AppLayout><RackManagement /></AppLayout></PrivateRoute>} />
-      <Route path="/profile-settings" element={<PrivateRoute><AppLayout><ProfileSettings /></AppLayout></PrivateRoute>} />
-      <Route path="/receipt-settings" element={<PrivateRoute><AppLayout><ReceiptSettings /></AppLayout></PrivateRoute>} />
-      <Route path="/setup-business" element={<BusinessProfileSetup />} />
-      <Route path="/owner" element={<OwnerRoute><OwnerLayout><OwnerPanel /></OwnerLayout></OwnerRoute>} />
-      <Route path="/platform-admin" element={<SuperadminRoute><SuperadminLayout><PlatformAdmin /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/platform-admin/reports" element={<SuperadminRoute><SuperadminLayout><PlatformAdminReports /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/platform-admin/settings" element={<SuperadminRoute><SuperadminLayout><PlatformSettings /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/admin/premium-plans" element={<SuperadminRoute><SuperadminLayout><PlatformAdminPremiumPlans /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/admin/payment-methods" element={<SuperadminRoute><SuperadminLayout><PlatformAdminPaymentMethods /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/premium-plans" element={<PrivateRoute><AppLayout><PremiumPlans /></AppLayout></PrivateRoute>} />
-      <Route path="/PilihPaketPremium" element={<PrivateRoute><AppLayout><PilihPaketPremium /></AppLayout></PrivateRoute>} />
-      <Route path="/KonfirmasiPremium" element={<PrivateRoute><AppLayout><KonfirmasiPremium /></AppLayout></PrivateRoute>} />
-      <Route path="/platform-admin/premium-orders" element={<SuperadminRoute><SuperadminLayout><PesananPremium /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/platform-admin/tenants" element={<SuperadminRoute><SuperadminLayout><PlatformAdminTenants /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/platform-admin/dev-notification" element={<SuperadminRoute><SuperadminLayout><DevNotificationPage /></SuperadminLayout></SuperadminRoute>} />
-      <Route path="/discussion" element={<PrivateRoute><AppLayout><Discussion /></AppLayout></PrivateRoute>} />
-      <Route path="/discussion/:threadId" element={<PrivateRoute><AppLayout><DiscussionDetail /></AppLayout></PrivateRoute>} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <>
+      <PrivacyConsentDialog />
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/update-password" element={<UpdatePassword />} />
+        <Route path="/updatepassword" element={<ResetPassword />} />
+        <Route path="/confirm-email" element={<EmailConfirmation />} />
+        {/* Rute publik untuk kebijakan privasi dan syarat & ketentuan */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-conditions" element={<TermsConditions />} />
+        <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
+        <Route path="/orders" element={<PrivateRoute><AppLayout><Orders /></AppLayout></PrivateRoute>} />
+        <Route path="/orders/:orderId" element={<PrivateRoute><AppLayout><OrderDetail /></AppLayout></PrivateRoute>} />
+        <Route path="/order-archive" element={<PrivateRoute><AppLayout><OrderArchive /></AppLayout></PrivateRoute>} />
+        <Route path="/tracking" element={<PrivateRoute><AppLayout><Tracking /></AppLayout></PrivateRoute>} />
+        <Route path="/notifications" element={<PrivateRoute><AppLayout><Notifications /></AppLayout></PrivateRoute>} />
+        <Route path="/pos" element={<PrivateRoute><AppLayout><POS /></AppLayout></PrivateRoute>} />
+        <Route path="/customers" element={<PrivateRoute><AppLayout><Customers /></AppLayout></PrivateRoute>} />
+        <Route path="/inventory" element={<PrivateRoute><AppLayout><Inventory /></AppLayout></PrivateRoute>} />
+        <Route path="/reports" element={<PrivateRoute><AppLayout><FinancialReports /></AppLayout></PrivateRoute>} />
+        <Route path="/racks" element={<PrivateRoute><AppLayout><RackManagement /></AppLayout></PrivateRoute>} />
+        <Route path="/profile-settings" element={<PrivateRoute><AppLayout><ProfileSettings /></AppLayout></PrivateRoute>} />
+        <Route path="/receipt-settings" element={<PrivateRoute><AppLayout><ReceiptSettings /></AppLayout></PrivateRoute>} />
+        <Route path="/setup-business" element={<BusinessProfileSetup />} />
+        <Route path="/owner" element={<OwnerRoute><OwnerLayout><OwnerPanel /></OwnerLayout></OwnerRoute>} />
+        <Route path="/platform-admin" element={<SuperadminRoute><SuperadminLayout><PlatformAdmin /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/platform-admin/reports" element={<SuperadminRoute><SuperadminLayout><PlatformAdminReports /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/platform-admin/settings" element={<SuperadminRoute><SuperadminLayout><PlatformSettings /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/admin/premium-plans" element={<SuperadminRoute><SuperadminLayout><PlatformAdminPremiumPlans /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/admin/payment-methods" element={<SuperadminRoute><SuperadminLayout><PlatformAdminPaymentMethods /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/premium-plans" element={<PrivateRoute><AppLayout><PremiumPlans /></AppLayout></PrivateRoute>} />
+        <Route path="/PilihPaketPremium" element={<PrivateRoute><AppLayout><PilihPaketPremium /></AppLayout></PrivateRoute>} />
+        <Route path="/KonfirmasiPremium" element={<PrivateRoute><AppLayout><KonfirmasiPremium /></AppLayout></PrivateRoute>} />
+        <Route path="/platform-admin/premium-orders" element={<SuperadminRoute><SuperadminLayout><PesananPremium /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/platform-admin/tenants" element={<SuperadminRoute><SuperadminLayout><PlatformAdminTenants /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/platform-admin/dev-notification" element={<SuperadminRoute><SuperadminLayout><DevNotificationPage /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/discussion" element={<PrivateRoute><AppLayout><Discussion /></AppLayout></PrivateRoute>} />
+        <Route path="/discussion/:threadId" element={<PrivateRoute><AppLayout><DiscussionDetail /></AppLayout></PrivateRoute>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }
 
