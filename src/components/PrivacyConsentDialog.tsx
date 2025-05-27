@@ -80,27 +80,23 @@ export default function PrivacyConsentDialog() {
         
         <p className="mb-4 text-gray-700">
           Dengan menggunakan aplikasi ini, Anda menyetujui pengumpulan dan pemrosesan data sesuai dengan 
-          <Button 
-            variant="link" 
-            className="px-1 text-blue-600 font-medium"
-            onClick={() => {
-              navigate('/privacy-policy');
-              setShowConsent(false);
-            }}
+          <a 
+            href="/privacy-policy" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="px-1 text-blue-600 font-medium hover:underline"
           >
             Kebijakan Privasi
-          </Button> 
+          </a> 
           dan 
-          <Button 
-            variant="link" 
-            className="px-1 text-blue-600 font-medium"
-            onClick={() => {
-              navigate('/terms-conditions');
-              setShowConsent(false);
-            }}
+          <a 
+            href="/terms-conditions" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="px-1 text-blue-600 font-medium hover:underline"
           >
             Syarat & Ketentuan
-          </Button> 
+          </a> 
           kami.
         </p>
         

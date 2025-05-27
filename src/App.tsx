@@ -140,6 +140,7 @@ function AppRoutes() {
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/updatepassword" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<EmailConfirmation />} />
+        {/* Rute publik untuk kebijakan privasi dan syarat & ketentuan */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
