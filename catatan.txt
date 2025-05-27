@@ -58,66 +58,6 @@ Resource action: Click
 Resource Name: android:id/button1 atau .MainActivity/Login
 redmi 6A
 
-######catatan perbaikan
-- card users info + button lihat detail
-
-####
-[x]button export pelanggan tidak berfungsi di android  
-[x]batasan users POS free dan premium PRIORITAS
-[x]card users besarin sedikit + button lihat detail
-[x]button bantuan belum berfungsi 
-[x] seting profile belum ada >>>>. testing  edit  
-[ ]testing platformadmin setting besok !
-[ ]finish to deploy  
-[x]tabel belum dibayar masih kebesaran
-[x]tabel arsip order masih kebesaran
-[x] untuk produk belum sycron dengan POS sisa produk 8 di beli 5 stok sisa 7 aneh
-button batalkan tidak ada ketika jenis order bayar
-
-
-fitur setting
-###
-Manajemen Batasan Pengguna
-Maksimal Pengguna (Free): Mengontrol berapa banyak pengguna yang bisa ditambahkan ke akun gratis (saat ini diatur ke 3)
-Maksimal Pengguna (Premium): Mengontrol berapa banyak pengguna yang bisa ditambahkan ke akun premium (saat ini diatur ke 20)
-soon
-
-###
-Batasan Penggunaan POS
-Maksimal Penggunaan POS per Hari (Free): Membatasi berapa kali pengguna gratis dapat menggunakan sistem POS setiap hari (saat ini diatur ke 10)
-Maksimal Penggunaan POS per Hari (Premium): Mengontrol batasan penggunaan POS untuk pengguna premium (0 berarti tidak terbatas)
-done
-
-###3. Kontrol Akses Fitur
-a. Manajemen Pesanan ##done 
-Rak & Lokasi Penyimpanan (racks): Memungkinkan pengguna untuk menetapkan dan mengelola lokasi penyimpanan cucian pada rak
-Saat ini: Free = MATI, Premium = AKTIF
-fitur rak di order detial dan menu 
-
-b. point of Sale ##DONE
-Cetak Struk (print_receipt): Fitur untuk mencetak struk transaksi dengan format yang bersih dan profesional
-Saat ini: Free = AKTIF, Premium = AKTIF
-logo usaha 
-
-c. Laporan & Analitik ##DONE
-Laporan Keuangan (financial_reports): Akses ke laporan keuangan detail dan kemampuan untuk mengekspor data
-Saat ini: Free = MATI, Premium = AKTIF
-Catatan: Ini adalah fitur yang Anda sebutkan tentang "laporan keuangan = export laporan"
-export laporan button
-
-d. Notifikasi WhatsApp (wa_notification_clean) ##DONE BELUM FS
-: Kirim notifikasiotomatis ke pelanggan melalui WhatsApp saat cucian selesai
-Saat ini: Free = MATI, Premium = AKTIF
-ini hanya button menu notifikasi yang disable 
-
-
-
-
-[X]Rak & Lokasi Penyimpanan (racks)
-[X]Logo Pada Struk (print_receipt)
-[X]Export Laporan Keuangan (financial_reports)
-[X]Export Data Pelanggan & Arsip (export_data)
-[X]Forum Diskusi (discussion)
 
 [ ] menu tutorial penggunaan aplikasi 
 # list card 
@@ -146,3 +86,51 @@ list perbaikan console
 - console nota antar
 
 
+###### CHECKLIST PERBAIKAN UNTUK DEPLOY KE XIAOMI GETAPPS ######
+
+### 1. PERBAIKAN PERIZINAN APLIKASI
+[X] Hapus izin MANAGE_EXTERNAL_STORAGE (sangat sering ditolak oleh app store)
+[X] Justifikasi penggunaan izin lokasi (ACCESS_FINE_LOCATION & ACCESS_COARSE_LOCATION)
+[X] Evaluasi kebutuhan izin Bluetooth, pastikan hanya diminta jika benar-benar digunakan
+[X] Ganti READ_EXTERNAL_STORAGE dengan READ_MEDIA_* yang lebih spesifik
+
+### 2. PERBAIKAN KEAMANAN KONFIGURASI
+[X] Nonaktifkan allowMixedContent di capacitor.config.ts (ubah menjadi false)
+[X] Nonaktifkan webContentsDebuggingEnabled untuk build produksi
+[X] Nonaktifkan cleartext di konfigurasi server (jika memungkinkan)
+[X] Aktifkan minifyEnabled di build.gradle untuk optimasi ukuran aplikasi
+[X] Tambahkan konfigurasi ProGuard untuk obfuskasi kode
+
+### 3. DOKUMEN LEGAL & KEPATUHAN
+[ ] Buat halaman Kebijakan Privasi dalam aplikasi
+[ ] Buat halaman Syarat & Ketentuan dalam aplikasi
+[ ] Tambahkan pengungkapan penanganan data pengguna
+[ ] Pastikan kepatuhan GDPR/perlindungan data
+[ ] Tambahkan opsi persetujuan pengumpulan data
+
+### 4. KOMPATIBILITAS XIAOMI
+[ ] Evaluasi alternatif untuk Google Services di perangkat Xiaomi China
+[ ] Tambahkan lokalisasi Bahasa China (jika menargetkan pasar China)
+[ ] Pastikan aplikasi berfungsi tanpa Google Play Services
+[ ] Uji aplikasi di perangkat Xiaomi (terutama MIUI)
+
+### 5. OPTIMASI APLIKASI
+[ ] Implementasikan strategi versioning yang tepat (tingkatkan versionCode)
+[ ] Optimalkan ukuran aplikasi (compress gambar, hapus aset yang tidak digunakan)
+[ ] Tambahkan fungsionalitas offline
+[ ] Optimalkan kinerja aplikasi pada perangkat kelas menengah-bawah
+[ ] Implementasikan penanganan kesalahan jaringan yang lebih baik
+
+### 6. KEAMANAN DATA
+[ ] Amankan penyimpanan kredensial Supabase dalam build produksi
+[ ] Tambahkan pembatasan rate untuk panggilan API
+[ ] Tinjau keamanan sistem pembayaran premium
+[ ] Enkripsi data sensitif yang disimpan di perangkat
+[ ] Implementasikan mekanisme deteksi dan pencegahan serangan
+
+### 7. PERSIAPAN SUBMISSION
+[ ] Siapkan screenshot berkualitas tinggi untuk halaman aplikasi
+[ ] Buat deskripsi aplikasi yang menarik dalam Bahasa Indonesia dan Inggris
+[ ] Siapkan video demo aplikasi (jika diperlukan)
+[ ] Pastikan semua metadata aplikasi lengkap dan akurat
+[ ] Periksa ulang semua persyaratan khusus Xiaomi GetApps

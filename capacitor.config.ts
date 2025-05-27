@@ -7,7 +7,8 @@ const config: CapacitorConfig = {
   // Konfigurasi server yang aman
   server: {
     androidScheme: 'https',
-    cleartext: true
+    // cleartext dinonaktifkan untuk keamanan di build produksi
+    cleartext: false
   },
   plugins: {
     BluetoothSerial: {
@@ -22,9 +23,11 @@ const config: CapacitorConfig = {
     }
   },
   android: {
-    allowMixedContent: true,
+    // allowMixedContent dinonaktifkan untuk keamanan di build produksi
+    allowMixedContent: false,
     captureInput: true,
-    webContentsDebuggingEnabled: true
+    // webContentsDebuggingEnabled dinonaktifkan untuk build produksi
+    webContentsDebuggingEnabled: process.env.NODE_ENV === 'development'
   },
   ios: {
     scheme: 'com.laundrypro.app'
