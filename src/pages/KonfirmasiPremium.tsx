@@ -24,6 +24,7 @@ function getBankLogo(bankName: string | null) {
   return null;
 }
 
+// Component for premium package confirmation
 export default function KonfirmasiPremium() {
   const [methods, setMethods] = useState<any[]>([]);
   const [selected, setSelected] = useState<any | null>(null);
