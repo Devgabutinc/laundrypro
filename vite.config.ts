@@ -26,7 +26,6 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
       // Jika di Vercel, buat alias untuk plugin Capacitor ke modul dummy
       ...(isVercel ? {
-        '@codetrix-studio/capacitor-google-auth': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
         '@capacitor/browser': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
         '@capacitor/app': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),
         '@capacitor/filesystem': path.resolve(__dirname, './src/utils/capacitor-shims/empty-module.js'),

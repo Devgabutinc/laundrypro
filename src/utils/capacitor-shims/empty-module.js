@@ -34,11 +34,7 @@ export default {
   // App
   exitApp: () => console.log('Capacitor plugin shim: App.exitApp called'),
   
-  // GoogleAuth
-  signIn: async () => {
-    console.log('Capacitor plugin shim: GoogleAuth.signIn called');
-    throw new Error('Google Auth not available in web version');
-  },
+
   
   // Push Notifications
   register: async () => console.log('Capacitor plugin shim: PushNotifications.register called'),
@@ -63,15 +59,6 @@ export default {
 };
 
 // Named exports for various Capacitor plugins
-export const GoogleAuth = {
-  initialize: async () => console.log('Capacitor plugin shim: GoogleAuth.initialize called'),
-  signIn: async () => {
-    console.log('Capacitor plugin shim: GoogleAuth.signIn called');
-    throw new Error('Google Auth not available in web version');
-  },
-  refresh: async () => console.log('Capacitor plugin shim: GoogleAuth.refresh called'),
-  signOut: async () => console.log('Capacitor plugin shim: GoogleAuth.signOut called'),
-};
 
 export const Browser = {
   open: async () => console.log('Capacitor plugin shim: Browser.open called'),
