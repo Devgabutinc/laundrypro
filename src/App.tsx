@@ -156,9 +156,15 @@ function AppRoutes() {
     return <Navigate to="/owner" replace />;
   }
 
+  // Cek apakah halaman saat ini adalah halaman publik
+  const isPublicPage = location.pathname === "/landing" || 
+                      location.pathname === "/privacy-policy" || 
+                      location.pathname === "/terms-conditions";
+
   return (
     <>
-      <PrivacyConsentDialog />
+      {/* Hanya tampilkan PrivacyConsentDialog jika bukan di halaman publik */}
+      {!isPublicPage && <PrivacyConsentDialog />}
       <Routes>
         <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
