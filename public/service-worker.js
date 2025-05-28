@@ -74,9 +74,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Deteksi permintaan ke Supabase API
+  const isSupabaseRequest = requestUrl.hostname.includes('supabase.co');
+  
+  // Jika ini adalah permintaan ke Supabase dan bukan permintaan GET, jangan intercept
+  if (isSupabaseRequest && event.request.method !== 'GET') {
+    return;
+  }
+  
   // Strategi cache untuk API
-  if (requestUrl.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirstThenCache(event.request));
+  if (requestUrl.pathname.startsWith('/api/') || isSupabaseRequest) {
+    event.respondWith(safeNetworkFirstThenCache(event.request));
     return;
   }
   
@@ -108,27 +116,66 @@ async function cacheFirstThenNetwork(request) {
     
     // Jika offline dan request adalah halaman HTML atau navigasi, tampilkan halaman offline
     if (request.mode === 'navigate' || (request.headers.get('Accept') && request.headers.get('Accept').includes('text/html'))) {
-      console.log('[Service Worker] Serving offline page');
-      return caches.match('/offline.html').then(offlineResponse => {
-        if (offlineResponse) {
-          return offlineResponse;
-        }
-        // Jika offline.html tidak ditemukan di cache, coba ambil dari network
-        return fetch('/offline.html').catch(() => {
-          // Jika gagal, kembalikan response sederhana
-          return new Response('<html><body><h1>Offline</h1><p>Aplikasi sedang dalam mode offline.</p></body></html>', {
+      console.log('[Service Worker] Serving offline page for URL:', request.url);
+      
+      // Cek apakah offline.html ada di cache
+      const offlineResponse = await caches.match('/offline.html');
+      if (offlineResponse) {
+        console.log('[Service Worker] Found offline.html in cache');
+        return offlineResponse;
+      }
+      
+      // Jika tidak ada di cache, coba ambil dari network (mungkin masih online)
+      try {
+        console.log('[Service Worker] Trying to fetch offline.html from network');
+        const networkOfflineResponse = await fetch('/offline.html');
+        
+        // Simpan ke cache untuk penggunaan berikutnya
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put('/offline.html', networkOfflineResponse.clone());
+        
+        return networkOfflineResponse;
+      } catch (offlineError) {
+        console.error('[Service Worker] Failed to fetch offline.html:', offlineError);
+        
+        // Jika gagal, kembalikan response HTML sederhana
+        return new Response(
+          `<!DOCTYPE html>
+          <html lang="id">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>LaundryPro - Mode Offline</title>
+            <style>
+              body { font-family: system-ui, sans-serif; padding: 2rem; text-align: center; }
+              .container { max-width: 500px; margin: 0 auto; }
+              h1 { color: #2563eb; }
+              p { color: #4b5563; }
+              button { background: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Mode Offline</h1>
+              <p>Aplikasi LaundryPro sedang dalam mode offline. Beberapa fitur mungkin tidak tersedia.</p>
+              <p>Silakan periksa koneksi internet Anda dan coba lagi.</p>
+              <button onclick="location.reload()">Coba Lagi</button>
+            </div>
+          </body>
+          </html>`,
+          {
             headers: { 'Content-Type': 'text/html' }
-          });
-        });
-      });
+          }
+        );
+      }
     }
     
     throw error;
   }
 }
 
-// Strategi Network First, Cache Fallback untuk API
-async function networkFirstThenCache(request) {
+// Strategi Network First, Cache Fallback untuk API dengan penanganan error yang lebih baik
+async function safeNetworkFirstThenCache(request) {
   try {
     // Coba ambil dari network dulu
     const networkResponse = await fetch(request);
@@ -141,15 +188,38 @@ async function networkFirstThenCache(request) {
     
     return networkResponse;
   } catch (error) {
+    console.log('[Service Worker] Network request failed, trying cache:', request.url);
+    
     // Jika offline, coba ambil dari cache
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
+      console.log('[Service Worker] Returning cached response for:', request.url);
       return cachedResponse;
     }
     
     console.error('[Service Worker] API fetch failed and no cache available:', error);
+    
+    // Untuk permintaan API, kembalikan respons JSON kosong untuk mencegah crash aplikasi
+    const requestUrl = new URL(request.url);
+    if (requestUrl.hostname.includes('supabase.co')) {
+      // Cek jenis permintaan Supabase
+      if (request.headers.get('Accept')?.includes('application/json')) {
+        console.log('[Service Worker] Returning empty JSON response for Supabase request');
+        return new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    
+    // Jika bukan permintaan JSON, lempar error seperti biasa
     throw error;
   }
+}
+
+// Strategi Network First, Cache Fallback untuk API (versi lama)
+async function networkFirstThenCache(request) {
+  return safeNetworkFirstThenCache(request);
 }
 
 // Background sync untuk data yang dibuat saat offline
