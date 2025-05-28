@@ -37,40 +37,64 @@ interface OfflineOrder {
  */
 export const saveOfflineOrder = (orderData: any): string => {
   try {
+    console.log('Starting saveOfflineOrder with data:', orderData);
+    
     // Buat ID unik untuk pesanan offline
     const offlineOrderId = `offline_${generateUUID()}`;
+    console.log('Generated offline order ID:', offlineOrderId);
+    
+    // Pastikan orderData memiliki semua properti yang diperlukan
+    const safeOrderData = {
+      ...orderData,
+      id: offlineOrderId, // Gunakan ID offline sebagai ID pesanan
+      status: 'pending_sync', // Status khusus untuk pesanan offline
+      created_at: new Date().toISOString(),
+      customer: orderData.customer || { name: 'Customer Offline', phone: '-', address: '-' },
+      items: Array.isArray(orderData.items) ? orderData.items : [],
+      payment_method: orderData.payment_method || 'cash',
+      business_id: orderData.business_id || '',
+      is_offline: true
+    };
     
     // Buat objek pesanan offline
     const offlineOrder: OfflineOrder = {
       id: offlineOrderId,
-      orderData: {
-        ...orderData,
-        id: offlineOrderId, // Gunakan ID offline sebagai ID pesanan
-        status: 'pending_sync', // Status khusus untuk pesanan offline
-        created_at: new Date().toISOString(),
-      },
+      orderData: safeOrderData,
       createdAt: new Date().toISOString(),
       synced: false,
     };
     
     // Ambil data pesanan offline yang sudah ada
     const existingOrdersStr = localStorage.getItem(OFFLINE_ORDERS_KEY);
-    const existingOrders: OfflineOrder[] = existingOrdersStr 
-      ? JSON.parse(existingOrdersStr) 
-      : [];
+    let existingOrders: OfflineOrder[] = [];
+    
+    try {
+      existingOrders = existingOrdersStr ? JSON.parse(existingOrdersStr) : [];
+      // Pastikan existingOrders adalah array
+      if (!Array.isArray(existingOrders)) {
+        console.warn('existingOrders bukan array, mereset ke array kosong');
+        existingOrders = [];
+      }
+    } catch (parseError) {
+      console.error('Error parsing existing offline orders:', parseError);
+      // Reset ke array kosong jika terjadi error parsing
+      existingOrders = [];
+    }
+    
+    console.log('Existing offline orders count:', existingOrders.length);
     
     // Tambahkan pesanan baru ke daftar
     existingOrders.push(offlineOrder);
     
     // Simpan kembali ke localStorage
-    localStorage.setItem(OFFLINE_ORDERS_KEY, JSON.stringify(existingOrders));
+    const ordersToSave = JSON.stringify(existingOrders);
+    localStorage.setItem(OFFLINE_ORDERS_KEY, ordersToSave);
+    console.log('Saved offline orders to localStorage, new count:', existingOrders.length);
     
-    // Tampilkan notifikasi sukses
-    toast({
-      title: "Pesanan Disimpan Offline",
-      description: "Pesanan akan disinkronkan saat Anda kembali online.",
-      variant: "default",
-    });
+    // Simpan juga pesanan individual untuk akses langsung
+    const individualOrderKey = `offline_order_${offlineOrderId}`;
+    localStorage.setItem(individualOrderKey, JSON.stringify(offlineOrder));
+    console.log('Saved individual offline order to localStorage with key:', individualOrderKey);
     
     return offlineOrderId;
   } catch (error) {
@@ -94,7 +118,9 @@ export const saveOfflineOrder = (orderData: any): string => {
 export const getOfflineOrders = (): OfflineOrder[] => {
   try {
     const offlineOrdersStr = localStorage.getItem(OFFLINE_ORDERS_KEY);
-    return offlineOrdersStr ? JSON.parse(offlineOrdersStr) : [];
+    const orders = offlineOrdersStr ? JSON.parse(offlineOrdersStr) : [];
+    // Pastikan hasilnya adalah array
+    return Array.isArray(orders) ? orders : [];
   } catch (error) {
     console.error('Gagal mendapatkan pesanan offline:', error);
     return [];
@@ -103,16 +129,62 @@ export const getOfflineOrders = (): OfflineOrder[] => {
 
 /**
  * Mendapatkan pesanan offline berdasarkan ID
+ * @param orderId ID pesanan offline
+ * @returns Pesanan offline atau null jika tidak ditemukan
+ */
+export const getOfflineOrderById = (orderId: string): OfflineOrder | null => {
+  try {
+    // Coba ambil dari penyimpanan individual terlebih dahulu (lebih cepat)
+    const individualOrderKey = `offline_order_${orderId}`;
+    const individualOrderStr = localStorage.getItem(individualOrderKey);
+    
+    if (individualOrderStr) {
+      console.log('Found offline order in individual storage:', orderId);
+      return JSON.parse(individualOrderStr);
+    }
+    
+    // Jika tidak ditemukan, cari di daftar pesanan offline
+    console.log('Searching for offline order in list:', orderId);
+    const orders = getOfflineOrders();
+    const order = orders.find(o => o.id === orderId || o.id === `offline_${orderId}` || orderId === `offline_${o.id}`);
+    
+    if (order) {
+      console.log('Found offline order in list:', orderId);
+      // Simpan ke penyimpanan individual untuk akses lebih cepat di masa depan
+      localStorage.setItem(individualOrderKey, JSON.stringify(order));
+    } else {
+      console.log('Offline order not found:', orderId);
+    }
+    
+    return order || null;
+  } catch (error) {
+    console.error('Gagal mendapatkan pesanan offline by ID:', error);
+    return null;
+  }
+};
+
+/**
+ * Mendapatkan data pesanan offline berdasarkan ID (hanya data pesanan, bukan objek OfflineOrder)
  * @param id ID pesanan offline
  * @returns Data pesanan offline
  */
-export const getOfflineOrderById = (id: string): any => {
+export const getOfflineOrderData = (id: string): any => {
   try {
+    // Coba ambil dari penyimpanan individual terlebih dahulu
+    const individualOrderKey = `offline_order_${id}`;
+    const individualOrderStr = localStorage.getItem(individualOrderKey);
+    
+    if (individualOrderStr) {
+      const order = JSON.parse(individualOrderStr);
+      return order.orderData;
+    }
+    
+    // Jika tidak ada di penyimpanan individual, cari di daftar
     const offlineOrders = getOfflineOrders();
-    const order = offlineOrders.find(order => order.id === id);
+    const order = offlineOrders.find(order => order.id === id || order.id === `offline_${id}` || id === `offline_${order.id}`);
     return order ? order.orderData : null;
   } catch (error) {
-    console.error('Gagal mendapatkan pesanan offline by ID:', error);
+    console.error('Gagal mendapatkan data pesanan offline by ID:', error);
     return null;
   }
 };

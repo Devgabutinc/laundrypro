@@ -20,6 +20,7 @@ import { Product } from "@/models/Product";
 import { App as CapApp } from '@capacitor/app';
 import { isOnline } from "@/utils/networkUtils";
 import { saveOfflineOrder } from "@/utils/offlineOrderUtils";
+import { showOfflinePage } from "@/utils/offlineHandler";
 
 // Helper sederhana untuk cek akses fitur
 function canAccessFeature(featureName: string, tenantStatus: string, featureSettings: any[]): boolean {
@@ -172,50 +173,102 @@ const POS = () => {
       const online = isOnline();
       
       if (!online) {
-        // Mode offline - simpan pesanan ke localStorage
-        const mappedItems = cartItems.map(item => ({
-          id: item.productId,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          notes: item.notes,
-          isProduct: item.isProduct
-        }));
-        
-        // Buat data pesanan untuk disimpan offline
-        const offlineOrderData = {
-          customer: customer,
-          items: mappedItems,
-          payment_method: paymentData.method,
-          options: { ...cartOptions, estimate: estimatedCompletion },
-          subtotal: subtotal,
-          discount: discount,
-          total: total,
-          amountReceived: amountReceived,
-          change: change,
-          business_id: businessId,
-          created_at: new Date().toISOString(),
-          status: 'processing',
-          payment_status: 'paid'
-        };
-        
-        // Simpan pesanan ke localStorage
-        newOrderId = saveOfflineOrder(offlineOrderData);
-        
-        // Simpan stok produk yang diubah untuk disinkronkan nanti
-        if (Object.keys(tempProductStock).length > 0) {
-          const existingStockUpdates = JSON.parse(localStorage.getItem('offline_stock_updates') || '{}');
-          localStorage.setItem('offline_stock_updates', JSON.stringify({
-            ...existingStockUpdates,
-            ...tempProductStock
+        try {
+          // Catat penggunaan POS secara offline
+          const today = new Date().toISOString().split('T')[0];
+          const offlinePosUsage = JSON.parse(localStorage.getItem('offline_pos_usage') || '{}');
+          if (offlinePosUsage[today]) {
+            offlinePosUsage[today] += 1;
+          } else {
+            offlinePosUsage[today] = 1;
+          }
+          localStorage.setItem('offline_pos_usage', JSON.stringify(offlinePosUsage));
+          
+          // Mode offline - simpan pesanan ke localStorage
+          const mappedItems = cartItems.map(item => ({
+            id: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            notes: item.notes,
+            isProduct: item.isProduct
           }));
+          
+          // Pastikan customer memiliki data minimal
+          const customerData = {
+            name: customer.name || 'Customer Offline',
+            phone: customer.phone || '-',
+            address: customer.address || '-'
+          };
+          
+          // Buat data pesanan untuk disimpan offline
+          const offlineOrderData = {
+            customer: customerData,
+            items: mappedItems,
+            payment_method: paymentData.method,
+            options: { ...cartOptions, estimate: estimatedCompletion },
+            subtotal: subtotal,
+            discount: discount,
+            total: total,
+            amountReceived: amountReceived,
+            change: change,
+            business_id: businessId,
+            created_at: new Date().toISOString(),
+            status: 'processing',
+            payment_status: 'paid',
+            is_offline: true
+          };
+          
+          console.log('Saving offline order:', offlineOrderData);
+          
+          // Simpan pesanan ke localStorage
+          newOrderId = saveOfflineOrder(offlineOrderData);
+          console.log('Offline order saved with ID:', newOrderId);
+          
+          // Simpan stok produk yang diubah untuk disinkronkan nanti
+          if (Object.keys(tempProductStock).length > 0) {
+            const existingStockUpdates = JSON.parse(localStorage.getItem('offline_stock_updates') || '{}');
+            localStorage.setItem('offline_stock_updates', JSON.stringify({
+              ...existingStockUpdates,
+              ...tempProductStock
+            }));
+            console.log('Offline stock updates saved');
+          }
+          
+          // Reset state dan stok sementara
+          setTempProductStock({});
+          
+          // Tandai bahwa stok telah diperbarui untuk di-refresh di halaman Inventory
+          localStorage.setItem('inventory_needs_refresh', 'true');
+          
+          // Reset state lainnya
+          setCartItems([]);
+          setCustomer({ name: "", phone: "", address: "" });
+          setPendingOrderToPay(null);
+          setCurrentStep('customer');
+          
+          // Increment local counter untuk UI
+          setPosUsageCount(prevCount => prevCount + 1);
+          
+          toast({
+            title: "Pesanan Disimpan Offline",
+            description: "Pesanan telah disimpan dan akan disinkronkan saat Anda kembali online.",
+            variant: "default"
+          });
+          
+          // Redirect ke halaman detail order
+          if (newOrderId) {
+            navigate(`/orders/${newOrderId}`);
+            return;
+          }
+        } catch (offlineError) {
+          console.error('Error saving offline order:', offlineError);
+          toast({
+            title: "Gagal Menyimpan Pesanan Offline",
+            description: "Terjadi kesalahan saat menyimpan pesanan offline. Silakan coba lagi.",
+            variant: "destructive"
+          });
         }
-        
-        toast({
-          title: "Pesanan Disimpan Offline",
-          description: "Pesanan telah disimpan dan akan disinkronkan saat Anda kembali online.",
-          variant: "default"
-        });
       } else {
         // Mode online - normal flow
         // Increment POS usage count
@@ -514,7 +567,7 @@ const POS = () => {
     
     fetchPlatformSettings();
   }, []);
-  
+
   // Fetch and track POS usage
   useEffect(() => {
     const fetchPosUsage = async () => {
@@ -541,17 +594,17 @@ const POS = () => {
         }
       } catch (error) {
         // Error handled via state management
-        toast({
-          title: "Error",
-          description: "Gagal memuat data penggunaan POS",
-          variant: "destructive"
-        });
+        console.error('Error fetching POS usage:', error);
+        // Tidak perlu menampilkan toast error untuk pengguna
       } finally {
         setPosUsageLoading(false);
       }
     };
     
-    fetchPosUsage();
+    // Hanya fetch jika online
+    if (isOnline()) {
+      fetchPosUsage();
+    }
   }, [businessId]);
 
   useEffect(() => {
@@ -584,6 +637,32 @@ const POS = () => {
   const incrementPosUsage = async () => {
     if (!businessId) return;
     
+    // Cek apakah online atau offline
+    const online = isOnline();
+    
+    if (!online) {
+      // Mode offline - simpan data penggunaan ke localStorage
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const offlinePosUsage = JSON.parse(localStorage.getItem('offline_pos_usage') || '{}');
+        
+        if (offlinePosUsage[today]) {
+          offlinePosUsage[today] += 1;
+        } else {
+          offlinePosUsage[today] = 1;
+        }
+        
+        localStorage.setItem('offline_pos_usage', JSON.stringify(offlinePosUsage));
+        // Increment local counter untuk UI
+        setPosUsageCount(prevCount => prevCount + 1);
+        return;
+      } catch (offlineError) {
+        console.error('Error saving offline POS usage:', offlineError);
+        return;
+      }
+    }
+    
+    // Mode online
     try {
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       
@@ -595,17 +674,29 @@ const POS = () => {
           usage_date: today,
           usage_count: posUsageCount + 1
         }, {
-          onConflict: 'business_id,usage_date',
-          returning: 'representation'
+          onConflict: 'business_id,usage_date'
         });
       
-      if (error) throw error;
-      
-      if (data && data.length > 0) {
-        setPosUsageCount(data[0].usage_count);
+      if (error) {
+        console.error('Error updating POS usage:', error);
+        throw error;
       }
+      
+      // Increment local counter untuk UI
+      setPosUsageCount(prevCount => prevCount + 1);
     } catch (error) {
-      // Error handled via state management
+      console.error('Error tracking POS usage:', error);
+      // Jika error, simpan ke localStorage sebagai fallback
+      const today = new Date().toISOString().split('T')[0];
+      const offlinePosUsage = JSON.parse(localStorage.getItem('offline_pos_usage') || '{}');
+      
+      if (offlinePosUsage[today]) {
+        offlinePosUsage[today] += 1;
+      } else {
+        offlinePosUsage[today] = 1;
+      }
+      
+      localStorage.setItem('offline_pos_usage', JSON.stringify(offlinePosUsage));
     }
   };
 
