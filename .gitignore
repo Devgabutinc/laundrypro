@@ -32,7 +32,11 @@ android/*
 !android/capacitor.settings.gradle
 !android/app/src/main/AndroidManifest.xml
 !android/app/src/main/res/
+!android/app/src/main/java/
 android/app/src/main/assets/public/
+android/app/build/
+android/.gradle/
+android/build/
 ios/
 resources/
 
