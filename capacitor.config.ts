@@ -7,6 +7,7 @@ const config: CapacitorConfig = {
   // Konfigurasi server yang aman
   server: {
     androidScheme: 'https',
+    // cleartext tetap aktif untuk fungsi printing
     cleartext: true
   },
   plugins: {
@@ -21,34 +22,10 @@ const config: CapacitorConfig = {
       showTitle: true
     }
   },
-  // Konfigurasi yang lebih lengkap untuk deep linking
+  // Konfigurasi Android
   android: {
-    intentFilters: [
-      {
-        action: 'VIEW',
-        autoVerify: true,
-        data: [
-          // Skema kustom untuk deep link
-          {
-            scheme: 'com.laundrypro.app',
-            host: '*',
-          },
-          // URL callback dari Supabase/Google OAuth
-          {
-            scheme: 'https',
-            host: 'laundrypro.vercel.app',
-            pathPrefix: '/auth/v1/callback'
-          },
-          // URL alternatif dari Supabase
-          {
-            scheme: 'https',
-            host: 'igogxmfqfsxubjbtrguf.supabase.co',
-            pathPrefix: '/auth/v1/callback'
-          }
-        ],
-        categories: ['DEFAULT', 'BROWSABLE'],
-      },
-    ],
+    // Konfigurasi webContentsDebuggingEnabled untuk build produksi
+    webContentsDebuggingEnabled: false
   },
   ios: {
     scheme: 'com.laundrypro.app'
