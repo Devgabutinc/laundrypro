@@ -1,4 +1,5 @@
 {
+  "_comment": "Updated configuration to fix landing page access",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
