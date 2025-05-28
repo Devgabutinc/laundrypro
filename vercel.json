@@ -3,11 +3,7 @@
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "redirects": [
-    { "source": "/", "destination": "/landing", "permanent": false },
-    { "source": "https://laundrypro.space", "destination": "https://www.laundrypro.space/landing", "permanent": true },
-    { "source": "https://laundrypro.space/", "destination": "https://www.laundrypro.space/landing", "permanent": true },
-    { "source": "https://www.laundrypro.space", "destination": "https://www.laundrypro.space/landing", "permanent": false },
-    { "source": "https://www.laundrypro.space/", "destination": "https://www.laundrypro.space/landing", "permanent": false }
+    { "source": "/", "destination": "/landing", "permanent": false }
   ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
