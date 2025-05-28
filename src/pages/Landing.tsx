@@ -1,9 +1,71 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    console.error("Landing page error:", error, errorInfo);
+  }
+
+  render(): React.ReactNode {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 p-4 text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
+          <pre className="bg-white p-4 rounded shadow-sm overflow-auto max-w-full text-sm mb-4">
+            {this.state.error?.toString()}
+          </pre>
+          <p className="mb-4">Please try refreshing the page or contact support if the issue persists.</p>
+          <Link to="/">
+            <Button variant="outline">Go to Home</Button>
+          </Link>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const Landing = () => {
   console.log("Landing component rendering...");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    console.log("Landing component mounted");
+    setMounted(true);
+    
+    // Log any global errors
+    const errorHandler = (event: ErrorEvent) => {
+      console.error("Global error:", event.error);
+    };
+    
+    window.addEventListener('error', errorHandler);
+    return () => window.removeEventListener('error', errorHandler);
+  }, []);
+
+  if (!mounted) {
+    console.log("Landing component not yet mounted");
+  }
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header/Navbar */}
@@ -464,4 +526,12 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+const WrappedLanding = () => {
+  return (
+    <ErrorBoundary>
+      <Landing />
+    </ErrorBoundary>
+  );
+};
+
+export default WrappedLanding;
