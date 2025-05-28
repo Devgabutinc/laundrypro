@@ -1,6 +1,23 @@
 import { toast } from '@/components/ui/use-toast';
-import { v4 as uuidv4 } from 'uuid';
 import { isOnline } from './networkUtils';
+
+// Implementasi fungsi UUID internal untuk menghindari masalah build di Vercel
+function generateUUID(): string {
+  // Implementasi sederhana untuk menghasilkan UUID
+  const s: string[] = [];
+  const hexDigits = '0123456789abcdef';
+  for (let i = 0; i < 36; i++) {
+    s[i] = hexDigits.charAt(Math.floor(Math.random() * 0x10));
+  }
+  // Bits 12-15 of time_hi_and_version field to 0010
+  s[14] = '4';
+  // Bits 6-7 of clock_seq_hi_and_reserved to 01
+  s[19] = hexDigits.charAt((parseInt(s[19], 16) & 0x3) | 0x8);
+  // Menambahkan tanda hubung
+  s[8] = s[13] = s[18] = s[23] = '-';
+  
+  return s.join('');
+}
 
 // Kunci penyimpanan untuk data pesanan offline
 const OFFLINE_ORDERS_KEY = 'laundrypro_offline_orders';
@@ -21,7 +38,7 @@ interface OfflineOrder {
 export const saveOfflineOrder = (orderData: any): string => {
   try {
     // Buat ID unik untuk pesanan offline
-    const offlineOrderId = `offline_${uuidv4()}`;
+    const offlineOrderId = `offline_${generateUUID()}`;
     
     // Buat objek pesanan offline
     const offlineOrder: OfflineOrder = {
