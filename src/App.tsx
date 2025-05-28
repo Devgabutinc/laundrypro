@@ -64,7 +64,9 @@ function AppRoutes() {
   // Inisialisasi aplikasi
 
   useEffect(() => {
-    // Pasang listener FCM sebelum register
+    // Push notifications sementara dinonaktifkan karena tidak ada file google-services.json
+    // Komentar kode di bawah untuk mencegah crash aplikasi
+    /*
     PushNotifications.addListener('registration', (token) => {
       // FCM token received
     });
@@ -73,6 +75,7 @@ function AppRoutes() {
     });
     // Panggil request permission & register
     requestPushPermission();
+    */
   }, []);
 
   // Handler tombol back Android
