@@ -51,6 +51,7 @@ import EmailConfirmation from "@/pages/EmailConfirmation";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import PrivacyConsentDialog from "./components/PrivacyConsentDialog";
+import Landing from "./pages/Landing";
 
 
 const queryClient = new QueryClient();
@@ -139,11 +140,11 @@ function AppRoutes() {
     <>
       <PrivacyConsentDialog />
       <Routes>
+        <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/update-password" element={<UpdatePassword />} />
-        <Route path="/updatepassword" element={<ResetPassword />} />
-        <Route path="/confirm-email" element={<EmailConfirmation />} />
-        {/* Rute publik untuk kebijakan privasi dan syarat & ketentuan */}
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/email-confirmation" element={<EmailConfirmation />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
