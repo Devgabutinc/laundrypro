@@ -24,7 +24,7 @@ import { useRef } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import { id } from 'date-fns/locale/id';
+import id from 'date-fns/locale/id';
 
 // Helper sederhana untuk cek akses fitur
 function canAccessFeature(featureName: string, tenantStatus: string, featureSettings: any[]): boolean {
