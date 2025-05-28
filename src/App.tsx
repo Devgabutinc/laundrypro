@@ -37,7 +37,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Discussion from "./pages/Discussion";
 import DiscussionDetail from "@/pages/DiscussionDetail";
 import PlatformAdminReports from "./pages/PlatformAdminReports";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { requestPushPermission } from './utils/pushNotifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { App as CapApp } from '@capacitor/app';
@@ -61,35 +61,11 @@ function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
   const backHandlerRef = useRef<any>(null);
-  const [isMobileApp, setIsMobileApp] = useState(false);
-  
-  // Deteksi apakah aplikasi dijalankan sebagai mobile app (Capacitor/Cordova)
-  useEffect(() => {
-    const checkPlatform = async () => {
-      try {
-        // Cek apakah aplikasi berjalan di Capacitor
-        const info = await CapApp.getInfo();
-        setIsMobileApp(true);
-      } catch (error) {
-        // Jika error, berarti bukan mobile app
-        setIsMobileApp(false);
-      }
-    };
-    
-    checkPlatform();
-
-    // Log untuk debugging
-    console.log("Current pathname:", location.pathname);
-    console.log("Is mobile app:", isMobileApp);
-    console.log("Has session:", !!session);
-  }, [location.pathname, isMobileApp, session]);
   
   // Inisialisasi aplikasi
 
   useEffect(() => {
-    // Push notifications sementara dinonaktifkan karena tidak ada file google-services.json
-    // Komentar kode di bawah untuk mencegah crash aplikasi
-    /*
+    // Pasang listener FCM sebelum register
     PushNotifications.addListener('registration', (token) => {
       // FCM token received
     });
@@ -98,7 +74,6 @@ function AppRoutes() {
     });
     // Panggil request permission & register
     requestPushPermission();
-    */
   }, []);
 
   // Handler tombol back Android
@@ -132,47 +107,36 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // Daftar halaman publik yang dapat diakses tanpa login
-  const publicPages = [
-    "/landing",
-    "/update-password",
-    "/reset-password",
-    "/email-confirmation",
-    "/privacy-policy",
-    "/terms-conditions",
-    "/auth"
-  ];
-  
-  console.log("Public pages:", publicPages);
-
-  // PRIORITAS TERTINGGI: Cek apakah halaman saat ini adalah halaman publik
-  if (publicPages.includes(location.pathname)) {
-    console.log(`Public page accessed: ${location.pathname}`);
-    // Tidak perlu melakukan redirect atau pemeriksaan lainnya
-    return null; // Allow access to the public page
+  // Allow access to reset password and email confirmation pages without any redirection
+  if (location.pathname === "/updatepassword" || location.pathname === "/confirm-email" ||
+      location.pathname === "/landing" || location.pathname === "/privacy-policy" ||
+      location.pathname === "/terms-conditions") {
+    console.log("Public page accessed: " + location.pathname);
+    // Continue to the routes without redirection
   }
-  
-  console.log(`Current path is not in public pages: ${location.pathname}`);
-  console.log(`Checking other conditions...`);
-
-  // Jika di root path "/"
-  if (location.pathname === "/") {
-    console.log("Root path detected");
-    // Jika mobile app, tetap ke auth flow
-    if (isMobileApp) {
+  // Jika di root path dan belum login
+  else if (location.pathname === "/" && !session) {
+    // Deteksi apakah pengguna menggunakan mobile app (Capacitor/Cordova)
+    // Metode 1: Cek user agent untuk Capacitor/Cordova
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobileApp = userAgent.includes('capacitor') || userAgent.includes('cordova');
+    
+    // Metode 2: Cek jika aplikasi berjalan dalam mode standalone (PWA) atau native app
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        (window as any).navigator.standalone === true;
+    
+    if (isMobileApp || isStandalone) {
+      // Jika mobile app, redirect ke auth
       console.log("Mobile app detected, redirecting to auth");
-      if (!session) {
-        return <Navigate to="/auth" replace />;
-      }
-    } 
-    // Jika web browser dan tidak ada session, redirect ke landing
-    else if (!session) {
-      console.log("Web browser without session detected, redirecting to landing");
+      return <Navigate to="/auth" replace />;
+    } else {
+      // Jika web browser, redirect ke landing
+      console.log("Web browser detected, redirecting to landing");
       return <Navigate to="/landing" replace />;
     }
   }
-  // Jika belum login dan bukan di halaman publik, redirect ke auth
-  else if (!session) {
+  // Jika belum login dan bukan di halaman auth, redirect ke /auth
+  else if (!session && location.pathname !== "/auth") {
     return <Navigate to="/auth" replace />;
   }
   // Jika sudah login tapi belum punya bisnis, redirect ke setup bisnis
@@ -199,8 +163,9 @@ function AppRoutes() {
         <Route path="/landing" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/update-password" element={<UpdatePassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/email-confirmation" element={<EmailConfirmation />} />
+        <Route path="/updatepassword" element={<ResetPassword />} />
+        <Route path="/confirm-email" element={<EmailConfirmation />} />
+        {/* Rute publik untuk kebijakan privasi dan syarat & ketentuan */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
         <Route path="/" element={<PrivateRoute><AppLayout><Index /></AppLayout></PrivateRoute>} />
