@@ -3,19 +3,16 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const Landing = () => {
+  console.log("Landing component rendering...");
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header/Navbar */}
       <header className="container mx-auto py-6 px-4 flex justify-between items-center">
         <div className="flex items-center">
           <img 
-            src="/assets/logo.png" 
+            src="https://via.placeholder.com/150x50?text=LaundryPro" 
             alt="LaundryPro Logo" 
             className="h-10 w-auto mr-2"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = 'https://via.placeholder.com/150x50?text=LaundryPro';
-            }}
           />
           <span className="text-2xl font-bold text-blue-600">LaundryPro</span>
         </div>
@@ -65,6 +62,8 @@ const Landing = () => {
             src="https://via.placeholder.com/600x400?text=LaundryPro+Dashboard" 
             alt="LaundryPro Dashboard" 
             className="rounded-lg shadow-2xl"
+            onLoad={() => console.log("Hero image loaded successfully")}
+            onError={() => console.log("Error loading hero image")}
           />
         </div>
       </section>
