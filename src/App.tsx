@@ -77,7 +77,12 @@ function AppRoutes() {
     };
     
     checkPlatform();
-  }, []);
+
+    // Log untuk debugging
+    console.log("Current pathname:", location.pathname);
+    console.log("Is mobile app:", isMobileApp);
+    console.log("Has session:", !!session);
+  }, [location.pathname, isMobileApp, session]);
   
   // Inisialisasi aplikasi
 
@@ -127,25 +132,25 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // PRIORITAS TERTINGGI: Akses langsung ke landing page harus selalu diizinkan
-  if (location.pathname === "/landing") {
-    console.log("Landing page accessed directly");
-    // Lanjutkan ke route tanpa redirect
-    return null; // Eksplisit mengembalikan null untuk melanjutkan ke route
+  // Daftar halaman publik yang dapat diakses tanpa login
+  const publicPages = [
+    "/landing",
+    "/updatepassword",
+    "/confirm-email",
+    "/privacy-policy",
+    "/terms-conditions",
+    "/auth"
+  ];
+
+  // PRIORITAS TERTINGGI: Cek apakah halaman saat ini adalah halaman publik
+  if (publicPages.includes(location.pathname)) {
+    console.log(`Public page accessed: ${location.pathname}`);
+    // Tidak perlu redirect, biarkan aplikasi menampilkan halaman yang diminta
+    return null;
   }
-  
-  // Allow access to other public pages without any redirection
-  if (
-    location.pathname === "/updatepassword" || 
-    location.pathname === "/confirm-email" ||
-    location.pathname === "/privacy-policy" ||
-    location.pathname === "/terms-conditions"
-  ) {
-    console.log("Public page accessed: " + location.pathname);
-    // Continue to the routes without redirection
-  }
+
   // Jika di root path "/"
-  else if (location.pathname === "/") {
+  if (location.pathname === "/") {
     // Jika mobile app, tetap ke auth flow
     if (isMobileApp) {
       if (!session) {
@@ -157,8 +162,8 @@ function AppRoutes() {
       return <Navigate to="/landing" replace />;
     }
   }
-  // Jika belum login dan bukan di halaman auth, redirect ke auth
-  else if (!session && location.pathname !== "/auth") {
+  // Jika belum login dan bukan di halaman publik, redirect ke auth
+  else if (!session) {
     return <Navigate to="/auth" replace />;
   }
   // Jika sudah login tapi belum punya bisnis, redirect ke setup bisnis
