@@ -9,11 +9,10 @@ const Landing = () => {
       {/* Header/Navbar */}
       <header className="container mx-auto py-4 px-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img 
-            src="https://via.placeholder.com/150x50?text=LaundryPro" 
-            alt="LaundryPro Logo" 
-            className="h-10 w-auto mr-2" 
-          />
+          <div className="text-2xl font-bold">
+            <span className="text-blue-600">Laundry</span>
+            <span className="text-blue-400">Pro</span>
+          </div>
         </div>
         <div className="flex gap-4">
           <Link to="/auth">
@@ -53,9 +52,15 @@ const Landing = () => {
         </div>
         <div className="md:w-1/2">
           <img 
-            src="https://via.placeholder.com/600x400?text=LaundryPro+Dashboard" 
+            src="/hero-image.png" 
             alt="LaundryPro Dashboard" 
             className="rounded-lg shadow-lg w-full" 
+            onError={(e) => {
+              // Fallback ke placeholder jika gambar tidak ditemukan
+              const target = e.target as HTMLImageElement;
+              target.src = "https://via.placeholder.com/600x400?text=LaundryPro+Dashboard";
+              console.log("Hero image failed to load, using placeholder");
+            }}
           />
         </div>
       </section>
