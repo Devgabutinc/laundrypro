@@ -104,12 +104,25 @@ async function cacheFirstThenNetwork(request) {
     
     return networkResponse;
   } catch (error) {
-    // Jika offline dan request adalah halaman HTML, tampilkan halaman offline
-    if (request.headers.get('Accept').includes('text/html')) {
-      return caches.match('/offline.html');
+    console.error('[Service Worker] Fetch failed:', error);
+    
+    // Jika offline dan request adalah halaman HTML atau navigasi, tampilkan halaman offline
+    if (request.mode === 'navigate' || (request.headers.get('Accept') && request.headers.get('Accept').includes('text/html'))) {
+      console.log('[Service Worker] Serving offline page');
+      return caches.match('/offline.html').then(offlineResponse => {
+        if (offlineResponse) {
+          return offlineResponse;
+        }
+        // Jika offline.html tidak ditemukan di cache, coba ambil dari network
+        return fetch('/offline.html').catch(() => {
+          // Jika gagal, kembalikan response sederhana
+          return new Response('<html><body><h1>Offline</h1><p>Aplikasi sedang dalam mode offline.</p></body></html>', {
+            headers: { 'Content-Type': 'text/html' }
+          });
+        });
+      });
     }
     
-    console.error('[Service Worker] Fetch failed:', error);
     throw error;
   }
 }

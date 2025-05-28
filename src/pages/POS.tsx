@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Product } from "@/models/Product";
 import { App as CapApp } from '@capacitor/app';
+import { isOnline } from "@/utils/networkUtils";
+import { saveOfflineOrder } from "@/utils/offlineOrderUtils";
 
 // Helper sederhana untuk cek akses fitur
 function canAccessFeature(featureName: string, tenantStatus: string, featureSettings: any[]): boolean {
@@ -143,7 +145,7 @@ const POS = () => {
     }
   };
 
-  // Modifikasi handleCompleteTransaction
+  // Modifikasi handleCompleteTransaction dengan dukungan offline
   const handleCompleteTransaction = async (paymentData: any) => {
     try {
       if (!session) {
@@ -155,9 +157,6 @@ const POS = () => {
         return;
       }
       
-      // Increment POS usage count
-      await incrementPosUsage();
-
       const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const discount = paymentData.discount || 0;
       const total = Math.max(0, subtotal - discount);
@@ -168,89 +167,147 @@ const POS = () => {
       const estimatedCompletion = parseEstimateToISO(cartOptions.estimate);
       const cartOptionsWithISO = { ...cartOptions, estimate: estimatedCompletion };
       let newOrderId = null;
-      if (pendingOrderToPay) {
-        // Update existing pending order (update payment_status dan estimated_completion saja, JANGAN update status)
-        const { error: updateError } = await supabase
-          .from('orders')
-          .update({
-            payment_status: 'paid', // Tandai sudah dibayar
-            estimated_completion: estimatedCompletion
-          })
-          .eq('id', pendingOrderToPay.id);
-
-        if (updateError) throw updateError;
-        newOrderId = pendingOrderToPay.id;
-
-        // Simpan informasi pembayaran ke tabel transactions
-        const { error: transactionError } = await supabase
-          .from('transactions')
-          .insert({
-            type: 'income',
-            amount: total,
-            description: `Pembayaran pesanan ${pendingOrderToPay.id}`,
-            category: 'laundry',
-            related_order_id: pendingOrderToPay.id,
-            payment_method: paymentData.method,
-            status: 'completed',
-            business_id: businessId
-          });
-
-        if (transactionError) throw transactionError;
-      } else {
-        // Create new order
-        // Prepare data for createOrder
-        // Process cart items
-        
+      
+      // Cek apakah perangkat online atau offline
+      const online = isOnline();
+      
+      if (!online) {
+        // Mode offline - simpan pesanan ke localStorage
         const mappedItems = cartItems.map(item => ({
           id: item.productId,
           name: item.name,
           quantity: item.quantity,
           price: item.price,
           notes: item.notes,
-          isProduct: item.isProduct // Tambahkan properti isProduct
+          isProduct: item.isProduct
         }));
         
-        // Send mapped items to createOrder
+        // Buat data pesanan untuk disimpan offline
+        const offlineOrderData = {
+          customer: customer,
+          items: mappedItems,
+          payment_method: paymentData.method,
+          options: { ...cartOptions, estimate: estimatedCompletion },
+          subtotal: subtotal,
+          discount: discount,
+          total: total,
+          amountReceived: amountReceived,
+          change: change,
+          business_id: businessId,
+          created_at: new Date().toISOString(),
+          status: 'processing',
+          payment_status: 'paid'
+        };
         
-        const orderData = await createOrder(
-          customer,
-          mappedItems,
-          paymentData.method,
-          { ...cartOptions, estimate: estimatedCompletion }
-        );
-        newOrderId = orderData.id;
+        // Simpan pesanan ke localStorage
+        newOrderId = saveOfflineOrder(offlineOrderData);
+        
+        // Simpan stok produk yang diubah untuk disinkronkan nanti
+        if (Object.keys(tempProductStock).length > 0) {
+          const existingStockUpdates = JSON.parse(localStorage.getItem('offline_stock_updates') || '{}');
+          localStorage.setItem('offline_stock_updates', JSON.stringify({
+            ...existingStockUpdates,
+            ...tempProductStock
+          }));
+        }
+        
+        toast({
+          title: "Pesanan Disimpan Offline",
+          description: "Pesanan telah disimpan dan akan disinkronkan saat Anda kembali online.",
+          variant: "default"
+        });
+      } else {
+        // Mode online - normal flow
+        // Increment POS usage count
+        await incrementPosUsage();
+        
+        if (pendingOrderToPay) {
+          // Update existing pending order (update payment_status dan estimated_completion saja, JANGAN update status)
+          const { error: updateError } = await supabase
+            .from('orders')
+            .update({
+              payment_status: 'paid', // Tandai sudah dibayar
+              estimated_completion: estimatedCompletion
+            })
+            .eq('id', pendingOrderToPay.id);
 
-        // Update slot rak jika dipilih
-        await supabase.from('rack_slots').update({
-          order_id: orderData.id,
-          occupied: true,
-          assigned_at: new Date().toISOString()
-        }).eq('id', cartOptions.rackLocation);
-      }
+          if (updateError) throw updateError;
+          newOrderId = pendingOrderToPay.id;
 
-      // Reset state dan stok sementara
-      // Reset stok sementara
-      setTempProductStock({});
-      
-      // Tandai bahwa stok telah diperbarui untuk di-refresh di halaman Inventory
-      localStorage.setItem('inventory_needs_refresh', 'true');
-      
-      // Reset state lainnya
-      setCartItems([]);
-      setCustomer({ name: "", phone: "", address: "" });
-      setPendingOrderToPay(null);
-      setCurrentStep('customer');
+          // Simpan informasi pembayaran ke tabel transactions
+          const { error: transactionError } = await supabase
+            .from('transactions')
+            .insert({
+              type: 'income',
+              amount: total,
+              description: `Pembayaran pesanan ${pendingOrderToPay.id}`,
+              category: 'laundry',
+              related_order_id: pendingOrderToPay.id,
+              payment_method: paymentData.method,
+              status: 'completed',
+              business_id: businessId
+            });
 
-      // Redirect ke halaman detail order
-      if (newOrderId) {
-        navigate(`/orders/${newOrderId}`);
-        return;
+          if (transactionError) throw transactionError;
+        } else {
+          // Create new order
+          // Prepare data for createOrder
+          // Process cart items
+          
+          const mappedItems = cartItems.map(item => ({
+            id: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            notes: item.notes,
+            isProduct: item.isProduct // Tambahkan properti isProduct
+          }));
+          
+          // Send mapped items to createOrder
+          
+          const orderData = await createOrder(
+            customer,
+            mappedItems,
+            paymentData.method,
+            { ...cartOptions, estimate: estimatedCompletion }
+          );
+          newOrderId = orderData.id;
+
+          // Update slot rak jika dipilih
+          if (cartOptions.rackLocation) {
+            await supabase.from('rack_slots').update({
+              order_id: orderData.id,
+              occupied: true,
+              assigned_at: new Date().toISOString()
+            }).eq('id', cartOptions.rackLocation);
+          }
+        }
+
+        // Reset state dan stok sementara
+        // Reset stok sementara
+        setTempProductStock({});
+        
+        // Tandai bahwa stok telah diperbarui untuk di-refresh di halaman Inventory
+        localStorage.setItem('inventory_needs_refresh', 'true');
+        
+        // Reset state lainnya
+        setCartItems([]);
+        setCustomer({ name: "", phone: "", address: "" });
+        setPendingOrderToPay(null);
+        setCurrentStep('customer');
+
+        // Redirect ke halaman detail order
+        if (newOrderId) {
+          navigate(`/orders/${newOrderId}`);
+          return;
+        }
       }
     } catch (error) {
+      console.error('Error completing transaction:', error);
       // Error handled via state management
       toast({
         title: "Error",
-        description: "Gagal memproses pembayaran",
+        description: "Gagal memproses pembayaran. Coba lagi nanti.",
         variant: "destructive"
       });
     }
