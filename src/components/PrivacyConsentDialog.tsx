@@ -81,7 +81,7 @@ export default function PrivacyConsentDialog() {
         <p className="mb-4 text-gray-700">
           Dengan menggunakan aplikasi ini, Anda menyetujui pengumpulan dan pemrosesan data sesuai dengan 
           <a 
-            href="/privacy-policy" 
+            href="https://www.laundrypro.space/privacy-policy" 
             target="_blank" 
             rel="noopener noreferrer"
             className="px-1 text-blue-600 font-medium hover:underline"
@@ -90,7 +90,7 @@ export default function PrivacyConsentDialog() {
           </a> 
           dan 
           <a 
-            href="/terms-conditions" 
+            href="https://www.laundrypro.space/terms-conditions" 
             target="_blank" 
             rel="noopener noreferrer"
             className="px-1 text-blue-600 font-medium hover:underline"

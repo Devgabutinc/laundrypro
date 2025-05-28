@@ -89,6 +89,33 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
+          <h2 className="text-xl font-semibold mb-3">Informasi tentang Pihak Ketiga (SDK/API)</h2>
+          <p className="text-gray-700 mb-2">
+            Aplikasi LaundryPro menggunakan beberapa layanan dan pustaka pihak ketiga untuk meningkatkan fungsionalitas aplikasi. Berikut adalah daftar pihak ketiga yang kami gunakan:
+          </p>
+          <ul className="list-disc pl-6 text-gray-700 space-y-1">
+            <li><strong>Supabase:</strong> Digunakan untuk autentikasi, penyimpanan data, dan manajemen database. Informasi lebih lanjut tentang kebijakan privasi Supabase dapat ditemukan di <a href="https://supabase.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">https://supabase.com/privacy</a>.</li>
+            
+            <li><strong>Firebase Cloud Messaging (FCM):</strong> Kami menggunakan Firebase Cloud Messaging untuk mengirimkan notifikasi. Token perangkat Anda dikumpulkan untuk keperluan pengiriman pesan yang bersifat fungsional dan informatif. Informasi lebih lanjut tentang kebijakan privasi Firebase dapat ditemukan di <a href="https://firebase.google.com/support/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">https://firebase.google.com/support/privacy</a>.</li>
+            
+            <li><strong>Capacitor:</strong> Framework yang digunakan untuk mengembangkan aplikasi mobile dari kode web. Ini memungkinkan akses ke fitur perangkat seperti kamera, penyimpanan file, dan notifikasi.</li>
+            
+            <li><strong>Bluetooth Serial dan Izin Lokasi:</strong> Plugin yang digunakan untuk koneksi dengan printer Bluetooth untuk mencetak struk. Perlu diketahui bahwa pada perangkat Android 10 dan yang lebih baru, akses lokasi (ACCESS_FINE_LOCATION dan ACCESS_COARSE_LOCATION) diperlukan untuk melakukan pemindaian perangkat Bluetooth. Ini adalah persyaratan sistem Android dan bukan karena aplikasi kami menggunakan data lokasi Anda. Pada Android 12 dan yang lebih baru, kami menggunakan izin BLUETOOTH_SCAN dengan flag neverForLocation untuk menjelaskan bahwa pemindaian Bluetooth tidak digunakan untuk pelacakan lokasi.</li>
+            
+            <li><strong>Social Sharing:</strong> Plugin yang digunakan untuk berbagi konten seperti struk atau laporan melalui aplikasi lain di perangkat Anda. Ketika Anda menggunakan fitur ini, data yang dibagikan akan diproses oleh aplikasi penerima yang Anda pilih.</li>
+            
+            <li><strong>Filesystem:</strong> Digunakan untuk mengakses sistem file perangkat untuk menyimpan dan membaca file seperti laporan dan ekspor data. Akses ini terbatas pada direktori aplikasi dan direktori yang Anda pilih saat mengekspor data.</li>
+            
+            <li><strong>PDF Generation (jsPDF):</strong> Digunakan untuk membuat dokumen PDF seperti laporan dan struk. Pemrosesan dilakukan secara lokal di perangkat Anda dan tidak mengirimkan data ke server eksternal.</li>
+            
+            <li><strong>Excel Export (xlsx):</strong> Digunakan untuk mengekspor data dalam format Excel. Seperti pembuatan PDF, pemrosesan dilakukan secara lokal di perangkat Anda.</li>
+          </ul>
+          <p className="text-gray-700 mt-2">
+            Semua layanan pihak ketiga ini dipilih dengan mempertimbangkan keamanan dan privasi data Anda. Namun, kami menyarankan Anda untuk membaca kebijakan privasi masing-masing layanan untuk informasi lebih lanjut tentang bagaimana mereka menangani data Anda.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-semibold mb-3">Perubahan Kebijakan Privasi</h2>
           <p className="text-gray-700">
             Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk mencerminkan perubahan praktik kami atau karena alasan lain. Kami akan memberi tahu Anda tentang perubahan signifikan dengan memposting kebijakan baru di aplikasi atau melalui pemberitahuan langsung.

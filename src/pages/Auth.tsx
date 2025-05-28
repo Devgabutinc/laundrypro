@@ -125,12 +125,25 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex justify-center mb-4">
-            <div className="text-3xl font-bold text-center">
-              <span className="text-laundry-primary">Laundry</span>
-              <span className="text-laundry-accent">Pro</span>
-            </div>
+            <img 
+              src="/images/logo.svg" 
+              alt="LaundryPro Logo" 
+              className="h-16" 
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.style.display = 'none';
+                const parent = target.parentNode as HTMLElement;
+                if (parent) {
+                  const fallbackText = document.createElement('div');
+                  fallbackText.className = 'text-3xl font-bold text-center';
+                  fallbackText.innerHTML = '<span class="text-laundry-primary">Laundry</span><span class="text-laundry-accent">Pro</span>';
+                  parent.appendChild(fallbackText);
+                }
+              }}
+            />
           </div>
-          <CardTitle className="text-2xl text-center">Welcome to LaundryPro</CardTitle>
+          <CardTitle className="text-2xl text-center">Selamat Datang Di LaundryPro</CardTitle>
           <CardDescription className="text-center">
             Platform Management Laundry Professional
           </CardDescription>
@@ -237,7 +250,7 @@ const Auth = () => {
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 LaundryPro. Abdul Azizrrohman.
+            © 2025 LaundryPro. All rights reserved.
           </p>
         </CardFooter>
       </Card>

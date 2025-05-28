@@ -117,15 +117,26 @@ function AppRoutes() {
   // Jika di root path dan belum login
   else if (location.pathname === "/" && !session) {
     // Deteksi apakah pengguna menggunakan mobile app (Capacitor/Cordova)
-    // Metode 1: Cek user agent untuk Capacitor/Cordova
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isMobileApp = userAgent.includes('capacitor') || userAgent.includes('cordova');
+    // Metode 1: Cek keberadaan objek Capacitor global
+    const isCapacitorApp = !!(window as any).Capacitor;
     
-    // Metode 2: Cek jika aplikasi berjalan dalam mode standalone (PWA) atau native app
+    // Metode 2: Cek user agent untuk Capacitor/Cordova
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isUserAgentMobile = userAgent.includes('capacitor') || userAgent.includes('cordova');
+    
+    // Metode 3: Cek jika aplikasi berjalan dalam mode standalone (PWA) atau native app
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                         (window as any).navigator.standalone === true;
     
-    if (isMobileApp || isStandalone) {
+    // Jika salah satu metode deteksi menunjukkan ini adalah mobile app
+    const isMobileApp = isCapacitorApp || isUserAgentMobile || isStandalone;
+    
+    console.log("Capacitor detected:", isCapacitorApp);
+    console.log("User agent mobile:", isUserAgentMobile);
+    console.log("Standalone mode:", isStandalone);
+    console.log("Is mobile app:", isMobileApp);
+    
+    if (isMobileApp) {
       // Jika mobile app, redirect ke auth
       console.log("Mobile app detected, redirecting to auth");
       return <Navigate to="/auth" replace />;
