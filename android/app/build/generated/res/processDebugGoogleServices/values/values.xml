@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="gcm_defaultSenderId" translatable="false">797305778832</string>
-    <string name="google_api_key" translatable="false">AIzaSyAhC9y1qu9hwzApcPWQDzg7fM5V1OWGFjg</string>
-    <string name="google_app_id" translatable="false">1:797305778832:android:5296c4b1d8044434521e15</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAhC9y1qu9hwzApcPWQDzg7fM5V1OWGFjg</string>
-    <string name="google_storage_bucket" translatable="false">laundrypro-dc029.firebasestorage.app</string>
-    <string name="project_id" translatable="false">laundrypro-dc029</string>
-</resources>
