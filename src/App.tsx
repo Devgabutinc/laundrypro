@@ -135,30 +135,39 @@ function AppRoutes() {
   // Daftar halaman publik yang dapat diakses tanpa login
   const publicPages = [
     "/landing",
-    "/updatepassword",
-    "/confirm-email",
+    "/update-password",
+    "/reset-password",
+    "/email-confirmation",
     "/privacy-policy",
     "/terms-conditions",
     "/auth"
   ];
+  
+  console.log("Public pages:", publicPages);
 
   // PRIORITAS TERTINGGI: Cek apakah halaman saat ini adalah halaman publik
   if (publicPages.includes(location.pathname)) {
     console.log(`Public page accessed: ${location.pathname}`);
-    // Tidak perlu redirect, biarkan aplikasi menampilkan halaman yang diminta
-    return null;
+    // Tidak perlu melakukan redirect atau pemeriksaan lainnya
+    return null; // Allow access to the public page
   }
+  
+  console.log(`Current path is not in public pages: ${location.pathname}`);
+  console.log(`Checking other conditions...`);
 
   // Jika di root path "/"
   if (location.pathname === "/") {
+    console.log("Root path detected");
     // Jika mobile app, tetap ke auth flow
     if (isMobileApp) {
+      console.log("Mobile app detected, redirecting to auth");
       if (!session) {
         return <Navigate to="/auth" replace />;
       }
     } 
     // Jika web browser dan tidak ada session, redirect ke landing
     else if (!session) {
+      console.log("Web browser without session detected, redirecting to landing");
       return <Navigate to="/landing" replace />;
     }
   }
