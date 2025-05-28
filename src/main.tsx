@@ -3,11 +3,15 @@ import App from './App.tsx'
 import './index.css'
 import { setupNetworkListeners } from './utils/networkUtils'
 import { setupMemoryOptimization, isLowEndDevice } from './utils/performanceUtils'
+import { setupOfflineHandler } from './utils/offlineHandler'
 
 // Inisialisasi aplikasi dengan optimasi kinerja
 const initApp = () => {
   // Setup listener untuk status jaringan
   const cleanupNetworkListeners = setupNetworkListeners();
+  
+  // Setup handler offline yang lebih baik
+  const cleanupOfflineHandler = setupOfflineHandler();
   
   // Setup optimasi memori untuk perangkat low-end
   setupMemoryOptimization();
@@ -45,6 +49,7 @@ const initApp = () => {
   // Cleanup function untuk event listener
   return () => {
     cleanupNetworkListeners();
+    cleanupOfflineHandler();
   };
 };
 
