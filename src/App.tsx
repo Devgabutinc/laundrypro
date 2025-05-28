@@ -52,6 +52,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import PrivacyConsentDialog from "./components/PrivacyConsentDialog";
 import Landing from "./pages/Landing";
+import SimpleLanding from "./pages/SimpleLanding";
 
 
 const queryClient = new QueryClient();
@@ -135,6 +136,7 @@ function AppRoutes() {
   // Daftar halaman publik yang dapat diakses tanpa login
   const publicPages = [
     "/landing",
+    "/simple-landing",
     "/updatepassword",
     "/confirm-email",
     "/privacy-policy",
@@ -157,9 +159,9 @@ function AppRoutes() {
         return <Navigate to="/auth" replace />;
       }
     } 
-    // Jika web browser dan tidak ada session, redirect ke landing
+    // Jika web browser dan tidak ada session, redirect ke simple landing
     else if (!session) {
-      return <Navigate to="/landing" replace />;
+      return <Navigate to="/simple-landing" replace />;
     }
   }
   // Jika belum login dan bukan di halaman publik, redirect ke auth
@@ -188,6 +190,7 @@ function AppRoutes() {
       <PrivacyConsentDialog />
       <Routes>
         <Route path="/landing" element={<Landing />} />
+        <Route path="/simple-landing" element={<SimpleLanding />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
