@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
 
 const Landing = () => {
   return (
@@ -41,12 +40,7 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24 flex flex-col md:flex-row items-center">
-        <motion.div 
-          className="md:w-1/2 mb-10 md:mb-0"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="md:w-1/2 mb-10 md:mb-0">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
             Kelola Bisnis Laundry Anda dengan Mudah
           </h1>
@@ -65,19 +59,14 @@ const Landing = () => {
               </Button>
             </a>
           </div>
-        </motion.div>
-        <motion.div 
-          className="md:w-1/2"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
+        </div>
+        <div className="md:w-1/2 opacity-100 transition-all duration-500">
           <img 
             src="https://via.placeholder.com/600x400?text=LaundryPro+Dashboard" 
             alt="LaundryPro Dashboard" 
             className="rounded-lg shadow-2xl"
           />
-        </motion.div>
+        </div>
       </section>
 
       {/* Features Section */}
@@ -123,18 +112,14 @@ const Landing = () => {
                 icon: "🔄"
               }
             ].map((feature, index) => (
-              <motion.div 
+              <div 
                 key={index}
                 className="bg-blue-50 rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
               >
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -196,13 +181,9 @@ const Landing = () => {
                 highlighted: false
               }
             ].map((plan, index) => (
-              <motion.div 
+              <div 
                 key={index}
                 className={`rounded-lg p-8 ${plan.highlighted ? 'bg-blue-600 text-white shadow-xl scale-105' : 'bg-white text-gray-900 shadow-md'}`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
               >
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                 <div className="flex items-end mb-6">
@@ -228,7 +209,7 @@ const Landing = () => {
                     {plan.highlighted ? 'Mulai Sekarang' : 'Daftar'}
                   </Button>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -265,13 +246,9 @@ const Landing = () => {
                 image: "https://randomuser.me/api/portraits/men/2.jpg"
               }
             ].map((testimonial, index) => (
-              <motion.div 
+              <div 
                 key={index}
                 className="bg-gray-50 rounded-lg p-8 shadow-sm"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
               >
                 <div className="flex items-center mb-6">
                   <img 
@@ -285,7 +262,7 @@ const Landing = () => {
                   </div>
                 </div>
                 <p className="text-gray-600 italic">"{testimonial.content}"</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -324,12 +301,7 @@ const Landing = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <h3 className="text-2xl font-semibold mb-6 text-gray-900">Kirim Pesan</h3>
               <form className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -372,14 +344,9 @@ const Landing = () => {
                 </div>
                 <Button type="submit" className="w-full sm:w-auto">Kirim Pesan</Button>
               </form>
-            </motion.div>
+            </div>
             
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <h3 className="text-2xl font-semibold mb-6 text-gray-900">Informasi Kontak</h3>
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -436,7 +403,7 @@ const Landing = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
