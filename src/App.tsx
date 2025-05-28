@@ -52,6 +52,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import PrivacyConsentDialog from "./components/PrivacyConsentDialog";
 import Landing from "./pages/Landing";
+import SimpleLanding from "./pages/SimpleLanding";
 
 
 const queryClient = new QueryClient();
@@ -138,6 +139,8 @@ function AppRoutes() {
     "/update-password",
     "/reset-password",
     "/email-confirmation",
+    "/updatepassword",
+    "/confirm-email",
     "/privacy-policy",
     "/terms-conditions",
     "/auth"
@@ -197,6 +200,7 @@ function AppRoutes() {
       <PrivacyConsentDialog />
       <Routes>
         <Route path="/landing" element={<Landing />} />
+        <Route path="/simple-landing" element={<SimpleLanding />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
