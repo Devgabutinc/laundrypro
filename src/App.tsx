@@ -108,7 +108,6 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-<<<<<<< HEAD
   // Daftar halaman publik yang dapat diakses tanpa login
   const publicPages = [
     "/landing",
