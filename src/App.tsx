@@ -110,9 +110,15 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // Allow access to reset password and email confirmation pages without any redirection
-  if (location.pathname === "/updatepassword" || location.pathname === "/confirm-email") {
-    console.log("Auth bypass page accessed: " + location.pathname);
+  // Allow access to public pages without any redirection
+  if (
+    location.pathname === "/updatepassword" || 
+    location.pathname === "/confirm-email" ||
+    location.pathname === "/landing" ||
+    location.pathname === "/privacy-policy" ||
+    location.pathname === "/terms-conditions"
+  ) {
+    console.log("Public page accessed: " + location.pathname);
     // Continue to the routes without redirection
   }
   // Jika belum login, redirect ke /auth
