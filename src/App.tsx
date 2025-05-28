@@ -37,7 +37,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Discussion from "./pages/Discussion";
 import DiscussionDetail from "@/pages/DiscussionDetail";
 import PlatformAdminReports from "./pages/PlatformAdminReports";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { requestPushPermission } from './utils/pushNotifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { App as CapApp } from '@capacitor/app';
@@ -61,6 +61,23 @@ function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
   const backHandlerRef = useRef<any>(null);
+  const [isMobileApp, setIsMobileApp] = useState(false);
+  
+  // Deteksi apakah aplikasi dijalankan sebagai mobile app (Capacitor/Cordova)
+  useEffect(() => {
+    const checkPlatform = async () => {
+      try {
+        // Cek apakah aplikasi berjalan di Capacitor
+        const info = await CapApp.getInfo();
+        setIsMobileApp(true);
+      } catch (error) {
+        // Jika error, berarti bukan mobile app
+        setIsMobileApp(false);
+      }
+    };
+    
+    checkPlatform();
+  }, []);
   
   // Inisialisasi aplikasi
 
@@ -121,7 +138,20 @@ function AppRoutes() {
     console.log("Public page accessed: " + location.pathname);
     // Continue to the routes without redirection
   }
-  // Jika belum login, redirect ke /auth
+  // Jika di root path "/"
+  else if (location.pathname === "/") {
+    // Jika mobile app, tetap ke auth flow
+    if (isMobileApp) {
+      if (!session) {
+        return <Navigate to="/auth" replace />;
+      }
+    } 
+    // Jika web browser dan tidak ada session, redirect ke landing
+    else if (!session) {
+      return <Navigate to="/landing" replace />;
+    }
+  }
+  // Jika belum login dan bukan di halaman auth, redirect ke auth
   else if (!session && location.pathname !== "/auth") {
     return <Navigate to="/auth" replace />;
   }
