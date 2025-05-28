@@ -25,7 +25,14 @@ dist-ssr
 *.sw?
 
 # Capacitor/Native app files
-android/
+android/*
+!android/app/build.gradle
+!android/build.gradle
+!android/gradle.properties
+!android/capacitor.settings.gradle
+!android/app/src/main/AndroidManifest.xml
+!android/app/src/main/res/
+android/app/src/main/assets/public/
 ios/
 resources/
 
