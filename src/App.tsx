@@ -127,11 +127,17 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // Allow access to public pages without any redirection
+  // PRIORITAS TERTINGGI: Akses langsung ke landing page harus selalu diizinkan
+  if (location.pathname === "/landing") {
+    console.log("Landing page accessed directly");
+    // Lanjutkan ke route tanpa redirect
+    return null; // Eksplisit mengembalikan null untuk melanjutkan ke route
+  }
+  
+  // Allow access to other public pages without any redirection
   if (
     location.pathname === "/updatepassword" || 
     location.pathname === "/confirm-email" ||
-    location.pathname === "/landing" ||
     location.pathname === "/privacy-policy" ||
     location.pathname === "/terms-conditions"
   ) {
