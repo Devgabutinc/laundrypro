@@ -51,8 +51,6 @@ import EmailConfirmation from "@/pages/EmailConfirmation";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import PrivacyConsentDialog from "./components/PrivacyConsentDialog";
-import Landing from "./pages/Landing";
-import SimpleLanding from "./pages/SimpleLanding";
 
 
 const queryClient = new QueryClient();
@@ -108,49 +106,12 @@ function AppRoutes() {
 
   if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
 
-  // Daftar halaman publik yang dapat diakses tanpa login
-  const publicPages = [
-    "/landing",
-    "/update-password",
-    "/reset-password",
-    "/email-confirmation",
-    "/updatepassword",
-    "/confirm-email",
-    "/privacy-policy",
-    "/terms-conditions",
-    "/auth"
-  ];
-  
-  console.log("Public pages:", publicPages);
-
-  // PRIORITAS TERTINGGI: Cek apakah halaman saat ini adalah halaman publik
-  if (publicPages.includes(location.pathname)) {
-    console.log(`Public page accessed: ${location.pathname}`);
-    // Tidak perlu melakukan redirect atau pemeriksaan lainnya
-    return null; // Allow access to the public page
+  // Allow access to reset password and email confirmation pages without any redirection
+  if (location.pathname === "/updatepassword" || location.pathname === "/confirm-email") {
+    console.log("Auth bypass page accessed: " + location.pathname);
+    // Continue to the routes without redirection
   }
-  // Jika di root path dan belum login
-  else if (location.pathname === "/" && !session) {
-    // Deteksi apakah pengguna menggunakan mobile app (Capacitor/Cordova)
-    // Metode 1: Cek user agent untuk Capacitor/Cordova
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isMobileApp = userAgent.includes('capacitor') || userAgent.includes('cordova');
-    
-    // Metode 2: Cek jika aplikasi berjalan dalam mode standalone (PWA) atau native app
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        (window as any).navigator.standalone === true;
-    
-    if (isMobileApp || isStandalone) {
-      // Jika mobile app, redirect ke auth
-      console.log("Mobile app detected, redirecting to auth");
-      return <Navigate to="/auth" replace />;
-    } else {
-      // Jika web browser, redirect ke landing
-      console.log("Web browser detected, redirecting to landing");
-      return <Navigate to="/landing" replace />;
-    }
-  }
-  // Jika belum login dan bukan di halaman auth, redirect ke /auth
+  // Jika belum login, redirect ke /auth
   else if (!session && location.pathname !== "/auth") {
     return <Navigate to="/auth" replace />;
   }
@@ -175,8 +136,6 @@ function AppRoutes() {
     <>
       <PrivacyConsentDialog />
       <Routes>
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/simple-landing" element={<SimpleLanding />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/updatepassword" element={<ResetPassword />} />
