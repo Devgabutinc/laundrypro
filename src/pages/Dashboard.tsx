@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { OrderCard } from "@/components/orders/OrderCard";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, LineChart } from "recharts";
-import { ArrowRight, ArrowUp, ArrowDown, ShoppingCart, Archive, PackagePlus, BarChart3, Users, ArchiveRestore, MessagesSquare, Clock, Bell, Lock, UserCog } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowDown, ShoppingCart, Archive, PackagePlus, BarChart3, Users, ArchiveRestore, MessagesSquare, Clock, Bell, Lock, UserCog, BookOpen } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Order, OrderStatus, orderStatusLabels } from "@/models/Order";
 import { ChartContainer } from "@/components/ui/chart";
@@ -740,27 +740,27 @@ export default function Dashboard() {
   
       {/* Menu Utama */}
       <div className="mt-2">
-        <div className="grid grid-cols-4 gap-2 mt-4 flex-wrap">
+        <div className="grid grid-cols-3 gap-3 mt-4 flex-wrap">
           <Link to="/pos">
-            <Button className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
               <ShoppingCart className="h-8 w-8 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">POS</span>
             </Button>
           </Link>
           <Link to="/inventory">
-            <Button className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
               <PackagePlus className="h-8 w-8 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">Inventaris</span>
             </Button>
           </Link>
           <Link to="/customers">
-            <Button className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
               <Users className="h-8 w-8 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">Pelanggan</span>
             </Button>
           </Link>
           <button
-            className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
+            className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
             onClick={e => {
               if (!featureSettingsLoaded) return;
               if (canUseRacks) {
@@ -776,7 +776,7 @@ export default function Dashboard() {
             <span className="text-sm font-semibold text-gray-700">Rak</span>
           </button>
           <Button 
-            className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
+            className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
             onClick={() => {
               if (canAccessDiscussion) {
                 navigate('/discussion');
@@ -791,13 +791,13 @@ export default function Dashboard() {
             <span className="text-sm font-semibold text-gray-700">Diskusi</span>
           </Button>
           <Link to="/tracking">
-            <Button className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
               <Clock className="h-8 w-8 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">Lacak Pesanan</span>
             </Button>
           </Link>
           <Button 
-            className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
+            className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
             onClick={() => {
               if (canAccessNotifications) {
                 navigate('/notifications');
@@ -812,15 +812,21 @@ export default function Dashboard() {
             <span className="text-sm font-semibold text-gray-700">Notifikasi</span>
           </Button>
           <Link to="/reports">
-            <Button className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
               <BarChart3 className="h-8 w-8 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">Laporan</span>
             </Button>
           </Link>
           <Link to="/order-archive">
-            <Button className="w-full h-16 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
               <ArchiveRestore className="h-8 w-8 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">Arsip</span>
+            </Button>
+          </Link>
+          <Link to="/tutorials">
+            <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
+              <BookOpen className="h-8 w-8 text-[#F76B3C] mb-2" />
+              <span className="text-sm font-semibold text-gray-700">Tutorial</span>
             </Button>
           </Link>
         </div>
