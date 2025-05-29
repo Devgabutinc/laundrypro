@@ -7,6 +7,7 @@ import { TenantProvider } from "./contexts/TenantContext";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { AppLayout } from "./components/layout/AppLayout";
 import PrivateRoute from "./components/auth/PrivateRoute";
+import SplashScreen from "./components/SplashScreen";
 import Index from "./pages/Index";
 import Orders from "./pages/Orders";
 import Tracking from "./pages/Tracking";
@@ -38,7 +39,7 @@ import OrderDetail from "./pages/OrderDetail";
 import Discussion from "./pages/Discussion";
 import DiscussionDetail from "@/pages/DiscussionDetail";
 import PlatformAdminReports from "./pages/PlatformAdminReports";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { requestPushPermission } from './utils/pushNotifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { App as CapApp } from '@capacitor/app';
@@ -63,6 +64,7 @@ function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
   const backHandlerRef = useRef<any>(null);
+  const [showSplash, setShowSplash] = useState(true);
   
   // Inisialisasi aplikasi
 
@@ -107,7 +109,20 @@ function AppRoutes() {
     };
   }, [location, navigate]);
 
-  if (loading) return <div className="min-h-screen grid place-items-center">Loading...</div>;
+  // Tampilkan SplashScreen saat pertama kali aplikasi dibuka
+  useEffect(() => {
+    if (!loading) {
+      // Setelah loading selesai, tampilkan SplashScreen selama 1.5 detik
+      setTimeout(() => {
+        setShowSplash(false);
+      }, 1500);
+    }
+  }, [loading]);
+
+  // Tampilkan SplashScreen saat loading atau showSplash true
+  if (loading || showSplash) {
+    return <SplashScreen />;
+  }
 
   // Allow access to reset password, email confirmation, dan landing pages without any redirection
   if (location.pathname === "/updatepassword" || location.pathname === "/confirm-email" ||

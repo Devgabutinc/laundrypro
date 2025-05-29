@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { OrderCard } from "@/components/orders/OrderCard";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, LineChart } from "recharts";
-import { ArrowRight, ArrowUp, ArrowDown, ShoppingCart, Archive, PackagePlus, BarChart3, Users, ArchiveRestore, MessagesSquare, Clock, Bell, Lock, UserCog, BookOpen } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowDown, ShoppingCart, Archive, PackagePlus, BarChart3, Users, ArchiveRestore, MessagesSquare, Clock, Bell, Lock, UserCog, BookOpen, Shirt, Layers } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Order, OrderStatus, orderStatusLabels } from "@/models/Order";
 import { ChartContainer } from "@/components/ui/chart";
@@ -759,22 +759,21 @@ export default function Dashboard() {
               <span className="text-sm font-semibold text-gray-700">Pelanggan</span>
             </Button>
           </Link>
-          <button
+          <Button
             className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
-            onClick={e => {
+            onClick={() => {
               if (!featureSettingsLoaded) return;
               if (canUseRacks) {
                 navigate("/racks");
               } else {
-                e.preventDefault();
                 setShowRacksInfo(true);
               }
             }}
             disabled={!featureSettingsLoaded}
           >
-            <Archive className="h-8 w-8 text-[#F76B3C] mb-2" />
+            <Layers className="h-5 w-5 text-[#F76B3C] mb-2" />
             <span className="text-sm font-semibold text-gray-700">Rak</span>
-          </button>
+          </Button>
           <Button 
             className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs"
             onClick={() => {
@@ -819,7 +818,7 @@ export default function Dashboard() {
           </Link>
           <Link to="/order-archive">
             <Button className="w-full h-20 flex flex-col items-center justify-center rounded-lg shadow bg-white p-1 text-xs">
-              <ArchiveRestore className="h-8 w-8 text-[#F76B3C] mb-2" />
+              <ArchiveRestore className="h-6 w-6 text-[#F76B3C] mb-2" />
               <span className="text-sm font-semibold text-gray-700">Arsip</span>
             </Button>
           </Link>

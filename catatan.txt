@@ -109,13 +109,13 @@ list perbaikan console
 [X] Tambahkan opsi persetujuan pengumpulan data
 
 ### 4. KOMPATIBILITAS XIAOMI
-[ ] Evaluasi alternatif untuk Google Services di perangkat Xiaomi China
-[ ] Tambahkan lokalisasi Bahasa China (jika menargetkan pasar China)
-[ ] Pastikan aplikasi berfungsi tanpa Google Play Services
-[ ] Uji aplikasi di perangkat Xiaomi (terutama MIUI)
+[x] Evaluasi alternatif untuk Google Services di perangkat Xiaomi China
+[x] Tambahkan lokalisasi Bahasa China (jika menargetkan pasar China)
+[x] Pastikan aplikasi berfungsi tanpa Google Play Services
+[x] Uji aplikasi di perangkat Xiaomi (terutama MIUI)
 
 ### 5. OPTIMASI APLIKASI
-[ ] Implementasikan strategi versioning yang tepat (tingkatkan versionCode)
+[X] Implementasikan strategi versioning yang tepat (tingkatkan versionCode)
 [ ] Optimalkan ukuran aplikasi (compress gambar, hapus aset yang tidak digunakan)
 [ ] Tambahkan fungsionalitas offline
 [ ] Optimalkan kinerja aplikasi pada perangkat kelas menengah-bawah

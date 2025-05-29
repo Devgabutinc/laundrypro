@@ -72,7 +72,7 @@ export function usePosData() {
   };
 
   // Find or create customer
-  const findOrCreateCustomer = async (customerData: { name: string, phone: string }) => {
+  const findOrCreateCustomer = async (customerData: { name: string, phone: string, address?: string }) => {
     try {
       // First check if customer exists
       const { data: existingCustomer, error: searchError } = await supabase
@@ -86,6 +86,22 @@ export function usePosData() {
 
       // If customer exists, return it
       if (existingCustomer) {
+        // Update alamat jika ada dan berbeda dari yang tersimpan
+        if (customerData.address && customerData.address !== existingCustomer.address) {
+          const { data: updatedCustomer, error: updateError } = await supabase
+            .from('customers')
+            .update({ address: customerData.address })
+            .eq('id', existingCustomer.id)
+            .select()
+            .single();
+            
+          if (updateError) {
+            console.error('Error updating customer address:', updateError);
+            return existingCustomer; // Kembalikan data lama jika update gagal
+          }
+          
+          return updatedCustomer;
+        }
         return existingCustomer;
       }
 
@@ -95,6 +111,7 @@ export function usePosData() {
         .insert({
           name: customerData.name,
           phone: customerData.phone,
+          address: customerData.address || null,
           business_id: businessId
         })
         .select()
@@ -118,7 +135,7 @@ export function usePosData() {
 
   // Create a new order
   const createOrder = async (
-    customer: { name: string, phone: string },
+    customer: { name: string, phone: string, address?: string },
     items: Array<{ id?: string, name: string, price: number, quantity: number, notes?: string, isProduct?: boolean }>,
     paymentMethod: string,
     cartOptions?: { pickupType?: string, estimate?: string, priority?: boolean }
@@ -277,7 +294,7 @@ export function usePosData() {
   };
 
   const createPendingOrder = async (
-    customer: { name: string, phone: string },
+    customer: { name: string, phone: string, address?: string },
     items: Array<{ id?: string, name: string, price: number, quantity: number, notes?: string, isProduct?: boolean }>,
     cartOptions?: { pickupType?: string, estimate?: string, priority?: boolean }
   ) => {
