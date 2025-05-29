@@ -32,6 +32,7 @@ import PilihPaketPremium from "./pages/PilihPaketPremium";
 import KonfirmasiPremium from "./pages/KonfirmasiPremium";
 import PesananPremium from "./pages/PesananPremium";
 import PlatformAdminTenants from "./pages/PlatformAdminTenants";
+import PlatformAdminTutorials from "./pages/PlatformAdminTutorials";
 import DevNotificationPage from "./pages/DevNotificationPage";
 import OrderDetail from "./pages/OrderDetail";
 import Discussion from "./pages/Discussion";
@@ -52,6 +53,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import PrivacyConsentDialog from "./components/PrivacyConsentDialog";
 import Landing from "./pages/Landing";
+import Tutorials from "./pages/Tutorials";
 
 
 const queryClient = new QueryClient();
@@ -198,6 +200,7 @@ function AppRoutes() {
         <Route path="/racks" element={<PrivateRoute><AppLayout><RackManagement /></AppLayout></PrivateRoute>} />
         <Route path="/profile-settings" element={<PrivateRoute><AppLayout><ProfileSettings /></AppLayout></PrivateRoute>} />
         <Route path="/receipt-settings" element={<PrivateRoute><AppLayout><ReceiptSettings /></AppLayout></PrivateRoute>} />
+        <Route path="/tutorials" element={<PrivateRoute><AppLayout><Tutorials /></AppLayout></PrivateRoute>} />
         <Route path="/setup-business" element={<BusinessProfileSetup />} />
         <Route path="/owner" element={<OwnerRoute><OwnerLayout><OwnerPanel /></OwnerLayout></OwnerRoute>} />
         <Route path="/platform-admin" element={<SuperadminRoute><SuperadminLayout><PlatformAdmin /></SuperadminLayout></SuperadminRoute>} />
@@ -210,6 +213,7 @@ function AppRoutes() {
         <Route path="/KonfirmasiPremium" element={<PrivateRoute><AppLayout><KonfirmasiPremium /></AppLayout></PrivateRoute>} />
         <Route path="/platform-admin/premium-orders" element={<SuperadminRoute><SuperadminLayout><PesananPremium /></SuperadminLayout></SuperadminRoute>} />
         <Route path="/platform-admin/tenants" element={<SuperadminRoute><SuperadminLayout><PlatformAdminTenants /></SuperadminLayout></SuperadminRoute>} />
+        <Route path="/platform-admin/tutorials" element={<SuperadminRoute><SuperadminLayout><PlatformAdminTutorials /></SuperadminLayout></SuperadminRoute>} />
         <Route path="/platform-admin/dev-notification" element={<SuperadminRoute><SuperadminLayout><DevNotificationPage /></SuperadminLayout></SuperadminRoute>} />
         <Route path="/discussion" element={<PrivateRoute><AppLayout><Discussion /></AppLayout></PrivateRoute>} />
         <Route path="/discussion/:threadId" element={<PrivateRoute><AppLayout><DiscussionDetail /></AppLayout></PrivateRoute>} />

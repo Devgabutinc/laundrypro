@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
       platform_settings: {
@@ -675,57 +675,64 @@ export type Database = {
             foreignKeyName: "discussion_threads_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      },
       discussion_replies: {
         Row: {
-          id: string
-          content: string
-          thread_id: string
-          user_id: string
-          created_at: string
-          updated_at: string
-        }
+          id: string;
+          content: string;
+          thread_id: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
         Insert: {
-          id?: string
-          content: string
-          thread_id: string
-          user_id: string
-          created_at?: string
-          updated_at?: string
-        }
+          id?: string;
+          content: string;
+          thread_id: string;
+          user_id: string;
+          created_at?: string;
+          updated_at?: string;
+        };
         Update: {
-          id?: string
-          content?: string
-          thread_id?: string
-          user_id?: string
-          created_at?: string
-          updated_at?: string
-        }
+          id?: string;
+          content?: string;
+          thread_id?: string;
+          user_id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "discussion_replies_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "discussion_threads"
-            referencedColumns: ["id"]
+            foreignKeyName: "discussion_replies_thread_id_fkey";
+            columns: ["thread_id"];
+            isOneToOne: false;
+            referencedRelation: "discussion_threads";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "discussion_replies_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      },
+            foreignKeyName: "discussion_replies_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       discussion_reports: {
         Row: {
-          id: string
-          type: 'thread' | 'reply'
+          id: string;
+          type: "thread" | "reply";
+          item_id: string;
+          reason: string;
+          reporter_id: string;
+          reported_user_id: string;
+          business_id: string;
+          status: "pending" | "resolved" | "rejected";
+          action_taken?: string;
+          action_notes?: string;
+          created_at: string;
+          reviewed_at?: string;
+          reviewed_by?: string;
+        };
           item_id: string
           reason: string
           reporter_id: string

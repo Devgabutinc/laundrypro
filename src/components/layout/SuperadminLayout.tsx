@@ -12,6 +12,7 @@ const menuItems = [
   { label: "Batasan User", path: "/platform-admin/settings" },
   { label: "Tenant", path: "/platform-admin/tenants" },
   { label: "Users", path: "/platform-admin/users" },
+  { label: "Tutorial", path: "/platform-admin/tutorials" },
   { label: "Paket Premium", path: "/admin/premium-plans" },
   { label: "Metode Pembayaran", path: "/admin/payment-methods" },
   { label: "Pesanan Upgrade Premium", path: "/platform-admin/premium-orders" },
