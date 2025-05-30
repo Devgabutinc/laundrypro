@@ -134,7 +134,7 @@ const Landing = () => {
             onError={(e) => {
               // Fallback ke placeholder jika gambar tidak ditemukan
               const target = e.target as HTMLImageElement;
-              target.src = "/images/dashboard-placeholder.svg";
+              target.src = "/images/dashboard-placeholder.jpeg";
               console.log("Hero image failed to load, using placeholder");
             }}
           />
@@ -156,7 +156,7 @@ const Landing = () => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
               <div className="h-64 bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/images/app-screenshot-1.svg" 
+                  src="/images/app-screenshot-1.jpeg" 
                   alt="Screenshot Aplikasi 1" 
                   className="max-h-full object-cover"
                 />
@@ -171,7 +171,7 @@ const Landing = () => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
               <div className="h-64 bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/images/app-screenshot-2.svg" 
+                  src="/images/app-screenshot-2.jpeg" 
                   alt="Screenshot Aplikasi 2" 
                   className="max-h-full object-cover"
                 />
@@ -186,7 +186,7 @@ const Landing = () => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
               <div className="h-64 bg-gray-200 flex items-center justify-center">
                 <img 
-                  src="/images/app-screenshot-3.svg" 
+                  src="/images/app-screenshot-3.jpeg" 
                   alt="Screenshot Aplikasi 3" 
                   className="max-h-full object-cover"
                 />
