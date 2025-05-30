@@ -93,8 +93,8 @@ export const saveOfflineData = (key: string, data: any) => {
   }
 };
 
-// Wrapper untuk fetch API dengan penanganan offline
-export const fetchWithOfflineSupport = async (url: string, options: RequestInit = {}) => {
+// Wrapper untuk fetch API dengan penanganan offline dan retry
+export const fetchWithOfflineSupport = async (url: string, options: RequestInit = {}, retryCount = 3) => {
   if (!isOnline()) {
     toast({
       title: "Tidak Ada Koneksi Internet",
@@ -104,36 +104,66 @@ export const fetchWithOfflineSupport = async (url: string, options: RequestInit 
     throw new Error('Offline');
   }
   
-  try {
-    const response = await fetch(url, {
-      ...options,
-      // Tambahkan timeout untuk mencegah permintaan menggantung terlalu lama
-      signal: options.signal || AbortSignal.timeout(30000), // 30 detik timeout
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    
-    return response;
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      toast({
-        title: "Permintaan Timeout",
-        description: "Koneksi terlalu lambat. Silakan coba lagi nanti.",
-        variant: "destructive",
+  let lastError;
+  
+  // Implementasi retry logic
+  for (let attempt = 0; attempt < retryCount; attempt++) {
+    try {
+      // Jika ini adalah percobaan ulang, tunggu sebentar (exponential backoff)
+      if (attempt > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
+        console.log(`[LaundryPro] Retry attempt ${attempt} for ${url}`);
+      }
+      
+      const response = await fetch(url, {
+        ...options,
+        // Tambahkan timeout untuk mencegah permintaan menggantung terlalu lama
+        signal: options.signal || AbortSignal.timeout(30000), // 30 detik timeout
+        // Tambahkan cache control untuk mobile
+        headers: {
+          ...options.headers,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
-    } else if (error.message === 'Offline' || !isOnline()) {
-      // Sudah ditangani di atas
-    } else {
-      toast({
-        title: "Kesalahan Jaringan",
-        description: "Terjadi kesalahan saat menghubungi server. Silakan coba lagi.",
-        variant: "destructive",
-      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      return response;
+    } catch (error) {
+      lastError = error;
+      
+      // Jangan retry untuk beberapa jenis error
+      if (error.message === 'Offline' || 
+          error.name === 'AbortError' || 
+          (error.message && error.message.includes('Failed to fetch'))) {
+        break;
+      }
+      
+      // Jika ini adalah percobaan terakhir, tampilkan pesan error
+      if (attempt === retryCount - 1) {
+        if (error.name === 'AbortError') {
+          toast({
+            title: "Permintaan Timeout",
+            description: "Koneksi terlalu lambat. Silakan coba lagi nanti.",
+            variant: "destructive",
+          });
+        } else if (error.message === 'Offline' || !isOnline()) {
+          // Sudah ditangani di atas
+        } else {
+          toast({
+            title: "Kesalahan Jaringan",
+            description: "Terjadi kesalahan saat menghubungi server. Silakan coba lagi.",
+            variant: "destructive",
+          });
+        }
+      }
     }
-    throw error;
   }
+  
+  throw lastError;
 };
 
 // Fungsi untuk mengoptimalkan permintaan jaringan

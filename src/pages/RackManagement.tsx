@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,40 +42,103 @@ const RackManagement = () => {
     try {
       setLoading(true);
       
-      // Fetch racks
-      const { data: racksData, error: racksError } = await supabase
-        .from('racks')
-        .select<any, any>('*')
-        .eq('business_id', businessId)
-        .order('name', { ascending: true });
+      // Fetch racks with retry logic
+      let racksData = null;
+      let racksError = null;
       
-      if (racksError) throw racksError;
-      
-      // Fetch rack slots
-      const { data: slotsData, error: slotsError } = await supabase
-        .from('rack_slots')
-        .select('*')
-        .eq('business_id', businessId)
-        .order('position', { ascending: true });
+      try {
+        const result = await supabase
+          .from('racks')
+          .select<any, any>('*')
+          .eq('business_id', businessId)
+          .order('name', { ascending: true });
         
-      if (slotsError) throw slotsError;
+        racksData = result.data;
+        racksError = result.error;
+      } catch (error) {
+        console.error("Error fetching racks:", error);
+        racksError = error;
+      }
       
-      // Fetch orders that need rack space (status ironing or ready)
-      const { data: ordersData, error: ordersError } = await supabase
-        .from('orders')
-        .select('id, customer_id, status, total_price, created_at, updated_at, notes')
-        .eq('business_id', businessId)
-        .in('status', ['ironing', 'ready']);
-        
-      if (ordersError) throw ordersError;
+      if (racksError) {
+        console.error("Failed to fetch racks:", racksError);
+        toast({
+          title: "Gagal memuat data rak",
+          description: "Silakan coba refresh halaman",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
       
-      // Fetch customers to get names
-      const { data: customersData, error: customersError } = await supabase
-        .from('customers')
-        .select('id, name, phone')
-        .eq('business_id', businessId);
+      // Fetch rack slots with error handling
+      let slotsData = null;
+      let slotsError = null;
+      
+      try {
+        const result = await supabase
+          .from('rack_slots')
+          .select('*')
+          .eq('business_id', businessId)
+          .order('position', { ascending: true });
         
-      if (customersError) throw customersError;
+        slotsData = result.data;
+        slotsError = result.error;
+      } catch (error) {
+        console.error("Error fetching rack slots:", error);
+        slotsError = error;
+      }
+      
+      if (slotsError) {
+        console.error("Failed to fetch rack slots:", slotsError);
+        toast({
+          title: "Gagal memuat data slot rak",
+          description: "Silakan coba refresh halaman",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch orders with error handling
+      let ordersData = [];
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('id, customer_id, status, total_price, created_at, updated_at, notes')
+          .eq('business_id', businessId)
+          .in('status', ['ironing', 'ready']);
+        
+        if (error) {
+          console.error("Error fetching orders:", error);
+          toast({
+            title: "Gagal memuat data pesanan",
+            description: "Beberapa pesanan mungkin tidak ditampilkan",
+            variant: "destructive"
+          });
+        } else {
+          ordersData = data || [];
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+      
+      // Fetch customers with error handling
+      let customersData = [];
+      try {
+        const { data, error } = await supabase
+          .from('customers')
+          .select('id, name, phone')
+          .eq('business_id', businessId);
+        
+        if (error) {
+          console.error("Error fetching customers:", error);
+        } else {
+          customersData = data || [];
+        }
+      } catch (error) {
+        console.error("Error fetching customers:", error);
+      }
       
       // Map customers to orders
       const customerMap = new Map(customersData?.map(customer => [customer.id, customer]) || []);
@@ -318,19 +381,67 @@ const RackManagement = () => {
   const handleAddRack = async () => {
     setSaving(true);
     try {
-      // Insert rack
-      const { data: rackData, error: rackError } = await supabase
-        .from("racks")
-        .insert({
-          name: rackForm.name,
-          description: rackForm.description,
-          total_slots: Number(rackForm.total_slots),
-          available_slots: Number(rackForm.total_slots),
-          business_id: businessId
-        })
-        .select()
-        .single();
-      if (rackError) throw rackError;
+      // Validasi input
+      if (!rackForm.name.trim()) {
+        toast({ title: "Nama rak tidak boleh kosong", variant: "destructive" });
+        setSaving(false);
+        return;
+      }
+      
+      if (Number(rackForm.total_slots) < 1) {
+        toast({ title: "Jumlah slot minimal 1", variant: "destructive" });
+        setSaving(false);
+        return;
+      }
+      
+      // Insert rack dengan penanganan error yang lebih baik
+      let rackData;
+      try {
+        const result = await supabase
+          .from("racks")
+          .insert({
+            name: rackForm.name,
+            description: rackForm.description,
+            total_slots: Number(rackForm.total_slots),
+            available_slots: Number(rackForm.total_slots),
+            business_id: businessId
+          })
+          .select()
+          .single();
+          
+        if (result.error) {
+          console.error("Error inserting rack:", result.error);
+          toast({ 
+            title: "Gagal tambah rak", 
+            description: result.error.message || "Terjadi kesalahan saat menambahkan rak", 
+            variant: "destructive" 
+          });
+          setSaving(false);
+          return;
+        }
+        
+        rackData = result.data;
+      } catch (error: any) {
+        console.error("Exception inserting rack:", error);
+        toast({ 
+          title: "Gagal tambah rak", 
+          description: error.message || "Terjadi kesalahan saat menambahkan rak", 
+          variant: "destructive" 
+        });
+        setSaving(false);
+        return;
+      }
+      
+      if (!rackData || !rackData.id) {
+        toast({ 
+          title: "Gagal tambah rak", 
+          description: "Data rak tidak valid", 
+          variant: "destructive" 
+        });
+        setSaving(false);
+        return;
+      }
+      
       // Generate slot positions (A1, A2, ...)
       const slots = Array.from({ length: Number(rackForm.total_slots) }, (_, i) => ({
         rack_id: rackData.id,
@@ -338,15 +449,71 @@ const RackManagement = () => {
         occupied: false,
         business_id: businessId
       }));
-      // Insert slots
-      const { error: slotError } = await supabase.from("rack_slots").insert(slots);
-      if (slotError) throw slotError;
+      
+      // Insert slots dengan penanganan error yang lebih baik
+      try {
+        const { error: slotError } = await supabase.from("rack_slots").insert(slots);
+        if (slotError) {
+          console.error("Error inserting rack slots:", slotError);
+          // Hapus rak yang sudah dibuat karena slot gagal dibuat
+          await supabase.from("racks").delete().eq("id", rackData.id);
+          toast({ 
+            title: "Gagal tambah slot rak", 
+            description: slotError.message || "Terjadi kesalahan saat menambahkan slot rak", 
+            variant: "destructive" 
+          });
+          setSaving(false);
+          return;
+        }
+      } catch (error: any) {
+        console.error("Exception inserting rack slots:", error);
+        // Hapus rak yang sudah dibuat karena slot gagal dibuat
+        await supabase.from("racks").delete().eq("id", rackData.id);
+        toast({ 
+          title: "Gagal tambah slot rak", 
+          description: error.message || "Terjadi kesalahan saat menambahkan slot rak", 
+          variant: "destructive" 
+        });
+        setSaving(false);
+        return;
+      }
+      
+      // Semua operasi berhasil
       setShowAddDialog(false);
       setRackForm({ name: "", description: "", total_slots: 1 });
       toast({ title: "Rak berhasil ditambahkan" });
-      fetchData();
+      
+      // Tambahkan rak baru ke state untuk menghindari refresh penuh
+      const newRack = {
+        id: rackData.id,
+        name: rackData.name,
+        description: rackData.description,
+        total_slots: rackData.total_slots,
+        available_slots: rackData.available_slots,
+        slots: slots.map(slot => ({
+          id: slot.rack_id + '-' + slot.position, // Temporary ID
+          rack_id: slot.rack_id,
+          position: slot.position,
+          occupied: false,
+          order_id: undefined,
+          assigned_at: undefined,
+          due_date: undefined
+        }))
+      };
+      
+      setRacks(prevRacks => [...prevRacks, newRack as Rack]);
+      
+      // Refresh data setelah delay singkat
+      setTimeout(() => {
+        fetchData();
+      }, 500);
     } catch (error: any) {
-      toast({ title: "Gagal tambah rak", description: error.message, variant: "destructive" });
+      console.error("General error adding rack:", error);
+      toast({ 
+        title: "Gagal tambah rak", 
+        description: error.message || "Terjadi kesalahan yang tidak terduga", 
+        variant: "destructive" 
+      });
     } finally {
       setSaving(false);
     }
@@ -383,21 +550,75 @@ const RackManagement = () => {
     }
   };
 
-  // Fungsi hapus rak
+  // Fungsi hapus rak dengan penanganan error yang lebih baik
   const handleDeleteRack = async (rack: Rack) => {
     if (!window.confirm(`Hapus rak ${rack.name}? Semua slot akan ikut terhapus!`)) return;
     setSaving(true);
     try {
-      // Hapus slot dulu
-      const { error: slotError } = await supabase.from("rack_slots").delete().eq("rack_id", rack.id);
-      if (slotError) throw slotError;
-      // Hapus rak
-      const { error: rackError } = await supabase.from("racks").delete().eq("id", rack.id);
-      if (rackError) throw rackError;
+      // Hapus slot dulu dengan penanganan error yang lebih baik
+      try {
+        const { error: slotError } = await supabase.from("rack_slots").delete().eq("rack_id", rack.id);
+        if (slotError) {
+          console.error("Error deleting rack slots:", slotError);
+          toast({ 
+            title: "Gagal hapus slot rak", 
+            description: "Terjadi kesalahan saat menghapus slot rak", 
+            variant: "destructive" 
+          });
+          setSaving(false);
+          return;
+        }
+      } catch (slotError: any) {
+        console.error("Exception deleting rack slots:", slotError);
+        toast({ 
+          title: "Gagal hapus slot rak", 
+          description: slotError.message || "Terjadi kesalahan saat menghapus slot rak", 
+          variant: "destructive" 
+        });
+        setSaving(false);
+        return;
+      }
+      
+      // Hapus rak dengan penanganan error yang lebih baik
+      try {
+        const { error: rackError } = await supabase.from("racks").delete().eq("id", rack.id);
+        if (rackError) {
+          console.error("Error deleting rack:", rackError);
+          toast({ 
+            title: "Gagal hapus rak", 
+            description: "Terjadi kesalahan saat menghapus rak", 
+            variant: "destructive" 
+          });
+          setSaving(false);
+          return;
+        }
+      } catch (rackError: any) {
+        console.error("Exception deleting rack:", rackError);
+        toast({ 
+          title: "Gagal hapus rak", 
+          description: rackError.message || "Terjadi kesalahan saat menghapus rak", 
+          variant: "destructive" 
+        });
+        setSaving(false);
+        return;
+      }
+      
+      // Update local state untuk menghindari refresh penuh
+      setRacks(prevRacks => prevRacks.filter(r => r.id !== rack.id));
+      
       toast({ title: "Rak berhasil dihapus" });
-      fetchData();
+      
+      // Refresh data setelah delay singkat untuk memastikan UI diupdate terlebih dahulu
+      setTimeout(() => {
+        fetchData();
+      }, 500);
     } catch (error: any) {
-      toast({ title: "Gagal hapus rak", description: error.message, variant: "destructive" });
+      console.error("General error deleting rack:", error);
+      toast({ 
+        title: "Gagal hapus rak", 
+        description: error.message || "Terjadi kesalahan yang tidak terduga", 
+        variant: "destructive" 
+      });
     } finally {
       setSaving(false);
     }
@@ -434,38 +655,85 @@ const RackManagement = () => {
           <CardTitle>Ringkasan Rak</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama Rak</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead className="text-right">Total Slot</TableHead>
-                  <TableHead className="text-right">Slot Tersedia</TableHead>
-                  <TableHead className="text-right">Persentase</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {racks.map(rack => (
-                  <TableRow key={rack.id}>
-                    <TableCell className="font-medium">{rack.name}</TableCell>
-                    <TableCell>{rack.description}</TableCell>
-                    <TableCell className="text-right">{rack.total_slots}</TableCell>
-                    <TableCell className="text-right">{rack.available_slots}</TableCell>
-                    <TableCell className="text-right">
-                      <Badge variant={rack.available_slots > 0 ? "outline" : "destructive"}>
-                        {Math.round((rack.available_slots / rack.total_slots) * 100)}%
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleEditRack(rack)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteRack(rack)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-                    </TableCell>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            {/* Mobile view - card layout */}
+            <div className="md:hidden space-y-4">
+              {racks.map(rack => (
+                <div key={rack.id} className="border rounded-lg p-3 shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-medium text-base">{rack.name}</h3>
+                    <div className="flex space-x-1">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditRack(rack)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDeleteRack(rack)}>
+                        <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm text-muted-foreground mb-2 line-clamp-1">{rack.description}</div>
+                  
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <div>
+                      <div className="text-muted-foreground text-xs">Total</div>
+                      <div>{rack.total_slots}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground text-xs">Tersedia</div>
+                      <div>{rack.available_slots}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground text-xs">Status</div>
+                      <div>
+                        <div className="text-xs">
+                          {rack.available_slots > 0 ? 
+                            <span className="text-green-600">{Math.round((rack.available_slots / rack.total_slots) * 100)}%</span> :
+                            <span className="text-red-600">Penuh</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Desktop view - table layout */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nama Rak</TableHead>
+                    <TableHead>Deskripsi</TableHead>
+                    <TableHead className="text-right">Total Slot</TableHead>
+                    <TableHead className="text-right">Slot Tersedia</TableHead>
+                    <TableHead className="text-right">Persentase</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {racks.map(rack => (
+                    <TableRow key={rack.id}>
+                      <TableCell className="font-medium">{rack.name}</TableCell>
+                      <TableCell>{rack.description}</TableCell>
+                      <TableCell className="text-right">{rack.total_slots}</TableCell>
+                      <TableCell className="text-right">{rack.available_slots}</TableCell>
+                      <TableCell className="text-right">
+                        <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ring-1 ring-inset
+                          ${rack.available_slots > 0 ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-red-50 text-red-700 ring-red-600/20'}`}>
+                          {Math.round((rack.available_slots / rack.total_slots) * 100)}%
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => handleEditRack(rack)}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteRack(rack)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -479,9 +747,9 @@ const RackManagement = () => {
                   <div className="flex items-center">
                     <Archive className="mr-2 h-5 w-5" /> {rack.name}
                   </div>
-                  <Badge variant={rack.available_slots > 0 ? "outline" : "destructive"}>
+                  <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${rack.available_slots > 0 ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20" : "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20"}`}>
                     {rack.available_slots} dari {rack.total_slots} slot tersedia
-                  </Badge>
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -542,7 +810,9 @@ const RackManagement = () => {
                           <p className="font-medium">{shortId(order.id)}</p>
                           <p className="text-sm">{order.customerName}</p>
                         </div>
-                        <Badge>{order.status === "ironing" ? "Disetrika" : "Siap Diambil"}</Badge>
+                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${order.status === "ironing" ? "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/20" : "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20"}`}>
+                        {order.status === "ironing" ? "Disetrika" : "Siap Diambil"}
+                      </span>
                       </div>
                     </div>
                   ))}
@@ -560,7 +830,7 @@ const RackManagement = () => {
       
       {/* Assign Order Dialog */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Tempatkan Pesanan</DialogTitle>
           </DialogHeader>
@@ -588,53 +858,113 @@ const RackManagement = () => {
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-end">
             <Button variant="ghost" onClick={() => setShowAssignDialog(false)}>
               Batal
             </Button>
-            <Button onClick={handleAssignOrder} disabled={!selectedOrder}>
-              Tempatkan Pesanan
+            <Button onClick={handleAssignOrder} disabled={!selectedOrder || saving}>
+              {saving ? "Menempatkan..." : "Tempatkan Pesanan"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {/* Dialog Tambah Rak */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Tambah Rak Baru</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <Label>Nama Rak</Label>
-            <input name="name" className="input input-bordered w-full" value={rackForm.name} onChange={handleFormChange} />
-            <Label>Deskripsi</Label>
-            <textarea name="description" className="input input-bordered w-full" value={rackForm.description} onChange={handleFormChange} />
-            <Label>Jumlah Slot</Label>
-            <input name="total_slots" type="number" min="1" className="input input-bordered w-full" value={rackForm.total_slots} onChange={handleFormChange} />
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="rack-name">Nama Rak</Label>
+              <input 
+                id="rack-name"
+                name="name" 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                value={rackForm.name} 
+                onChange={handleFormChange} 
+                placeholder="Contoh: Rak A"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="rack-description">Deskripsi</Label>
+              <textarea 
+                id="rack-description"
+                name="description" 
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                value={rackForm.description} 
+                onChange={handleFormChange} 
+                placeholder="Deskripsi singkat tentang rak ini"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="rack-slots">Jumlah Slot</Label>
+              <input 
+                id="rack-slots"
+                name="total_slots" 
+                type="number" 
+                min="1" 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                value={rackForm.total_slots} 
+                onChange={handleFormChange} 
+              />
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-end">
             <Button variant="ghost" onClick={() => setShowAddDialog(false)}>Batal</Button>
-            <Button onClick={handleAddRack} disabled={saving || !rackForm.name || !rackForm.total_slots}>Simpan</Button>
+            <Button onClick={handleAddRack} disabled={saving || !rackForm.name || !rackForm.total_slots}>
+              {saving ? "Menyimpan..." : "Simpan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       {/* Dialog Edit Rak */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Rak</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <Label>Nama Rak</Label>
-            <input name="name" className="input input-bordered w-full" value={rackForm.name} onChange={handleFormChange} />
-            <Label>Deskripsi</Label>
-            <textarea name="description" className="input input-bordered w-full" value={rackForm.description} onChange={handleFormChange} />
-            <Label>Jumlah Slot</Label>
-            <input name="total_slots" type="number" min="1" className="input input-bordered w-full" value={rackForm.total_slots} onChange={handleFormChange} />
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-rack-name">Nama Rak</Label>
+              <input 
+                id="edit-rack-name"
+                name="name" 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                value={rackForm.name} 
+                onChange={handleFormChange} 
+                placeholder="Contoh: Rak A"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-rack-description">Deskripsi</Label>
+              <textarea 
+                id="edit-rack-description"
+                name="description" 
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                value={rackForm.description} 
+                onChange={handleFormChange} 
+                placeholder="Deskripsi singkat tentang rak ini"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-rack-slots">Jumlah Slot</Label>
+              <input 
+                id="edit-rack-slots"
+                name="total_slots" 
+                type="number" 
+                min="1" 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                value={rackForm.total_slots} 
+                onChange={handleFormChange} 
+              />
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-end">
             <Button variant="ghost" onClick={() => setShowEditDialog(false)}>Batal</Button>
-            <Button onClick={handleUpdateRack} disabled={saving || !rackForm.name || !rackForm.total_slots}>Simpan Perubahan</Button>
+            <Button onClick={handleUpdateRack} disabled={saving || !rackForm.name || !rackForm.total_slots}>
+              {saving ? "Menyimpan..." : "Simpan Perubahan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
