@@ -50,6 +50,18 @@ export const getStoredSession = (): Session | null => {
     return getFromIndexedDB(AUTH_KEY);
   } catch (error) {
     console.error('Error retrieving session:', error);
+    
+    // Last resort fallback
+    try {
+      const sessionData = sessionStorage.getItem(AUTH_KEY);
+      if (sessionData) {
+        console.log('Using session from sessionStorage after localStorage error');
+        return JSON.parse(sessionData);
+      }
+    } catch (sessionError) {
+      console.error('Error retrieving backup session:', sessionError);
+    }
+    
     return null;
   }
 };
@@ -62,10 +74,25 @@ export const storeUserProfile = (profile: any): void => {
 
   try {
     localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-    sessionStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    
+    // Also store in sessionStorage as backup
+    try {
+      sessionStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    } catch (sessionError) {
+      console.warn('Could not store profile in sessionStorage:', sessionError);
+    }
+    
     storeInIndexedDB(PROFILE_KEY, profile);
   } catch (error) {
-    console.error('Error storing user profile:', error);
+    console.error('Error storing profile in localStorage:', error);
+    
+    // Try sessionStorage as fallback
+    try {
+      sessionStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      console.log('Profile stored in sessionStorage as fallback');
+    } catch (sessionError) {
+      console.error('Error storing profile in sessionStorage:', sessionError);
+    }
   }
 };
 
@@ -77,9 +104,10 @@ export const getStoredUserProfile = (): any => {
       return JSON.parse(localData);
     }
     
+    // Try sessionStorage as fallback
     const sessionData = sessionStorage.getItem(PROFILE_KEY);
     if (sessionData) {
-      localStorage.setItem(PROFILE_KEY, sessionData);
+      console.log('Using profile from sessionStorage fallback');
       return JSON.parse(sessionData);
     }
     

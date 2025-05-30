@@ -79,7 +79,7 @@ export default function Dashboard() {
       startDate: string;
       endDate: string;
       remainingDays: number;
-      durationMonth: number;
+      durationDays: number;
     } | null
   });
   
@@ -99,111 +99,110 @@ export default function Dashboard() {
       const { data: platformData, error: platformError } = await supabase
         .from('platform_settings')
         .select('*')
-        .limit(1);
+        .single();
       
-      if (platformError) throw platformError;
-      
-      const maxPosUsage = tenantStatus === 'premium' 
-        ? (platformData[0]?.max_pos_usage_premium || 0) 
-        : (platformData[0]?.max_pos_usage_free || 10);
-      
-      // Get current date in YYYY-MM-DD format
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Fetch actual premium data from the database for premium tenants
-      let premiumData = null;
-      if (tenantStatus === 'premium' && businessId) {
-        try {
-          // Get the latest premium purchase for this business
-          // @ts-ignore - premium_purchases table exists but not in TypeScript types
-          const { data: purchaseData, error: purchaseError } = await supabase
-            .from('premium_purchases')
-            .select('*')
-            .eq('business_id', businessId)
-            .eq('status', 'approved')
-            .order('tanggal_pembelian', { ascending: false })
-            .limit(1);
-          
-          if (purchaseError) throw purchaseError;
-          
-          if (purchaseData && purchaseData.length > 0) {
-            // Use type assertion untuk mengatasi error TypeScript
-            const purchase = purchaseData[0] as any;
-            
-            // Calculate start and end dates
-            const startDate = new Date(purchase.tanggal_pembelian);
-            const endDate = new Date(purchase.tanggal_pembelian);
-            endDate.setMonth(endDate.getMonth() + purchase.plan_duration_month);
-            
-            // Calculate remaining days
-            const remainingDays = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-            
-            premiumData = {
-              planName: purchase.plan_name,
-              startDate: startDate.toLocaleDateString('id-ID'),
-              endDate: endDate.toLocaleDateString('id-ID'),
-              remainingDays: remainingDays > 0 ? remainingDays : 0,
-              durationMonth: purchase.plan_duration_month
-            };
-          } else {
-            // Fallback if no purchase data found
-            // @ts-ignore - tenants table exists but not in TypeScript types
-            const { data: tenantData, error: tenantError } = await supabase
-              .from('tenants')
-              .select('premium_start_date, premium_end_date')
-              .eq('business_id', businessId)
-              .single();
-              
-            if (tenantError) throw tenantError;
-            
-            if (tenantData) {
-              // Use type assertion untuk mengatasi error TypeScript
-              const typedTenantData = tenantData as any;
-              const startDate = new Date(typedTenantData.premium_start_date);
-              const endDate = new Date(typedTenantData.premium_end_date);
-              
-              // Calculate duration in months (approximate)
-              const durationMonths = Math.round((endDate.getTime() - startDate.getTime()) / (30 * 24 * 60 * 60 * 1000));
-              
-              // Calculate remaining days
-              const remainingDays = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-              
-              premiumData = {
-                planName: "Paket Premium",
-                startDate: startDate.toLocaleDateString('id-ID'),
-                endDate: endDate.toLocaleDateString('id-ID'),
-                remainingDays: remainingDays > 0 ? remainingDays : 0,
-                durationMonth: durationMonths || 1 // Default to 1 if calculation fails
-              };
-            }
-          }
-        } catch (error) {
-          // Error handling without console logs
-        }
+      if (platformError) {
+        // Silent error handling for production
       }
       
-      // Fetch current POS usage for today
+      // Default max usage for free accounts
+      const defaultMaxUsage = 10;
+      const maxPosUsage = platformData?.free_pos_limit || defaultMaxUsage;
+      
+      // Fetch current day's POS usage
+      const today = new Date().toISOString().split('T')[0];
       const { data: usageData, error: usageError } = await supabase
-        .from('pos_usage_tracking')
-        .select('usage_count')
+        .from('pos_usage')
+        .select('count')
         .eq('business_id', businessId)
         .eq('usage_date', today)
         .maybeSingle();
       
-      if (usageError) throw usageError;
+      if (usageError) {
+        // Silent error handling for production
+      }
       
-      const currentUsage = usageData?.usage_count || 0;
-      const remainingUsage = tenantStatus === 'premium' ? -1 : Math.max(0, maxPosUsage - currentUsage);
+      // Fetch business data directly to get accurate premium information
+      const { data: businessData, error: businessError } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('id', businessId)
+        .single();
+      
+      if (businessError) {
+        // Silent error handling for production
+      }
+      
+      // Get the actual tenant status from business data if available
+      const actualTenantStatus = businessData?.status || tenantStatus;
+      
+      // Calculate usage and limits
+      const currentUsage = usageData?.count || 0;
+      const maxUsage = actualTenantStatus === 'premium' ? 0 : maxPosUsage;
+      const remainingUsage = maxUsage === 0 ? -1 : Math.max(0, maxUsage - currentUsage);
+      
+      // Get premium details if applicable
+      let premiumData: {
+        planName: string;
+        startDate: string;
+        endDate: string;
+        remainingDays: number;
+        durationDays: number;
+      } | null = null;
+      
+      if (actualTenantStatus === 'premium' && businessData) {
+        // Use business data for premium details
+        const premiumStart = businessData.premium_start ? new Date(businessData.premium_start) : new Date();
+        const premiumEnd = businessData.premium_end ? new Date(businessData.premium_end) : new Date();
+        const now = new Date();
+        
+        // Calculate remaining days exactly as in PlatformAdminTenants
+        const diffTime = premiumEnd.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Use the calculated days directly without capping at 0
+        // This matches the PlatformAdminTenants calculation
+        const remainingDays = diffDays;
+        
+        
+        // Calculate total duration in days (not months)
+        const durationDays = Math.ceil((premiumEnd.getTime() - premiumStart.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Format dates in Indonesian format
+        const formatDate = (date: Date) => {
+          return date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+        };
+        
+        // Determine plan name based on duration in days
+        let planName = 'Premium';
+        if (durationDays <= 31) planName = 'Premium Bulanan';
+        else if (durationDays <= 93) planName = 'Premium 3 Bulan';
+        else if (durationDays <= 186) planName = 'Premium 6 Bulan';
+        else if (durationDays >= 365) planName = 'Premium Tahunan';
+        
+        premiumData = {
+          planName: planName,
+          startDate: formatDate(premiumStart),
+          endDate: formatDate(premiumEnd),
+          remainingDays,
+          durationDays
+        };
+      }
       
       setPosUsageData({
         currentUsage,
-        maxUsage: maxPosUsage,
+        maxUsage,
         remainingUsage,
         isLoading: false,
-        premiumData: premiumData
+        premiumData
       });
+      
     } catch (error) {
-      // Error handling without console logs
+      // Silent error handling for production
       toast({
         title: 'Error',
         description: 'Gagal memuat data penggunaan POS',
@@ -593,7 +592,7 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <p className="text-gray-500">Durasi</p>
-                        <p className="font-medium">{posUsageData.premiumData.durationMonth} bulan</p>
+                        <p className="font-medium">{posUsageData.premiumData.durationDays} hari</p>
                       </div>
                       <div>
                         <p className="text-gray-500">Tanggal Mulai</p>

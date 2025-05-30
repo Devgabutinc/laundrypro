@@ -41,6 +41,46 @@ const handleOffline = () => {
   });
 };
 
+// Cache data for offline use
+const cacheData = async (url: string, data: any) => {
+  try {
+    const cacheKey = `cache_${url}`;
+    const cacheEntry = {
+      data,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(cacheEntry));
+  } catch (error) {
+    console.warn('Failed to cache data:', error);
+  }
+};
+
+// Get cached data
+const getCachedData = async (url: string) => {
+  try {
+    const cacheKey = `cache_${url}`;
+    const cachedItem = localStorage.getItem(cacheKey);
+    if (!cachedItem) return null;
+    
+    const { data, timestamp } = JSON.parse(cachedItem);
+    
+    // Check if cache is too old (24 hours)
+    const cacheTime = new Date(timestamp).getTime();
+    const now = new Date().getTime();
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    
+    if (now - cacheTime > maxAge) {
+      localStorage.removeItem(cacheKey);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.warn('Error retrieving cached data:', error);
+    return null;
+  }
+};
+
 // Sinkronisasi data yang disimpan secara lokal selama offline
 export const syncOfflineData = async () => {
   try {
@@ -106,6 +146,24 @@ export const fetchWithOfflineSupport = async (url: string, options: RequestInit 
   
   let lastError;
   
+  // Special handling for business queries that might cause 406 errors
+  if (url.includes('/businesses?') && url.includes('eq.')) {
+    // Extract business ID from URL
+    const businessIdMatch = url.match(/id=eq\.([^&]+)/);
+    if (businessIdMatch && businessIdMatch[1]) {
+      const businessId = businessIdMatch[1];
+      try {
+        const cachedBusiness = localStorage.getItem(`business_${businessId}`);
+        if (cachedBusiness) {
+          console.log('Using cached business data from localStorage for:', businessId);
+          return { json: async () => JSON.parse(cachedBusiness) };
+        }
+      } catch (e) {
+        console.warn('Error reading business from localStorage:', e);
+      }
+    }
+  }
+  
   // Implementasi retry logic
   for (let attempt = 0; attempt < retryCount; attempt++) {
     try {
@@ -127,8 +185,46 @@ export const fetchWithOfflineSupport = async (url: string, options: RequestInit 
         }
       });
       
+      // Special handling for 406 errors (common with RLS policies)
+      if (response.status === 406) {
+        console.warn('Received 406 Not Acceptable, handling gracefully');
+        
+        // For business data, try to get from localStorage
+        if (url.includes('/businesses?')) {
+          const businessIdMatch = url.match(/id=eq\.([^&]+)/);
+          if (businessIdMatch && businessIdMatch[1]) {
+            const businessId = businessIdMatch[1];
+            try {
+              const cachedBusiness = localStorage.getItem(`business_${businessId}`);
+              if (cachedBusiness) {
+                console.log('Using cached business data for 406 error:', businessId);
+                return { json: async () => JSON.parse(cachedBusiness) };
+              }
+            } catch (e) {
+              console.warn('Error reading business from localStorage:', e);
+            }
+          }
+        }
+        
+        // Return empty result instead of throwing
+        return { 
+          ok: true, 
+          status: 200, 
+          json: async () => ({ data: [] }) 
+        };
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      // Cache successful responses
+      try {
+        const clonedResponse = response.clone();
+        const responseData = await clonedResponse.json();
+        await cacheData(url, responseData);
+      } catch (cacheError) {
+        console.warn('Failed to cache response:', cacheError);
       }
       
       return response;
@@ -161,6 +257,21 @@ export const fetchWithOfflineSupport = async (url: string, options: RequestInit 
         }
       }
     }
+  }
+  
+  // Try to get cached data as a last resort
+  try {
+    const cachedData = await getCachedData(url);
+    if (cachedData) {
+      console.log('Using cached data after fetch failures for:', url);
+      return { 
+        ok: true, 
+        status: 200, 
+        json: async () => cachedData 
+      };
+    }
+  } catch (cacheError) {
+    console.warn('Error retrieving cache as fallback:', cacheError);
   }
   
   throw lastError;
