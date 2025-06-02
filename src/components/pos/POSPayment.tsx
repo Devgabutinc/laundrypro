@@ -35,9 +35,10 @@ export function POSPayment({
 }: POSPaymentProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [amountReceived, setAmountReceived] = useState<number>(totalAmount);
-  const [discount, setDiscount] = useState<number>(0);
+  const [discount, setDiscount] = useState<string>('0');
 
-  const totalAfterDiscount = Math.max(0, totalAmount - discount);
+  const discountValue = parseFloat(discount) || 0;
+  const totalAfterDiscount = Math.max(0, totalAmount - discountValue);
 
   const calculateChange = () => {
     if (paymentMethod !== "cash") return 0;
@@ -81,7 +82,7 @@ export function POSPayment({
               </div>
               <div className="flex justify-between text-sm">
                 <span>Diskon</span>
-                <span>- Rp {discount.toLocaleString("id-ID")}</span>
+                <span>- Rp {discountValue.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between font-semibold mt-1 pt-1 border-t">
                 <span>Total Bayar</span>
@@ -96,11 +97,20 @@ export function POSPayment({
             <Label htmlFor="discount">Diskon (Rp)</Label>
             <Input
               id="discount"
-              type="number"
-              min={0}
-              max={totalAmount}
+              type="text"
+              inputMode="numeric"
               value={discount}
-              onChange={e => setDiscount(Math.max(0, Math.min(totalAmount, parseInt(e.target.value) || 0)))}
+              onChange={e => {
+                const value = e.target.value;
+                // Allow empty string or valid numbers
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  const numValue = parseFloat(value) || 0;
+                  // Only enforce max limit when we have a valid number
+                  if (value === '' || numValue <= totalAmount) {
+                    setDiscount(value);
+                  }
+                }
+              }}
             />
           </div>
           <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -180,7 +190,7 @@ export function POSPayment({
             onClick={() => {
               onComplete({
                 method: paymentMethod,
-                discount,
+                discount: discountValue,
                 amountReceived,
                 change
               });

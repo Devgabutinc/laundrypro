@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useFeature } from '@/hooks/useFeature';
 import { convertImageToEscposBytes } from '@/utils/convertImageToEscposBytes';
+import { TenantContext } from '@/contexts/TenantContext';
 
 // Declare bluetoothSerial for TypeScript
 declare var bluetoothSerial: any;
@@ -45,8 +46,11 @@ interface OrderData {
   cashierName?: string;
   deliveryType?: string;
   isPriority?: boolean;
-  estimatedCompletion?: string;
+  estimatedCompletion?: string; // Format yang sudah diproses untuk tampilan
+  estimated_completion?: string; // Field dari database untuk kompatibilitas
   statusHistory?: { status: string; timestamp: string }[];
+  status: string;
+  timestamp: string;
 }
 
 interface BusinessProfile {
@@ -58,11 +62,47 @@ interface BusinessProfile {
   status?: string; // 'free' | 'premium' | 'suspended'
 }
 
+// Konstanta untuk local storage
+const LAST_CONNECTED_PRINTER_KEY = 'lastConnectedPrinter';
+
+// Fungsi untuk menyimpan printer terakhir yang berhasil terkoneksi
+const saveLastConnectedPrinter = (device: any) => {
+  if (device && device.address && device.name) {
+    const printerInfo = {
+      address: device.address,
+      name: device.name,
+      class: device.class,
+      id: device.id || device.address
+    };
+   
+    localStorage.setItem(LAST_CONNECTED_PRINTER_KEY, JSON.stringify(printerInfo));
+  }
+};
+
+// Fungsi untuk mendapatkan printer terakhir yang berhasil terkoneksi
+const getLastConnectedPrinter = () => {
+  try {
+    const savedPrinter = localStorage.getItem(LAST_CONNECTED_PRINTER_KEY);
+    if (savedPrinter) {
+      const printerInfo = JSON.parse(savedPrinter);
+     
+      return printerInfo;
+    }
+  } catch (e) {
+    // Error handling
+  }
+  return null;
+};
+
 export const usePrintStruk = () => {
   const { toast } = useToast();
+  const { tenant } = useContext(TenantContext);
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [receiptSettingsLoaded, setReceiptSettingsLoaded] = useState(false);
   const [availableDevices, setAvailableDevices] = useState<any[]>([]);
   const [scanning, setScanning] = useState(false);
+  const [device, setDevice] = useState<any>(null);
   const { hasAccess: hasReceiptCustomization } = useFeature('receipt_customization');
   const [receiptSettings, setReceiptSettings] = useState<any>({
     show_logo: true,
@@ -78,48 +118,26 @@ export const usePrintStruk = () => {
     qr_code_url: '',
   });
 
-  useEffect(() => {
-    // Load receipt settings from database if available
-    const loadReceiptSettings = async () => {
-      try {
-        if (!hasReceiptCustomization) return;
-        
-        // Fetch settings from Supabase
-        const { data, error } = await supabase
-          .from('receipt_settings')
-          .select('*')
-          .single();
-          
-        if (error && error.code !== 'PGRST116') {
-          // Error fetching receipt settings
-          return;
-        }
-        
-        if (data) {
-          // Receipt settings loaded from database
-          setReceiptSettings(data);
-        } else {
-          // Fallback to localStorage if no database settings
-          const settings = localStorage.getItem('receiptSettings');
-          if (settings) {
-            setReceiptSettings(JSON.parse(settings));
-          }
-        }
-      } catch (error) {
-        // Error loading receipt settings
-      }
-    };
+  // Refresh receipt settings from database - deklarasi di sini akan dihapus
+  // karena ada deklarasi lain di bawah
 
-    loadReceiptSettings();
+  // Load receipt settings when component mounts
+  useEffect(() => {
+    const loadSettings = async () => {
+      await refreshReceiptSettings();
+    };
+    
+    loadSettings();
   }, [hasReceiptCustomization]);
 
   // Generate ESC/POS commands for printing
   const generateStrukData = async (
     order: OrderData,
     businessProfile: BusinessProfile,
-    tenantStatus: string
+    tenantStatus: string,
+    tenantInfo = tenant // Menggunakan tenant dari context sebagai default
   ): Promise<string> => {
-    // Debug logging
+    // Kode untuk generate struk data
     // Order data processing
     // Business profile processing
     // Tenant status processing
@@ -184,6 +202,7 @@ export const usePrintStruk = () => {
       
       // Header section - hanya untuk premium
       if (tenantStatus === 'premium' && receiptSettings.header_text) {
+
         escpos.center().text(receiptSettings.header_text).feed(1);
       }
       escpos.center().text(businessProfile?.address || '-').feed(1);
@@ -195,29 +214,88 @@ export const usePrintStruk = () => {
       escpos.left(); // Left alignment
       escpos.text(`No Order: ${order.shortId || order.id?.slice(-4) || '-'}`).feed(1);
       escpos.text(`Tanggal: ${order.date || '-'}`).feed(1);
-      escpos.text(`Kasir: ${order.cashierName || '-'}`).feed(1);
+      
+      // Hanya tampilkan kasir jika pengaturan show_cashier_name aktif
+      if (receiptSettings.show_cashier_name) {
+        let cashierName = order.cashierName;
+        if (!cashierName || cashierName === '-') {
+          cashierName = tenantInfo?.businessName || '-';
+        }
+        escpos.text(`Kasir: ${cashierName}`).feed(1);
+      }
+      
+      
       escpos.text(`Nama: ${order.customerName || '-'}`).feed(1);
       escpos.text(`No HP: ${order.customerPhone || '-'}`).feed(1);
-      escpos.text(`Alamat: ${order.customerAddress || '-'}`).feed(1);
+      
+      // Alamat pelanggan - pastikan ditampilkan dengan benar
+      // Jika alamat terlalu panjang, pecah menjadi beberapa baris
+      if (order.customerAddress && order.customerAddress !== '-') {
+        const maxWidth = 32; // 32 karakter per baris untuk printer 58mm
+        const address = order.customerAddress.trim();
+        
+        escpos.text('Alamat: ');
+        
+        if (address.length <= maxWidth - 8) { // 8 adalah panjang 'Alamat: '
+          escpos.text(address).feed(1);
+        } else {
+          // Pecah alamat menjadi beberapa baris
+          escpos.feed(1); // Baris baru setelah 'Alamat: '
+          
+          let remainingAddress = address;
+          while (remainingAddress.length > 0) {
+            const chunk = remainingAddress.substring(0, maxWidth);
+            escpos.text(chunk).feed(1);
+            remainingAddress = remainingAddress.substring(maxWidth);
+          }
+        }
+      } else {
+        escpos.text(`Alamat: -`).feed(1);
+      }
       
       // Tambahkan informasi jemput/antar jika ada
       if (order.deliveryType) {
         escpos.text(`Jemput/Antar: ${order.deliveryType}`).feed(1);
       }
       
-      // Tambahkan informasi prioritas jika ada
-      if (order.isPriority) {
-        escpos.text(`Prioritas: Ya`).feed(1);
-      } else {
-        escpos.text(`Prioritas: Tidak`).feed(1);
-      }
+    
       
-      // Tambahkan informasi estimasi jika ada
-      if (order.estimatedCompletion && order.estimatedCompletion !== '-') {
-        escpos.text(`Estimasi: ${order.estimatedCompletion}`).feed(1);
-      } else {
-        escpos.text(`Estimasi: -`).feed(1);
+      // Perbaiki logika untuk menangani lebih banyak kasus
+      // Cast order ke any untuk mengakses properti is_priority yang mungkin ada
+      const rawOrder = order as any;
+      const isPriority = order.isPriority === true || 
+                        order.isPriority === 'true' || 
+                        order.isPriority === 1 || 
+                        order.isPriority === '1' || 
+                        (rawOrder && rawOrder.is_priority === true) || 
+                        (rawOrder && rawOrder.is_priority === 'true') || 
+                        (rawOrder && rawOrder.is_priority === 1) || 
+                        (rawOrder && rawOrder.is_priority === '1');
+      
+      // isPriority sudah dievaluasi
+      escpos.text(`Prioritas: ${isPriority ? 'Ya' : 'Tidak'}`).feed(1);
+      
+      // Gunakan pendekatan sederhana untuk estimasi seperti di OrderDetail.tsx
+      let estimasiText = '-';
+      
+      // Prioritaskan estimated_completion dari database
+      if (order.estimated_completion) {
+        try {
+          // Gunakan toLocaleString tanpa opsi tambahan untuk konsistensi
+          const estimasi = new Date(order.estimated_completion).toLocaleString('id-ID');
+          if (estimasi !== 'Invalid Date') {
+            estimasiText = estimasi;
+          } else {
+            estimasiText = String(order.estimated_completion);
+          }
+        } catch (e) {
+          // Gunakan nilai asli jika parsing gagal
+          estimasiText = String(order.estimated_completion);
+        }
+      } else if (order.estimatedCompletion && order.estimatedCompletion !== '-') {
+        estimasiText = order.estimatedCompletion;
       }
+      escpos.text(`Estimasi Selesai: ${estimasiText}`).feed(1);
       
       escpos.feed(1).line().feed(1);
       
@@ -292,42 +370,72 @@ export const usePrintStruk = () => {
       }
       
       // Footer text if available
-      if (receiptSettings.footer_text) {
-        escpos.center().text(receiptSettings.footer_text).feed(1);
+      if (tenantStatus === 'premium' && receiptSettings.footer_text) {
+
+        escpos.feed(1).center().text(receiptSettings.footer_text).feed(1);
+      } else {
+        // Default footer untuk semua pengguna
+
+        escpos.feed(1).center().text('Terima kasih telah menggunakan jasa kami!').feed(1);
       }
+      
       
       // QR Code for premium users
       if (tenantStatus === 'premium' && receiptSettings.show_qr_code && receiptSettings.qr_code_url) {
         try {
-          // Menambahkan QR code ke struk
 
-          // Pastikan URL QR code valid
-          if (receiptSettings.qr_code_url && receiptSettings.qr_code_url.startsWith('http')) {
+          
+          // Validasi URL QR code
+          if (receiptSettings.qr_code_url && (
+              receiptSettings.qr_code_url.startsWith('http') || 
+              receiptSettings.qr_code_url.startsWith('https') || 
+              receiptSettings.qr_code_url.startsWith('data:')
+          )) {
             try {
-              // Konversi QR code ke ESC/POS bytes - ukuran untuk 58mm printer
-              const qrWidth = 384; // Standard width for 58mm printer
-              const qrCodeBytes = await convertImageToEscposBytes(receiptSettings.qr_code_url, qrWidth, Math.floor(qrWidth * 0.5));
+
+              // Konversi QR code ke format ESC/POS
+              const qrWidth = 384; // Lebar maksimum untuk printer 58mm
+              const qrHeight = Math.floor(qrWidth * 0.6); // Tinggi proporsional
               
-              // Set alignment ke center untuk QR code
-              escpos.text('\x1B\x61\x01'); // ESC a 1 - center alignment
+
               
-              // Konversi Uint8Array ke string untuk QR code
+              // Konversi gambar QR code ke bytes ESC/POS
+              const qrCodeBytes = await convertImageToEscposBytes(
+                receiptSettings.qr_code_url, 
+                qrWidth, 
+                qrHeight
+              );
+              
+              // Set alignment ke center (\x1B\x61\x01)
+              escpos.text('\x1B\x61\x01');
+              
+              // Konversi bytes ke string untuk dikirim ke printer
               let qrData = '';
               for (let i = 0; i < qrCodeBytes.length; i++) {
                 qrData += String.fromCharCode(qrCodeBytes[i]);
               }
               
-              // Tambahkan data QR code langsung setelah center alignment
+              // Tambahkan QR code ke struk
               escpos.text(qrData);
+              
+              // Tambahkan spasi setelah QR code
               escpos.feed(2);
+              
+
             } catch (error) {
-              // Error adding QR code to receipt
+              // Jika gagal menambahkan QR code, tampilkan pesan fallback
+
+              escpos.center().text('Scan QR code di website kami').feed(1);
             }
           } else {
             // URL QR code tidak valid
+
+            escpos.center().text('Scan QR code di website kami').feed(1);
           }
         } catch (error) {
-          // Error adding QR code to receipt
+          // Error umum pada bagian QR code
+
+          escpos.center().text('Scan QR code di website kami').feed(1);
         }
       }
       
@@ -344,8 +452,150 @@ export const usePrintStruk = () => {
       
       return escpos.encode();
     } catch (error) {
-      // Error generating struk data
+      console.error('Error generating struk data:', error);
       throw error;
+    }
+  };
+
+  // Validate data before printing
+  const validatePrintData = (order: OrderData, businessProfile: BusinessProfile): boolean => {
+   
+    
+    // Check order data
+    if (!order || !order.id) {
+     
+      toast({ 
+        title: "Data tidak lengkap", 
+        description: "Data pesanan tidak lengkap. ID pesanan tidak ditemukan.", 
+        variant: "destructive" 
+      });
+      return false;
+    }
+    
+    // Check order items
+    if (!order.items || order.items.length === 0) {
+     
+      toast({ 
+        title: "Data tidak lengkap", 
+        description: "Tidak ada item dalam pesanan.", 
+        variant: "destructive" 
+      });
+      return false;
+    }
+    
+    // Check business profile
+    if (!businessProfile || (!businessProfile.name && !businessProfile.businessName)) {
+     
+      toast({ 
+        title: "Data tidak lengkap", 
+        description: "Profil bisnis tidak lengkap. Pastikan nama bisnis terisi.", 
+        variant: "destructive" 
+      });
+      return false;
+    }
+    
+    // Validasi estimasi selesai
+    if (order.estimatedCompletion) {
+      try {
+        // Pastikan format estimasi valid
+        const estimatedDate = new Date(order.estimatedCompletion);
+        if (isNaN(estimatedDate.getTime())) {
+       
+          toast({ 
+            title: "Peringatan", 
+            description: "Format tanggal estimasi tidak valid. Struk akan tetap dicetak.", 
+            variant: "warning" 
+          });
+          // Tetap lanjutkan mencetak meskipun ada warning
+        }
+      } catch (e) {
+      
+      }
+    }
+    
+    // Validasi total harga
+    if (typeof order.total !== 'number' || isNaN(order.total)) {
+     
+      toast({ 
+        title: "Data tidak lengkap", 
+        description: "Total harga tidak valid. Pastikan total harga terisi dengan benar.", 
+        variant: "destructive" 
+      });
+      return false;
+    }
+    
+  
+    return true;
+  };
+  
+  // Load fresh receipt settings from database
+  const refreshReceiptSettings = async (): Promise<boolean> => {
+    if (!hasReceiptCustomization) {
+      setDataLoading(false);
+      setReceiptSettingsLoaded(true);
+      return true;
+    }
+    
+    try {
+      setDataLoading(true);
+      
+      // Pastikan kita memiliki tenant.id untuk filter
+      if (!tenant || !tenant.id) {
+  
+        setDataLoading(false);
+        return false;
+      }
+      
+
+      
+      // Fetch settings dari Supabase berdasarkan business_id yang sesuai dengan tenant saat ini
+      const { data, error } = await supabase
+        .from('receipt_settings' as any)
+        .select('*')
+        .eq('business_id', tenant.id); // Filter berdasarkan business_id yang sesuai dengan tenant.id
+        
+      if (error) {
+
+        setDataLoading(false);
+        // Fallback to localStorage if no database settings
+        const settings = localStorage.getItem(`receiptSettings_${tenant.id}`);
+        if (settings) {
+          try {
+            const parsedSettings = JSON.parse(settings);
+            setReceiptSettings(parsedSettings);
+
+          } catch (e) {
+
+          }
+        }
+      } else if (data && data.length > 0) {
+        // Update receipt settings with data from database
+        const dbSettings = data[0];
+
+        
+        // Merge default settings with database settings
+        const mergedSettings = {
+          ...receiptSettings,
+          ...dbSettings
+        };
+        
+        // Update state with merged settings
+        setReceiptSettings(mergedSettings);
+        
+        // Save to localStorage as backup with tenant ID in the key
+        localStorage.setItem(`receiptSettings_${tenant.id}`, JSON.stringify(mergedSettings));
+      } else {
+
+      }
+      
+      setDataLoading(false);
+      setReceiptSettingsLoaded(true);
+      return true;
+    } catch (error) {
+
+      setDataLoading(false);
+      setReceiptSettingsLoaded(true);
+      return false;
     }
   };
 
@@ -358,129 +608,264 @@ export const usePrintStruk = () => {
   ) => {
     const { onSuccess, onError } = options;
     setLoading(true);
-
+    
     try {
+    
+      
+      // Validate data first
+      if (!validatePrintData(order, businessProfile)) {
+       
+        setLoading(false);
+        if (onError) onError(new Error('Invalid print data'));
+        return;
+      }
+      
+   
+      if (hasReceiptCustomization) {
+        toast({
+          title: "Memuat pengaturan",
+          description: "Sedang memuat pengaturan struk...",
+        });
+        const settingsRefreshed = await refreshReceiptSettings();
+        if (!settingsRefreshed) {
+         
+        }
+      }
+      
+      // Kode untuk refresh data order telah dipindahkan ke dalam fungsi printStruk dan connectToDevice
+      // untuk menghindari error 'Cannot find name order'
+      
+      // Cek apakah QR code diaktifkan untuk pengguna premium
+      if (tenantStatus === 'premium' && receiptSettings.show_qr_code) {
+
+      }
+      
+      // Persiapan data order untuk cetak
+      
+      // Pastikan nilai isPriority diset dengan benar
+      // Jika isPriority undefined, default ke false
+      if (order.isPriority === undefined) {
+        // Dalam beberapa kasus, data dari database mungkin menggunakan is_priority
+        // Cek apakah ada properti is_priority di objek order (meskipun tidak dalam interface)
+        const rawOrder = order as any; // Cast ke any untuk akses properti yang tidak dalam interface
+        if (rawOrder && typeof rawOrder.is_priority !== 'undefined') {
+          order.isPriority = Boolean(rawOrder.is_priority);
+        } else {
+          // Default ke false jika keduanya undefined
+          order.isPriority = false;
+        }
+      }
+      
+
+      
       // Cek koneksi printer terlebih dahulu
       bluetoothSerial.isConnected(
+        // Callback jika sudah terkoneksi
         async () => {
-          // Printer sudah terkoneksi, langsung print
-          // Langsung print struk tanpa preview
-          const strukData = await generateStrukData(order, businessProfile, tenantStatus);
-          bluetoothSerial.write(
-            strukData,
-            () => {
-              // Struk berhasil di-print
-              toast({ 
-                title: "Berhasil", 
-                description: "Struk berhasil di-print", 
-                variant: "default" 
-              });
-              setLoading(false);
-              if (onSuccess) onSuccess();
-            },
-            (error: any) => {
-              // Gagal print struk
-              toast({ 
-                title: "Gagal print struk", 
-                description: "Gagal mencetak struk. Silakan coba lagi.", 
-                variant: "destructive" 
-              });
-              setLoading(false);
-              if (onError) onError(error);
-            }
-          );
-        },
-        async () => {
-          // Printer belum terkoneksi, mencari printer
-          // Cek apakah printer sudah pernah dipasangkan
-          bluetoothSerial.list(
-            async (devices: any) => {
-              // Daftar device ditemukan
-              // Filter device yang memiliki nama
-              const filteredDevices = (devices || []).filter((d: any) => d.name);
-              // Device dengan nama ditemukan
-              setAvailableDevices(filteredDevices);
-              
-              // Cari printer yang sudah pernah dipasangkan
-              const pairedPrinter = filteredDevices.find((d: any) => 
-                d.name?.toLowerCase().includes('58printer') || 
-                d.name?.toLowerCase().includes('panda') ||
-                d.name?.toLowerCase().includes('prj-58d')
-              );
-
-              if (pairedPrinter) {
-                // Printer ditemukan, mencoba koneksi
-                // Coba koneksi ke printer yang sudah dipasangkan
-                bluetoothSerial.connectInsecure(
-                  pairedPrinter.address,
-                  async () => {
-                    // Berhasil terkoneksi ke printer
-                    // Langsung print struk setelah terkoneksi
-                    const strukData = await generateStrukData(order, businessProfile, tenantStatus);
-                    bluetoothSerial.write(
-                      strukData,
-                      () => {
-                        // Struk berhasil di-print
-                        toast({ 
-                          title: "Berhasil", 
-                          description: "Struk berhasil di-print", 
-                          variant: "default" 
-                        });
-                        setLoading(false);
-                        if (onSuccess) onSuccess();
-                      },
-                      (error: any) => {
-                        // Gagal print struk
-                        toast({ 
-                          title: "Gagal print struk", 
-                          description: "Gagal mencetak struk. Silakan coba lagi.", 
-                          variant: "destructive" 
-                        });
-                        setLoading(false);
-                        if (onError) onError(error);
-                      }
-                    );
-                  },
-                  () => {
-                    // Gagal koneksi ke printer yang dipasangkan
-                    toast({ 
-                      title: "Printer tidak tersambung", 
-                      description: "Silakan pilih printer Bluetooth dari daftar.", 
-                      variant: "destructive" 
-                    });
-                    setLoading(false);
-                    if (onError) onError(new Error('Failed to connect to paired printer'));
-                  }
-                );
-              } else {
-                // Printer tidak ditemukan
+          try {
+            // Order data sudah siap untuk dicetak
+            
+            // Generate struk data
+            const strukData = await generateStrukData(order, businessProfile, tenantStatus, tenant);
+            
+            // Print struk
+            bluetoothSerial.write(
+              strukData,
+              () => {
+                // Struk berhasil di-print
                 toast({ 
-                  title: "Printer tidak ditemukan", 
-                  description: "Silakan sambungkan printer Bluetooth Anda.", 
+                  title: "Berhasil", 
+                  description: "Struk berhasil di-print", 
+                  variant: "default" 
+                });
+                setLoading(false);
+                if (onSuccess) onSuccess();
+              },
+              (error) => {
+                // Handle error if print fails
+                toast({ 
+                  title: "Gagal", 
+                  description: "Gagal mencetak struk", 
                   variant: "destructive" 
                 });
                 setLoading(false);
-                if (onError) onError(new Error('No printer found'));
+                if (onError) onError(error);
               }
-            },
-            (error: any) => {
-              // Gagal mencari printer
-              toast({ 
-                title: "Gagal mencari printer", 
-                description: "Gagal mencari printer Bluetooth. Pastikan Bluetooth aktif.", 
-                variant: "destructive" 
-              });
-              setLoading(false);
-              if (onError) onError(error);
+            );
+            
+            // Refresh data order dari database untuk memastikan data terbaru
+            if (order.id) {
+              try {
+                const { data: freshOrderData, error } = await supabase
+                  .from('orders')
+                  .select('*, customers(*)')
+                  .eq('id', order.id)
+                  .single();
+                  
+                if (!error && freshOrderData) {
+                  // Update alamat pelanggan jika ada
+                  if (freshOrderData.customers && freshOrderData.customers.address) {
+                    order.customerAddress = freshOrderData.customers.address;
+                  }
+                  
+                  // Update nama pelanggan jika ada
+                  if (freshOrderData.customers && freshOrderData.customers.name) {
+                    order.customerName = freshOrderData.customers.name;
+                  }
+                  
+                  // Update nomor telepon pelanggan jika ada
+                  if (freshOrderData.customers && freshOrderData.customers.phone) {
+                    order.customerPhone = freshOrderData.customers.phone;
+                  }
+                }
+              } catch (e) {
+                // Error handling
+              }
             }
-          );
+          } catch (e) {
+            // Continue with printing even if order data refresh fails
+            // Error handling
+          }
+        },
+        // Callback jika tidak terkoneksi - akan ditangani di bagian selanjutnya
+        async () => {
+          // Jika tidak terkoneksi, coba koneksi manual ke device yang dipilih
+          try {
+            const strukData = await generateStrukData(order, businessProfile, tenantStatus, tenant);
+            // Pastikan device sudah didefinisikan sebelum digunakan
+            if (!device || !device.address) {
+              throw new Error('Printer tidak ditemukan atau tidak dipilih');
+            }
+            
+            // Coba koneksi ke printer
+            bluetoothSerial.connect(
+              device.address,
+              async () => {
+                // Berhasil terkoneksi ke printer
+                try {
+                  // Notify successful connection
+                  toast({ 
+                    title: "Berhasil", 
+                    description: `Berhasil terhubung ke ${device.name || 'printer'}`, 
+                    variant: "default" 
+                  });
+                  
+                  // Simpan printer yang berhasil terkoneksi
+                  saveLastConnectedPrinter(device);
+                  
+                  // Refresh receipt settings jika diperlukan
+                  if (hasReceiptCustomization) {
+                    const settingsRefreshed = await refreshReceiptSettings();
+                    if (!settingsRefreshed) {
+                      // Receipt settings could not be refreshed
+                    }
+                  }
+                  
+                  // Refresh data order dari database untuk memastikan data terbaru
+                  if (order.id) {
+                    try {
+                      const { data: latestOrderData, error } = await supabase
+                        .from('orders')
+                        .select('*, customers(*)')
+                        .eq('id', order.id)
+                        .single();
+                        
+                      if (!error && latestOrderData) {
+                        // Update estimasi selesai jika ada
+                        if (latestOrderData.estimated_completion) {
+                          // Format tanggal estimasi selesai dengan benar
+                          const estimatedDate = new Date(latestOrderData.estimated_completion);
+                          if (!isNaN(estimatedDate.getTime())) {
+                            order.estimatedCompletion = estimatedDate.toLocaleString("id-ID", { dateStyle: 'short' });
+                          } else {
+                            order.estimatedCompletion = latestOrderData.estimated_completion;
+                          }
+                        }
+                        
+                        // Update alamat pelanggan jika ada
+                        if (latestOrderData.customers && latestOrderData.customers.address) {
+                          order.customerAddress = latestOrderData.customers.address;
+                        }
+                        
+                        // Update nama pelanggan jika ada
+                        if (latestOrderData.customers && latestOrderData.customers.name) {
+                          order.customerName = latestOrderData.customers.name;
+                        }
+                        
+                        // Update nomor telepon pelanggan jika ada
+                        if (latestOrderData.customers && latestOrderData.customers.phone) {
+                          order.customerPhone = latestOrderData.customers.phone;
+                        }
+                      }
+                    } catch (e) {
+                      // Error handling
+                    }
+                  }
+                  
+                  // Cetak struk setelah refresh data
+                  const updatedStrukData = await generateStrukData(order, businessProfile, tenantStatus, tenant);
+                  bluetoothSerial.write(
+                    updatedStrukData,
+                    () => {
+                      // Struk berhasil di-print
+                      toast({ 
+                        title: "Berhasil", 
+                        description: "Struk berhasil di-print", 
+                        variant: "default" 
+                      });
+                      setLoading(false);
+                      if (onSuccess) onSuccess();
+                    },
+                    (error: any) => {
+                      // Gagal print struk
+                      toast({ 
+                        title: "Gagal print struk", 
+                        description: "Gagal mencetak struk. Silakan coba lagi.", 
+                        variant: "destructive" 
+                      });
+                      setLoading(false);
+                      if (onError) onError(error);
+                    }
+                  );
+                } catch (error) {
+                  // Error saat proses printing
+                  toast({ 
+                    title: "Gagal generate struk", 
+                    description: "Terjadi kesalahan saat membuat data struk.", 
+                    variant: "destructive" 
+                  });
+                  setLoading(false);
+                  if (onError) onError(error);
+                }
+              },
+              (error: any) => {
+                // Gagal koneksi ke printer
+                toast({ 
+                  title: "Gagal terhubung", 
+                  description: `Gagal terhubung ke ${device.name || 'printer'}. Silakan coba lagi.`, 
+                  variant: "destructive" 
+                });
+                setLoading(false);
+                if (onError) onError(error);
+              }
+            );
+          } catch (error) {
+            // Error dalam proses koneksi manual
+            toast({ 
+              title: "Gagal", 
+              description: "Gagal mempersiapkan printer. Silakan coba lagi.", 
+              variant: "destructive" 
+            });
+            setLoading(false);
+            if (onError) onError(error);
+          }
         }
-      );
+      )
     } catch (error) {
-      // Error printing struk
+      // Error handling
       toast({ 
-        title: "Gagal print struk", 
-        description: "Terjadi kesalahan saat mencetak struk.", 
+        title: "Gagal", 
+        description: "Terjadi kesalahan saat mencetak struk. Silakan coba lagi.", 
         variant: "destructive" 
       });
       setLoading(false);
@@ -488,32 +873,38 @@ export const usePrintStruk = () => {
     }
   };
 
-  // Scan for Bluetooth devices
-  const scanBluetoothDevices = () => {
+  // Function to scan for Bluetooth devices
+  const scanBluetoothDevices = async () => {
     setScanning(true);
-    bluetoothSerial.list(
-      (devices: any) => {
-        // Daftar device ditemukan
-        // Filter device yang memiliki nama
-        const filteredDevices = (devices || []).filter((d: any) => d.name);
-        // Device dengan nama ditemukan
-        setAvailableDevices(filteredDevices);
-        setScanning(false);
-      },
-      (error: any) => {
-        // Gagal mencari printer
-        toast({ 
-          title: "Gagal mencari printer", 
-          description: "Gagal mencari printer Bluetooth. Pastikan Bluetooth aktif.", 
-          variant: "destructive" 
-        });
-        setScanning(false);
-      }
-    );
+    try {
+      bluetoothSerial.list(
+        (devices: any[]) => {
+          setAvailableDevices(devices);
+          setScanning(false);
+        },
+        (error: any) => {
+          // Error handling
+          setScanning(false);
+          toast({ 
+            title: "Gagal scan", 
+            description: "Gagal mencari perangkat Bluetooth. Pastikan Bluetooth aktif.", 
+            variant: "destructive" 
+          });
+        }
+      );
+    } catch (error) {
+      // Error handling
+      setScanning(false);
+      toast({ 
+        title: "Gagal scan", 
+        description: "Terjadi kesalahan saat mencari perangkat Bluetooth.", 
+        variant: "destructive" 
+      });
+    }
   };
 
-  // Connect to a Bluetooth device
-  const connectToDevice = async (
+  // Connect to a Bluetooth device and print
+  const connectToDevice = (
     device: any,
     order: OrderData,
     businessProfile: BusinessProfile,
@@ -522,22 +913,83 @@ export const usePrintStruk = () => {
   ) => {
     const { onSuccess, onError } = options;
     setLoading(true);
-
-    bluetoothSerial.connectInsecure(
+    
+    bluetoothSerial.connect(
       device.address,
       async () => {
         // Berhasil terkoneksi ke printer
-        toast({ 
-          title: "Berhasil", 
-          description: `Berhasil terhubung ke ${device.name || 'printer'}`, 
-          variant: "default" 
-        });
-
-        // Langsung print struk setelah terkoneksi
         try {
-          const strukData = await generateStrukData(order, businessProfile, tenantStatus);
+          // Notify successful connection
+          toast({ 
+            title: "Berhasil", 
+            description: `Berhasil terhubung ke ${device.name || 'printer'}`, 
+            variant: "default" 
+          });
+          
+          // Simpan printer yang berhasil terkoneksi
+          saveLastConnectedPrinter(device);
+          
+          // Refresh receipt settings jika diperlukan
+          if (hasReceiptCustomization) {
+            const settingsRefreshed = await refreshReceiptSettings();
+            if (!settingsRefreshed) {
+              // Receipt settings could not be refreshed
+            }
+          }
+          
+          // Refresh data order dari database untuk memastikan data terbaru
+          if (order.id) {
+            try {
+              const { data: latestOrderData, error } = await supabase
+                .from('orders')
+                .select('*, customers(*)')
+                .eq('id', order.id)
+                .single();
+                
+              if (!error && latestOrderData) {
+                // Update estimasi selesai jika ada - menggunakan pendekatan sederhana seperti di OrderDetail.tsx
+                if (latestOrderData.estimated_completion) {
+                  try {
+                    // Gunakan pendekatan sederhana seperti di OrderDetail.tsx
+                    const estimasi = new Date(latestOrderData.estimated_completion).toLocaleString('id-ID');
+                    if (estimasi !== 'Invalid Date') {
+                      order.estimatedCompletion = estimasi;
+                    } else {
+                      order.estimatedCompletion = String(latestOrderData.estimated_completion);
+                    }
+                    // Simpan juga data asli untuk kompatibilitas
+                    order.estimated_completion = latestOrderData.estimated_completion;
+                  } catch (e) {
+                    // Fallback ke string asli jika parsing gagal
+                    order.estimatedCompletion = String(latestOrderData.estimated_completion);
+                    order.estimated_completion = latestOrderData.estimated_completion;
+                  }
+                }
+                
+                // Update alamat pelanggan jika ada
+                if (latestOrderData.customers && latestOrderData.customers.address) {
+                  order.customerAddress = latestOrderData.customers.address;
+                }
+                
+                // Update nama pelanggan jika ada
+                if (latestOrderData.customers && latestOrderData.customers.name) {
+                  order.customerName = latestOrderData.customers.name;
+                }
+                
+                // Update nomor telepon pelanggan jika ada
+                if (latestOrderData.customers && latestOrderData.customers.phone) {
+                  order.customerPhone = latestOrderData.customers.phone;
+                }
+              }
+            } catch (e) {
+              // Error handling
+            }
+          }
+          
+          // Cetak struk setelah refresh data
+          const updatedStrukData = await generateStrukData(order, businessProfile, tenantStatus, tenant);
           bluetoothSerial.write(
-            strukData,
+            updatedStrukData,
             () => {
               // Struk berhasil di-print
               toast({ 
@@ -560,7 +1012,7 @@ export const usePrintStruk = () => {
             }
           );
         } catch (error) {
-          // Error generating struk data
+          // Error saat proses printing
           toast({ 
             title: "Gagal generate struk", 
             description: "Terjadi kesalahan saat membuat data struk.", 
@@ -588,8 +1040,11 @@ export const usePrintStruk = () => {
     scanBluetoothDevices,
     connectToDevice,
     loading,
+    dataLoading,
     scanning,
     availableDevices,
-    generateStrukData
+    generateStrukData,
+    validatePrintData,
+    refreshReceiptSettings
   };
 };

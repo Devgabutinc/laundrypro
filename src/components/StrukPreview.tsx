@@ -23,27 +23,30 @@ declare global {
   }
 }
 
+interface OrderData {
+  id: string;
+  shortId?: string;
+  customerName: string;
+  customerPhone?: string;
+  customerAddress?: string;
+  items: { name: string; quantity: number; price: number }[];
+  subtotal: number;
+  discount: number;
+  total: number;
+  paymentMethod: string;
+  amountReceived?: number;
+  change?: number;
+  date: string;
+  cashierName?: string;
+  deliveryType?: string;
+  isPriority?: boolean;
+  estimatedCompletion?: string;
+  estimated_completion?: string | Date; // Timestamp with time zone dari database
+  statusHistory?: { status: string; timestamp: string }[];
+}
+
 interface StrukPreviewProps {
-  order: {
-    id: string;
-    shortId?: string;
-    customerName: string;
-    customerPhone?: string;
-    customerAddress?: string;
-    cashierName?: string;
-    items: { name: string; quantity: number; price: number }[];
-    subtotal: number;
-    discount: number;
-    total: number;
-    paymentMethod: string;
-    amountReceived?: number;
-    change?: number;
-    date: string;
-    deliveryType?: string;
-    isPriority?: boolean;
-    estimatedCompletion?: string;
-    statusHistory?: { status: string; timestamp: string }[];
-  };
+  order: OrderData;
   businessProfile: any;
   tenantStatus: string; // 'free' | 'premium' | 'suspended'
   isStrukClean?: boolean;
@@ -81,6 +84,8 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
   const { toast } = useToast();
   const { tenant } = useContext(TenantContext);
   const { hasAccess: hasReceiptCustomization } = useFeature('receipt_customization');
+  // State untuk menyimpan estimasi yang diformat
+  const [formattedEstimation, setFormattedEstimation] = useState<string>('-');
   const [receiptSettings, setReceiptSettings] = useState<any>({
     show_logo: true,
     show_business_name: true,
@@ -95,6 +100,30 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
     qr_code_url: '',
   });
 
+  // Format estimasi setiap kali order berubah - menggunakan pendekatan sederhana seperti di OrderDetail.tsx
+  useEffect(() => {
+    // Gunakan pendekatan sederhana seperti di OrderDetail.tsx
+    if (order?.estimated_completion) {
+      try {
+        // Langsung gunakan toLocaleString tanpa opsi tambahan untuk memastikan konsistensi
+        const estimasi = new Date(order.estimated_completion).toLocaleString('id-ID');
+        
+        if (estimasi !== 'Invalid Date') {
+          setFormattedEstimation(estimasi);
+        } else {
+          setFormattedEstimation(String(order.estimated_completion));
+        }
+      } catch (e) {
+        // Fallback ke string asli jika parsing gagal
+        setFormattedEstimation(String(order.estimated_completion));
+      }
+    } else {
+      setFormattedEstimation('-');
+    }
+  }, [order]);
+
+
+
   useEffect(() => {
     // Load receipt settings from database if available
     const loadReceiptSettings = async () => {
@@ -103,22 +132,25 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
         
         // Fetch settings from Supabase
         if (businessProfile?.id) {
+          // Fetch receipt settings for this business
+          
           // Use 'as any' to avoid TypeScript errors with the receipt_settings table
           const { data, error } = await supabase
             .from('receipt_settings' as any)
             .select('*')
             .eq('business_id', businessProfile.id)
-            .single();
+            .maybeSingle();
             
-          if (error && error.code !== 'PGRST116') {
+          if (error) {
             console.error('Error fetching receipt settings:', error);
             return;
           }
           
           if (data) {
-            console.log('Receipt settings loaded from database:', data);
+
             setReceiptSettings(data);
           } else {
+            // No settings found, try localStorage
             // Fallback to localStorage if no database settings
             const settings = localStorage.getItem('receiptSettings');
             if (settings) {
@@ -139,6 +171,7 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
 
   // Function to handle WhatsApp screenshot sharing
   const handleSendWAScreenshot = async () => {
+    // Prepare to send WhatsApp screenshot
     // Ambil screenshot hanya area struk (bukan seluruh modal)
     const node = document.querySelector('.struk-area') as HTMLElement;
     if (!node) {
@@ -192,7 +225,6 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
         if (onShare) onShare();
       }
     } catch (err: any) {
-      console.error('Screenshot error:', err);
       toast({ title: "Gagal screenshot", description: err?.message || String(err) });
     }
   };
@@ -301,9 +333,9 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
             <span style={{ fontWeight: 'bold' }}>Tanggal:</span> {order.date}
           </p>
           
-          {receiptSettings.show_cashier_name && order.cashierName && (
+          {receiptSettings.show_cashier_name && (
             <p style={{ margin: '2px 0', fontSize: '12px' }}>
-              <span style={{ fontWeight: 'bold' }}>Kasir:</span> {order.cashierName}
+              <span style={{ fontWeight: 'bold' }}>Kasir:</span> {order.cashierName || tenant?.businessName || '-'}
             </p>
           )}
           
@@ -332,14 +364,20 @@ const StrukPreview: React.FC<StrukPreviewProps> = ({
             </p>
           )}
           
-          {/* Priority status */}
+          {/* Priority status - pastikan konsisten dengan usePrintStruk.ts */}
           <p style={{ margin: '2px 0', fontSize: '12px' }}>
-            <span style={{ fontWeight: 'bold' }}>Prioritas:</span> {order.isPriority ? 'Ya' : 'Tidak'}
+            <span style={{ fontWeight: 'bold' }}>Prioritas:</span> {
+              (() => {
+                // Tambahkan debug inline
+                const isPriority = order.isPriority === true || order.isPriority === 'true' || order.isPriority === 1;
+                return isPriority ? 'Ya' : 'Tidak';
+              })()
+            }
           </p>
           
-          {/* Estimated completion date */}
+          {/* Estimated completion date - menggunakan formattedEstimation */}
           <p style={{ margin: '2px 0', fontSize: '12px' }}>
-            <span style={{ fontWeight: 'bold' }}>Estimasi:</span> {order.estimatedCompletion || '-'}
+            <span style={{ fontWeight: 'bold' }}>Estimasi Selesai:</span> {formattedEstimation}
           </p>
         </div>
 

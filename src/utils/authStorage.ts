@@ -20,8 +20,7 @@ export const storeSession = (session: Session | null): void => {
     // Simpan ke sessionStorage sebagai backup
     sessionStorage.setItem(AUTH_KEY, JSON.stringify(session));
     
-    // Simpan ke IndexedDB jika tersedia
-    storeInIndexedDB(AUTH_KEY, session);
+    // Skip IndexedDB storage - removed offline support
     
     console.log('Session stored successfully');
   } catch (error) {
@@ -46,8 +45,8 @@ export const getStoredSession = (): Session | null => {
       return JSON.parse(sessionData);
     }
     
-    // Jika masih tidak ada, coba dari IndexedDB
-    return getFromIndexedDB(AUTH_KEY);
+    // Skip IndexedDB - removed offline support
+    return null;
   } catch (error) {
     console.error('Error retrieving session:', error);
     
@@ -82,7 +81,7 @@ export const storeUserProfile = (profile: any): void => {
       console.warn('Could not store profile in sessionStorage:', sessionError);
     }
     
-    storeInIndexedDB(PROFILE_KEY, profile);
+    // Skip IndexedDB - removed offline support
   } catch (error) {
     console.error('Error storing profile in localStorage:', error);
     
@@ -111,7 +110,8 @@ export const getStoredUserProfile = (): any => {
       return JSON.parse(sessionData);
     }
     
-    return getFromIndexedDB(PROFILE_KEY);
+    // Skip IndexedDB - removed offline support
+    return null;
   } catch (error) {
     console.error('Error retrieving user profile:', error);
     return null;
@@ -125,8 +125,7 @@ export const clearSession = (): void => {
     sessionStorage.removeItem(AUTH_KEY);
     localStorage.removeItem(PROFILE_KEY);
     sessionStorage.removeItem(PROFILE_KEY);
-    clearFromIndexedDB(AUTH_KEY);
-    clearFromIndexedDB(PROFILE_KEY);
+    // Skip IndexedDB - removed offline support
   } catch (error) {
     console.error('Error clearing session:', error);
   }

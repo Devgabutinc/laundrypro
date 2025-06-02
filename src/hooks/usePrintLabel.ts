@@ -31,6 +31,7 @@ interface OrderData {
   shortId?: string;
   customerName: string;
   customerPhone?: string;
+  customerAddress?: string; // Added customerAddress property
   note?: string;
   items: { name: string; quantity: number; price: number }[];
   total: number;
@@ -161,9 +162,9 @@ export const usePrintLabel = () => {
       }
       
       // Customer info
-      escpos.text(`Nama: ${order.customer?.name || order.customerName || '-'}`).feed(1);
-      escpos.text(`No HP: ${order.customer?.phone || order.customerPhone || '-'}`).feed(1);
-      escpos.text(`Alamat: ${order.customer?.address || '-'}`).feed(1);
+      escpos.text(`Nama: ${order.customerName || '-'}`).feed(1);
+      escpos.text(`No HP: ${order.customerPhone || '-'}`).feed(1);
+      escpos.text(`Alamat: ${order.customerAddress || '-'}`).feed(1);
       
       // Estimated completion
       escpos.text(`Estimasi Selesai: ${order.estimatedDoneAt || order.estimatedCompletion || '-'}`).feed(1);
@@ -215,8 +216,49 @@ export const usePrintLabel = () => {
       // Cek koneksi printer terlebih dahulu
       bluetoothSerial.isConnected(
         async () => {
-          // console.log removed('[DEBUG] Printer sudah terkoneksi, langsung print label...');
-          // Langsung print label tanpa preview
+          // Refresh order data from database before printing
+          if (order.id) {
+            try {
+              const { supabase } = await import('@/integrations/supabase/client');
+              const { data: latestOrderData, error } = await supabase
+                .from('orders')
+                .select('*, customers(*)')
+                .eq('id', order.id)
+                .single();
+
+              if (!error && latestOrderData) {
+                // Update customer address if available
+                if (latestOrderData.customers && latestOrderData.customers.address) {
+                  order.customerAddress = latestOrderData.customers.address;
+                }
+                
+                // Update customer name if available
+                if (latestOrderData.customers && latestOrderData.customers.name) {
+                  order.customerName = latestOrderData.customers.name;
+                }
+                
+                // Update customer phone if available
+                if (latestOrderData.customers && latestOrderData.customers.phone) {
+                  order.customerPhone = latestOrderData.customers.phone;
+                }
+                
+                // Update estimated completion if available
+                if (latestOrderData.estimated_completion) {
+                  const estimasi = new Date(latestOrderData.estimated_completion).toLocaleString('id-ID');
+                  if (estimasi !== 'Invalid Date') {
+                    order.estimatedCompletion = estimasi;
+                  } else {
+                    order.estimatedCompletion = String(latestOrderData.estimated_completion);
+                  }
+                }
+              }
+            } catch (e) {
+              // Error handling - continue with existing data if refresh fails
+              console.error('Error refreshing order data:', e);
+            }
+          }
+          
+          // Generate and print label with refreshed data
           const labelData = await generateLabelData(order, businessProfile, tenantStatus);
           bluetoothSerial.write(
             labelData,
@@ -304,7 +346,6 @@ export const usePrintLabel = () => {
     bluetoothSerial.connect(
       device.address,
       async () => {
-        // console.log removed('[DEBUG] Berhasil terhubung ke printer:', device.name);
         toast({ 
           title: "Terhubung", 
           description: `Terhubung ke ${device.name}`, 
@@ -312,7 +353,49 @@ export const usePrintLabel = () => {
         });
         
         try {
-          // Generate and print label
+          // Refresh order data from database before printing
+          if (order.id) {
+            try {
+              const { supabase } = await import('@/integrations/supabase/client');
+              const { data: latestOrderData, error } = await supabase
+                .from('orders')
+                .select('*, customers(*)')
+                .eq('id', order.id)
+                .single();
+
+              if (!error && latestOrderData) {
+                // Update customer address if available
+                if (latestOrderData.customers && latestOrderData.customers.address) {
+                  order.customerAddress = latestOrderData.customers.address;
+                }
+                
+                // Update customer name if available
+                if (latestOrderData.customers && latestOrderData.customers.name) {
+                  order.customerName = latestOrderData.customers.name;
+                }
+                
+                // Update customer phone if available
+                if (latestOrderData.customers && latestOrderData.customers.phone) {
+                  order.customerPhone = latestOrderData.customers.phone;
+                }
+                
+                // Update estimated completion if available
+                if (latestOrderData.estimated_completion) {
+                  const estimasi = new Date(latestOrderData.estimated_completion).toLocaleString('id-ID');
+                  if (estimasi !== 'Invalid Date') {
+                    order.estimatedCompletion = estimasi;
+                  } else {
+                    order.estimatedCompletion = String(latestOrderData.estimated_completion);
+                  }
+                }
+              }
+            } catch (e) {
+              // Error handling - continue with existing data if refresh fails
+              console.error('Error refreshing order data:', e);
+            }
+          }
+          
+          // Generate and print label with refreshed data
           const labelData = await generateLabelData(order, businessProfile, tenantStatus);
           bluetoothSerial.write(
             labelData,

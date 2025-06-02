@@ -186,7 +186,9 @@ const Orders = () => {
   const fetchOrderSlots = async (ordersList: Order[]) => {
     const orderIds = ordersList.map(o => o.id);
     if (orderIds.length === 0) return;
+    
     const { data: slots } = await supabase.from('rack_slots').select('id, rack_id, position, order_id, occupied').in('order_id', orderIds).eq('occupied', true);
+    
     const { data: racks } = await supabase.from('racks').select('id, name');
     const slotMap: Record<string, any> = {};
     (slots || []).forEach(slot => {
@@ -195,6 +197,7 @@ const Orders = () => {
         position: slot.position
       };
     });
+    
     setOrderSlots(slotMap);
   };
 
@@ -263,22 +266,18 @@ const Orders = () => {
   const handleUpdateStatus = async (orderId: string, newStatus: OrderStatus) => {
     if (!session?.user) return;
     try {
-      console.log('[DEBUG] Mulai update status:', { orderId, newStatus });
       await supabase.from('orders').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', orderId).eq('business_id', businessId);
       await supabase.from('order_status_history').insert({ order_id: orderId, status: newStatus, updated_by: session.user.id, business_id: businessId });
       // Jika selesai atau dibatalkan, cari slot rak yang occupied oleh order ini, lalu kosongkan
       if (newStatus === 'completed' || newStatus === 'cancelled') {
         const { data: slots } = await supabase.from('rack_slots').select('*').eq('order_id', orderId).eq('occupied', true);
-        console.log('[DEBUG] Slot rak ditemukan:', { orderId, newStatus, slots });
         for (const slot of slots || []) {
           await supabase.from('rack_slots').update({ occupied: false, order_id: null, assigned_at: null, due_date: null }).eq('id', slot.id);
         }
-        console.log('[DEBUG] Slot rak dikosongkan:', { orderId, newStatus });
       }
       fetchOrders();
       toast({ title: "Status updated", description: `Order status changed to ${orderStatusLabels[newStatus]}`, variant: "default" });
     } catch (error: any) {
-      console.error('[DEBUG] Error update status:', error);
       toast({ title: "Error updating status", description: error.message, variant: "destructive" });
     }
   };

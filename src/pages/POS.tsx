@@ -18,9 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Product } from "@/models/Product";
 import { App as CapApp } from '@capacitor/app';
-import { isOnline } from "@/utils/networkUtils";
-import { saveOfflineOrder } from "@/utils/offlineOrderUtils";
-import { showOfflinePage } from "@/utils/offlineHandler";
+import { showNetworkError, isOnline } from '@/utils/networkUtils';
+import type { Database } from "@/integrations/supabase/types";
 
 // Helper sederhana untuk cek akses fitur
 function canAccessFeature(featureName: string, tenantStatus: string, featureSettings: any[]): boolean {
@@ -60,25 +59,64 @@ const POS = () => {
   
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("new-order");
-  const [cartItems, setCartItems] = useState<any[]>([]);
-  const [customer, setCustomer] = useState({
-    name: "",
-    phone: "",
-    address: ""
-  });
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Define types for better TypeScript support
+interface CustomerType {
+  name: string;
+  phone: string;
+  address?: string;
+}
+
+interface CartOption {
+  pickupType: string;
+  estimate: string;
+  priority: boolean;
+  rackLocation: string;
+  estimatedCompletion?: string | null;
+}
+
+interface PosUsageData {
+  currentUsage: number;
+  maxUsage: number;
+  remainingUsage: number;
+  isLoading: boolean;
+  premiumData: {
+    planName: string;
+    startDate: string;
+    endDate: string;
+    remainingDays: number;
+    durationDays: number;
+  } | null;
+}
+
+interface CartItem {
+  id?: string;
+  productId?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  notes?: string;
+  isProduct?: boolean;
+}
+  
+  const [customer, setCustomer] = useState<CustomerType>({ name: "", phone: "", address: "" });
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [businessProfile, setBusinessProfile] = useState<any>(null);
-  const [featureSettings, setFeatureSettings] = useState<any[]>([]);
+  const [featureSettings, setFeatureSettings] = useState<Array<{
+    feature_name: string;
+    is_free: boolean;
+    is_premium: boolean;
+  }>>([]);
   const [featureLoading, setFeatureLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState<'customer' | 'order' | 'cart' | 'payment'>('customer');
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderToPay, setPendingOrderToPay] = useState<any>(null);
   const [searchParams] = useSearchParams();
-  const [cartOptions, setCartOptions] = useState({
+  const [cartOptions, setCartOptions] = useState<CartOption>({
     pickupType: 'customer_come', // Default value
     estimate: '',
     priority: false,
@@ -100,7 +138,8 @@ const POS = () => {
           total_price,
           customers (
             name,
-            phone
+            phone,
+            address
           ),
           order_items (
             service_name,
@@ -115,10 +154,23 @@ const POS = () => {
       if (error) throw error;
 
       // Set data customer
-      setCustomer({
-        name: data.customers.name,
-        phone: data.customers.phone
-      });
+      if (data.customers) {
+        // Ensure we're getting a single customer object, not an array
+        const customerData = Array.isArray(data.customers) ? data.customers[0] : data.customers;
+        
+        // Create a properly typed customer object with required fields
+        const customerInfo: CustomerType = {
+          name: typeof customerData?.name === 'string' ? customerData.name : "",
+          phone: typeof customerData?.phone === 'string' ? customerData.phone : ""
+        };
+        
+        // Only add address if it exists and is a string
+        if (customerData && 'address' in customerData && typeof customerData.address === 'string') {
+          customerInfo.address = customerData.address;
+        }
+        
+        setCustomer(customerInfo);
+      }
 
       // Set data cart items
       const items = data.order_items.map((item: any) => ({
@@ -146,7 +198,7 @@ const POS = () => {
     }
   };
 
-  // Modifikasi handleCompleteTransaction dengan dukungan offline
+  // Handle transaction completion - online only
   const handleCompleteTransaction = async (paymentData: any) => {
     try {
       if (!session) {
@@ -155,6 +207,12 @@ const POS = () => {
           description: "You must be logged in to complete transactions",
           variant: "destructive"
         });
+        return;
+      }
+      
+      // Cek apakah perangkat online atau offline
+      if (!isOnline()) {
+        showNetworkError("Tidak dapat memproses transaksi tanpa koneksi internet. Silakan periksa koneksi Anda dan coba lagi.");
         return;
       }
       
@@ -169,112 +227,11 @@ const POS = () => {
       const cartOptionsWithISO = { ...cartOptions, estimate: estimatedCompletion };
       let newOrderId = null;
       
-      // Cek apakah perangkat online atau offline
-      const online = isOnline();
+      // Mode online - normal flow
+      // Increment POS usage count
+      await incrementPosUsage();
       
-      if (!online) {
-        try {
-          // Catat penggunaan POS secara offline
-          const today = new Date().toISOString().split('T')[0];
-          const offlinePosUsage = JSON.parse(localStorage.getItem('offline_pos_usage') || '{}');
-          if (offlinePosUsage[today]) {
-            offlinePosUsage[today] += 1;
-          } else {
-            offlinePosUsage[today] = 1;
-          }
-          localStorage.setItem('offline_pos_usage', JSON.stringify(offlinePosUsage));
-          
-          // Mode offline - simpan pesanan ke localStorage
-          const mappedItems = cartItems.map(item => ({
-            id: item.productId,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            notes: item.notes,
-            isProduct: item.isProduct
-          }));
-          
-          // Pastikan customer memiliki data minimal
-          const customerData = {
-            name: customer.name || 'Customer Offline',
-            phone: customer.phone || '-',
-            address: customer.address || '-'
-          };
-          
-          // Buat data pesanan untuk disimpan offline
-          const offlineOrderData = {
-            customer: customerData,
-            items: mappedItems,
-            payment_method: paymentData.method,
-            options: { ...cartOptions, estimate: estimatedCompletion },
-            subtotal: subtotal,
-            discount: discount,
-            total: total,
-            amountReceived: amountReceived,
-            change: change,
-            business_id: businessId,
-            created_at: new Date().toISOString(),
-            status: 'processing',
-            payment_status: 'paid',
-            is_offline: true
-          };
-          
-          console.log('Saving offline order:', offlineOrderData);
-          
-          // Simpan pesanan ke localStorage
-          newOrderId = saveOfflineOrder(offlineOrderData);
-          console.log('Offline order saved with ID:', newOrderId);
-          
-          // Simpan stok produk yang diubah untuk disinkronkan nanti
-          if (Object.keys(tempProductStock).length > 0) {
-            const existingStockUpdates = JSON.parse(localStorage.getItem('offline_stock_updates') || '{}');
-            localStorage.setItem('offline_stock_updates', JSON.stringify({
-              ...existingStockUpdates,
-              ...tempProductStock
-            }));
-            console.log('Offline stock updates saved');
-          }
-          
-          // Reset state dan stok sementara
-          setTempProductStock({});
-          
-          // Tandai bahwa stok telah diperbarui untuk di-refresh di halaman Inventory
-          localStorage.setItem('inventory_needs_refresh', 'true');
-          
-          // Reset state lainnya
-          setCartItems([]);
-          setCustomer({ name: "", phone: "", address: "" });
-          setPendingOrderToPay(null);
-          setCurrentStep('customer');
-          
-          // Increment local counter untuk UI
-          setPosUsageCount(prevCount => prevCount + 1);
-          
-          toast({
-            title: "Pesanan Disimpan Offline",
-            description: "Pesanan telah disimpan dan akan disinkronkan saat Anda kembali online.",
-            variant: "default"
-          });
-          
-          // Redirect ke halaman detail order
-          if (newOrderId) {
-            navigate(`/orders/${newOrderId}`);
-            return;
-          }
-        } catch (offlineError) {
-          console.error('Error saving offline order:', offlineError);
-          toast({
-            title: "Gagal Menyimpan Pesanan Offline",
-            description: "Terjadi kesalahan saat menyimpan pesanan offline. Silakan coba lagi.",
-            variant: "destructive"
-          });
-        }
-      } else {
-        // Mode online - normal flow
-        // Increment POS usage count
-        await incrementPosUsage();
-        
-        if (pendingOrderToPay) {
+      if (pendingOrderToPay) {
           // Update existing pending order (update payment_status dan estimated_completion saja, JANGAN update status)
           const { error: updateError } = await supabase
             .from('orders')
@@ -318,8 +275,19 @@ const POS = () => {
           
           // Send mapped items to createOrder
           
+          // Ensure customer has the correct type expected by createOrder
+          const customerData: { name: string, phone: string, address?: string } = {
+            name: customer.name,
+            phone: customer.phone
+          };
+          
+          // Only add address if it exists
+          if (customer.address) {
+            customerData.address = customer.address;
+          }
+          
           const orderData = await createOrder(
-            customer,
+            customerData,
             mappedItems,
             paymentData.method,
             { ...cartOptions, estimate: estimatedCompletion }
@@ -345,17 +313,16 @@ const POS = () => {
         
         // Reset state lainnya
         setCartItems([]);
-        setCustomer({ name: "", phone: "", address: "" });
+        setCustomer({ name: "", phone: "" }); // Reset customer with minimal required fields
         setPendingOrderToPay(null);
         setCurrentStep('customer');
 
         // Redirect ke halaman detail order
-        if (newOrderId) {
-          navigate(`/orders/${newOrderId}`);
-          return;
-        }
+      if (newOrderId) {
+        navigate(`/orders/${newOrderId}`);
+        return;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error completing transaction:', error);
       // Error handled via state management
       toast({
@@ -641,25 +608,9 @@ const POS = () => {
     const online = isOnline();
     
     if (!online) {
-      // Mode offline - simpan data penggunaan ke localStorage
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const offlinePosUsage = JSON.parse(localStorage.getItem('offline_pos_usage') || '{}');
-        
-        if (offlinePosUsage[today]) {
-          offlinePosUsage[today] += 1;
-        } else {
-          offlinePosUsage[today] = 1;
-        }
-        
-        localStorage.setItem('offline_pos_usage', JSON.stringify(offlinePosUsage));
-        // Increment local counter untuk UI
-        setPosUsageCount(prevCount => prevCount + 1);
-        return;
-      } catch (offlineError) {
-        console.error('Error saving offline POS usage:', offlineError);
-        return;
-      }
+          // App is now online-only, show network error
+      showNetworkError("Tidak dapat memproses transaksi tanpa koneksi internet. Silakan periksa koneksi Anda dan coba lagi.");
+      return;
     }
     
     // Mode online
@@ -686,21 +637,12 @@ const POS = () => {
       setPosUsageCount(prevCount => prevCount + 1);
     } catch (error) {
       console.error('Error tracking POS usage:', error);
-      // Jika error, simpan ke localStorage sebagai fallback
-      const today = new Date().toISOString().split('T')[0];
-      const offlinePosUsage = JSON.parse(localStorage.getItem('offline_pos_usage') || '{}');
-      
-      if (offlinePosUsage[today]) {
-        offlinePosUsage[today] += 1;
-      } else {
-        offlinePosUsage[today] = 1;
-      }
-      
-      localStorage.setItem('offline_pos_usage', JSON.stringify(offlinePosUsage));
+      // Show network error instead of using offline storage
+      showNetworkError("Terjadi kesalahan saat melacak penggunaan POS. Silakan periksa koneksi internet Anda.");
     }
   };
 
-  const handleUpdateCartOptions = (newOptions: any) => {
+  const handleUpdateCartOptions = (newOptions: CartOption) => {
     setCartOptions(newOptions);
   };
 
@@ -848,8 +790,10 @@ const POS = () => {
       } else if (currentStep === 'customer') {
         navigate('/');
       }
-    }).then((handler) => {
+    }).then((handler: { remove: () => void }) => {
       backHandlerRef.current = handler;
+    }).catch((error: Error) => {
+      console.error('Error setting up back button handler:', error);
     });
     return () => {
       isMounted = false;
@@ -857,7 +801,7 @@ const POS = () => {
         backHandlerRef.current.remove();
       }
     };
-  }, [currentStep]);
+  }, [currentStep, navigate]);
 
   return (
     <div className="container px-2 py-4 space-y-4 max-w-md mx-auto">

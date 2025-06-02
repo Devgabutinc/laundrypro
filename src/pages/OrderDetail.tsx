@@ -6,10 +6,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { TenantContext } from "@/contexts/TenantContext";
-import { Lock, Download } from "lucide-react";
+import { Printer, Share, Tag, Truck, Eye, Download, Lock } from "lucide-react";
 import { Capacitor } from '@capacitor/core';
 import StrukPreview from '@/components/StrukPreview';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { convertImageToEscposBytes } from '@/utils/convertImageToEscposBytes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -52,11 +52,14 @@ export default function OrderDetail() {
   const tenantStatus = tenant?.status || "free";
   const [showShareWAPreview, setShowShareWAPreview] = useState(false);
   const [showBluetoothModal, setShowBluetoothModal] = useState(false);
+  const [showStrukPreview, setShowStrukPreview] = useState(false);
+  const [strukPreviewData, setStrukPreviewData] = useState<any>(null);
   const [showLabelBluetoothModal, setShowLabelBluetoothModal] = useState(false);
   const [showNotaAntarBluetoothModal, setShowNotaAntarBluetoothModal] = useState(false);
   const [rackLocation, setRackLocation] = useState<string>('');
   const [showRackSelector, setShowRackSelector] = useState(false);
-  const [rackSlot, setRackSlot] = useState<{rackName: string, position: string} | null>(null);
+  const [rackSlot, setRackSlot] = useState<{ rackName: string; position: string } | null>(null);
+  const [hasRackAssigned, setHasRackAssigned] = useState<boolean>(false);
   const [availableSlots, setAvailableSlots] = useState<{id: string, name: string}[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [featureSettings, setFeatureSettings] = useState<any[]>([]);
@@ -116,11 +119,11 @@ export default function OrderDetail() {
   }, [orderId]);
 
   useEffect(() => {
-    if (order?.id) {
-      fetchRackSlot();
+    if (order?.id && order.rack_slot_id) {
+      fetchRackSlot(order.rack_slot_id);
     }
     // eslint-disable-next-line
-  }, [order?.id]);
+  }, [order?.id, order?.rack_slot_id]);
 
   // Fetch feature settings
   useEffect(() => {
@@ -152,7 +155,7 @@ export default function OrderDetail() {
       if (!error && data) {
         const slotList = data.map((slot: any) => ({
           id: slot.id,
-          name: `${slot.racks?.name || ''} ${slot.position}`.trim()
+          name: `${slot.racks && typeof slot.racks === 'object' ? (slot.racks as any).name || '' : ''} ${slot.position}`.trim()
         }));
         setAvailableSlots(slotList);
       }
@@ -175,141 +178,470 @@ export default function OrderDetail() {
   }, [navigate]);
 
   const fetchOrderDetail = async () => {
-    setLoading(true);
+    if (!orderId) return;
     try {
-      // Ambil data order, customer, dan item
-      const { data: orderData, error: orderError } = await supabase
-        .from("orders")
-        .select(`*, customers(*), order_items(*)`)
-        .eq("id", orderId)
+      // Jangan request rack_slot_id secara eksplisit karena menyebabkan error 400
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, customers(*), order_items(*)')
+        .eq('id', orderId)
         .single();
-      if (orderError) throw orderError;
-      setOrder(orderData);
-    } catch (error: any) {
-      toast({ title: "Gagal memuat detail order", description: error.message, variant: "destructive" });
-    } finally {
+      
+      if (error) throw error;
+      setOrder(data);
+      setLoading(false);
+      
+      // Langsung periksa di rack_slots apakah order ini sudah memiliki rak
+      checkRackSlotByOrderId(orderId);
+      
+      // Jika ada rack_slot_id di data (untuk kompatibilitas jika nanti kolom ini ditambahkan)
+      if (data.rack_slot_id) {
+        setRackLocation(data.rack_slot_id);
+        fetchRackSlot(data.rack_slot_id);
+      }
+    } catch (error) {
+
       setLoading(false);
     }
   };
 
-  const fetchRackSlot = async () => {
-    if (!order?.id) return;
-    const { data, error } = await supabase
-      .from('rack_slots')
-      .select('id, position, racks(name)')
-      .eq('order_id', order.id)
-      .eq('occupied', true)
-      .single();
-    if (!error && data) {
-      setRackSlot({
-        rackName: data.racks?.name || '',
-        position: data.position || ''
+  // Refresh order data from database
+  const refreshOrderData = async () => {
+    if (!orderId) return null;
+    
+    try {
+      // Fetch order dengan customer dan order items
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, customers(*), order_items(*)')
+        .eq('id', orderId)
+        .single();
+      
+      if (error) {
+
+        toast({
+          title: "Error",
+          description: "Gagal memuat data order terbaru",
+          variant: "destructive"
+        });
+        return null;
+      }
+      
+      if (data) {
+
+        
+        // Jika tidak ada data customer, coba fetch secara terpisah
+        if (!data.customers && data.customer_id) {
+          try {
+            const { data: customerData, error: customerError } = await supabase
+              .from('customers')
+              .select('*')
+              .eq('id', data.customer_id)
+              .single();
+              
+            if (!customerError && customerData) {
+              data.customers = customerData;
+
+            }
+          } catch (customerFetchError) {
+
+          }
+        }
+        
+        // Jika tidak ada order items, coba fetch secara terpisah
+        if (!data.order_items || data.order_items.length === 0) {
+          try {
+            const { data: orderItemsData, error: orderItemsError } = await supabase
+              .from('order_items')
+              .select('*')
+              .eq('order_id', data.id);
+              
+            if (!orderItemsError && orderItemsData) {
+              data.order_items = orderItemsData;
+
+            }
+          } catch (orderItemsFetchError) {
+
+          }
+        }
+        
+        // Update state dengan data terbaru
+        setOrder(data);
+        return data;
+      }
+      
+      return null;
+    } catch (error) {
+
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat memuat data order",
+        variant: "destructive"
       });
-    } else {
-      setRackSlot(null);
+      return null;
     }
   };
 
-  const handlePrint = async () => {
+  // Fetch rack slot info
+  const fetchRackSlot = async (slotId: string) => {
+    if (!slotId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('rack_slots')
+        .select('*, racks!inner(*)')
+        .eq('id', slotId)
+        .single();
+      
+      if (error) throw error;
+      
+      setRackSlot({
+        rackName: (data.racks as any).name || 'Rak',
+        position: data.position || '-'
+      });
+      setHasRackAssigned(true);
+    } catch (error) {
+      console.error('Error fetching rack slot:', error);
+    }
+  };
+  
+  // Check if order has a rack slot assigned by checking rack_slots table
+  const checkRackSlotByOrderId = async (orderId: string) => {
+    try {
+      // Gunakan maybeSingle daripada single untuk menghindari error jika tidak ditemukan
+      const { data, error } = await supabase
+        .from('rack_slots')
+        .select('*, racks(*)')
+        .eq('order_id', orderId)
+        .eq('occupied', true);
+      
+      if (error) {
+        setHasRackAssigned(false);
+        return;
+      }
+      
+      // Jika data adalah array dan memiliki elemen
+      if (data && data.length > 0) {
+        const slotData = data[0];
+        
+        // Pastikan data racks ada
+        if (slotData.racks) {
+          setRackLocation(slotData.id);
+          setRackSlot({
+            rackName: slotData.racks.name || 'Rak',
+            position: slotData.position || '-'
+          });
+          setHasRackAssigned(true);
+        } else {
+          setHasRackAssigned(true); // Tetap set true karena slot ditemukan
+          
+          // Ambil data rak secara terpisah
+          const { data: rackData } = await supabase
+            .from('racks')
+            .select('*')
+            .eq('id', slotData.rack_id)
+            .single();
+            
+          if (rackData) {
+            setRackSlot({
+              rackName: rackData.name || 'Rak',
+              position: slotData.position || '-'
+            });
+          }
+        }
+      } else {
+        setHasRackAssigned(false);
+      }
+    } catch (error) {
+      setHasRackAssigned(false);
+    }
+  };
+  
+  // Fungsi untuk menampilkan preview struk
+  const handleShowStrukPreview = async () => {
     if (!order || !tenant) return;
     
-    // Mapping order untuk format yang diharapkan oleh usePrintStruk
+
+    const freshOrder = await refreshOrderData();
+    
+    if (!freshOrder) {
+      toast({
+        title: "Peringatan",
+        description: "Gagal memuat data terbaru. Preview mungkin tidak akurat.",
+        variant: "warning"
+      });
+    }
+    
+    const currentOrder = freshOrder || order;
+    
+    // Pastikan data customer lengkap
+    let customerData = currentOrder.customers;
+    if (!customerData && currentOrder.customer_id) {
+      try {
+        const { data, error } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('id', currentOrder.customer_id)
+          .single();
+          
+        if (!error && data) {
+          customerData = data;
+          // Update current order dengan data customer yang baru diambil
+          currentOrder.customers = customerData;
+
+        }
+      } catch (error) {
+
+      }
+    }
+    
+    // Pastikan order items lengkap
+    if (!currentOrder.order_items || currentOrder.order_items.length === 0) {
+      try {
+        const { data, error } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', currentOrder.id);
+          
+        if (!error && data && data.length > 0) {
+          currentOrder.order_items = data;
+
+        }
+      } catch (error) {
+
+      }
+    }
+    
+    // Mapping order untuk format yang diharapkan oleh StrukPreview
     const mappedOrder = {
-      id: order.id,
-      shortId: getShortOrderId(order.id),
-      customerName: order.customers?.name || "-",
-      customerPhone: order.customers?.phone || "-",
-      customerAddress: order.customers?.address || "-",
-      cashierName: order.cashier_name || "-",
-      items: (order.order_items || []).map((item: any) => ({
+      id: currentOrder.id,
+      shortId: getShortOrderId(currentOrder.id),
+      customerName: currentOrder.customers?.name || "-",
+      customerPhone: currentOrder.customers?.phone || "-",
+      customerAddress: currentOrder.customers?.address || "-",
+      cashierName: currentOrder.cashier_name || "-",
+      items: (currentOrder.order_items || []).map((item: any) => ({
         name: item.service_name,
         quantity: item.quantity,
         price: item.price,
       })),
-      subtotal: order.total_price || 0,
-      discount: order.discount || 0,
-      total: (order.total_price || 0) - (order.discount || 0),
-      paymentMethod: order.payment_method || "Tunai",
-      amountReceived: order.amount_received || order.total_price || 0,
-      change: order.change || 0,
-      date: order.created_at ? new Date(order.created_at).toLocaleString("id-ID") : "-",
-      estimatedCompletion: order.estimated_completion ? new Date(order.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' }) : "-",
-      isPriority: order.is_priority || false,
-      deliveryType: order.delivery_type || "-",
-      statusHistory: order.status_history?.map((sh: any) => ({
+      subtotal: currentOrder.total_price || 0,
+      discount: currentOrder.discount || 0,
+      total: (currentOrder.total_price || 0) - (currentOrder.discount || 0),
+      paymentMethod: currentOrder.payment_method || "Tunai",
+      amountReceived: currentOrder.amount_received || currentOrder.total_price || 0,
+      change: currentOrder.change || 0,
+      date: currentOrder.created_at ? new Date(currentOrder.created_at).toLocaleString("id-ID") : "-",
+      estimatedCompletion: currentOrder.estimated_completion ? new Date(currentOrder.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' }) : "-",
+      isPriority: currentOrder.is_priority || false,
+      deliveryType: currentOrder.delivery_type || "-",
+      statusHistory: currentOrder.status_history?.map((sh: any) => ({
         status: sh.status,
         timestamp: new Date(sh.timestamp).toLocaleString("id-ID")
       })) || []
     };
     
-    // Cek koneksi printer terlebih dahulu
+    // Validasi data sebelum preview
+    if (mappedOrder.customerAddress === "-" && customerData?.address) {
+      mappedOrder.customerAddress = customerData.address;
+
+    }
+    
+    if (mappedOrder.estimatedCompletion === "-" && currentOrder.estimated_completion) {
+      try {
+        mappedOrder.estimatedCompletion = new Date(currentOrder.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' });
+
+      } catch (e) {
+
+      }
+    }
+    
+    
+    setStrukPreviewData(mappedOrder);
+    setShowStrukPreview(true);
+  };
+  const handlePrint = async () => {
+    if (!order || !tenant) return;
+    
+    // Refresh order data from database before printing
+
+    const freshOrder = await refreshOrderData();
+    
+    // Pastikan kita selalu menggunakan data terbaru
+    if (!freshOrder) {
+      toast({
+        title: "Peringatan",
+        description: "Gagal memuat data terbaru. Data mungkin tidak akurat.",
+        variant: "warning"
+      });
+    }
+    
+    const currentOrder = freshOrder || order;
+    
+    // Pastikan data customer lengkap
+    if (!currentOrder.customers) {
+      // Fetch customer data jika tidak ada
+      try {
+        const { data: customerData, error } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('id', currentOrder.customer_id)
+          .single();
+          
+        if (!error && customerData) {
+          currentOrder.customers = customerData;
+        }
+      } catch (error) {
+
+      }
+    }
+    
+    // Mapping order untuk format yang diharapkan oleh usePrintStruk
+    const mappedOrder = {
+      id: currentOrder.id,
+      shortId: getShortOrderId(currentOrder.id),
+      customerName: currentOrder.customers?.name || "-",
+      customerPhone: currentOrder.customers?.phone || "-",
+      customerAddress: currentOrder.customers?.address || "-",
+      cashierName: currentOrder.cashier_name || "-",
+      items: (currentOrder.order_items || []).map((item: any) => ({
+        name: item.service_name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      subtotal: currentOrder.total_price || 0,
+      discount: currentOrder.discount || 0,
+      total: (currentOrder.total_price || 0) - (currentOrder.discount || 0),
+      paymentMethod: currentOrder.payment_method || "Tunai", // Field yang diperlukan oleh OrderData
+      amountReceived: currentOrder.amount_received || currentOrder.total_price || 0,
+      change: currentOrder.change || 0,
+      paymentStatus: currentOrder.payment_status || "Belum Dibayar",
+      date: currentOrder.created_at ? new Date(currentOrder.created_at).toLocaleString("id-ID") : "-",
+      estimatedCompletion: currentOrder.estimated_completion ? new Date(currentOrder.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' }) : "-",
+      isPriority: currentOrder.is_priority || false,
+      deliveryType: currentOrder.delivery_type || "-",
+      statusHistory: currentOrder.status_history?.map((sh: any) => ({
+        status: sh.status,
+        timestamp: new Date(sh.timestamp).toLocaleString("id-ID")
+      })) || [],
+      status: currentOrder.status || "pending", // Tambahkan status yang dibutuhkan OrderData
+      timestamp: currentOrder.created_at ? new Date(currentOrder.created_at).toLocaleString("id-ID") : "-" // Tambahkan timestamp yang dibutuhkan OrderData
+    };
+    
+    // Validasi data sebelum print
+    if (mappedOrder.customerAddress === "-" && currentOrder.customers?.address) {
+      mappedOrder.customerAddress = currentOrder.customers.address;
+    }
+    
+    if (mappedOrder.estimatedCompletion === "-" && currentOrder.estimated_completion) {
+      try {
+        mappedOrder.estimatedCompletion = new Date(currentOrder.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' });
+      } catch (e) {
+
+      }
+    }
+    
+    // Cek apakah printer sudah terkoneksi
     bluetoothSerial.isConnected(
-      async () => {
-        console.log('[DEBUG] Printer sudah terkoneksi, langsung print...');
+      () => {
+
         try {
           // Gunakan hook usePrintStruk untuk mencetak struk
-          printStruk(
+          connectToDevice(
+            { address: 'connected' }, // Printer sudah terkoneksi
             mappedOrder,
             tenant,
             tenantStatus,
-            { 
-              paperSize: '58mm',
+            {
+              width: '58mm',
               onSuccess: () => {
-                console.log('[DEBUG] Struk berhasil di-print');
+
+                toast({
+                  title: "Struk berhasil dicetak",
+                  description: "Struk telah berhasil dicetak ke printer",
+                });
               },
               onError: (error) => {
-                console.error('[DEBUG] Gagal print struk:', error);
+
                 setShowBluetoothModal(true);
               }
             }
           );
         } catch (error) {
-          console.error('[DEBUG] Error saat mencetak:', error);
+
           setShowBluetoothModal(true);
         }
       },
       () => {
-        console.log('[DEBUG] Printer belum terkoneksi, tampilkan modal scan');
-        setShowBluetoothModal(true);
+
+        // Cek apakah ada perangkat yang tersedia sebelumnya
+        if (availablePrinters && availablePrinters.length > 0) {
+
+          // Gunakan perangkat pertama yang tersedia
+          connectToDevice(
+            availablePrinters[0],
+            mappedOrder,
+            tenant,
+            tenantStatus,
+            {
+              width: '58mm',
+              onSuccess: () => {
+
+                toast({
+                  title: "Struk berhasil dicetak",
+                  description: "Struk telah berhasil dicetak ke printer",
+                });
+              },
+              onError: (error) => {
+
+                // Jika gagal, baru tampilkan modal scan
+                setShowBluetoothModal(true);
+              }
+            }
+          );
+        } else {
+
+          setShowBluetoothModal(true);
+        }
       }
     );
   };
 
   // Fungsi generate struk teks untuk WA
-  function generateStrukText(order: any, tenant: any) {
-    const line = '==============================';
-    let text = '';
-    text += `🧺 *${tenant?.businessName || 'Laundry'}*\n`;
-    text += `${tenant?.address || '-'}\n`;
-    text += `Telp: ${tenant?.phone || '-'}\n`;
-    text += `${line}\n`;
-    text += `👤 *Nama:* ${order?.customers?.name || '-'}\n`;
-    text += `📱 *No HP:* ${order?.customers?.phone || '-'}\n`;
-    text += `🚚 *Jemput/Antar:* ${order?.delivery_type === 'customer_come' ? 'Datang Langsung' : (order?.delivery_type || '-')}\n`;
-    if (order?.is_priority) {
-      text += `⭐ *Prioritas:* Ya\n`;
+  const generateStrukText = (orderData: any, tenantData: any) => {
+    const lineBreak = '===============================';
+    let textContent = '';
+    textContent += `🧺 *${tenantData?.businessName || 'Laundry'}*\n`;
+    textContent += `${tenantData?.address || '-'}\n`;
+    textContent += `Telp: ${tenantData?.phone || '-'}\n`;
+    textContent += `${lineBreak}\n`;
+    textContent += `👤 *Nama:* ${orderData?.customers?.name || '-'}\n`;
+    textContent += `📱 *No HP:* ${orderData?.customers?.phone || '-'}\n`;
+    textContent += `🚚 *Jemput/Antar:* ${orderData?.delivery_type === 'customer_come' ? 'Datang Langsung' : (orderData?.delivery_type || '-')}\n`;
+    if (orderData?.is_priority) {
+      textContent += `⭐ *Prioritas:* Ya\n`;
     }
-    text += `⏰ *Estimasi:* ${order?.estimated_completion ? new Date(order.estimated_completion).toLocaleString('id-ID') : '-'}\n`;
-    text += `${line}\n`;
-    text += ` *No Order:* ${getShortOrderId(order?.id) || '-'}\n`;
-    text += ` *Kasir:* ${order?.cashier_name || '-'}\n`;
-    text += `${line}\n`;
-    text += `*Item | Qty | Harga*\n`;
-    if (order?.order_items && Array.isArray(order.order_items)) {
-      order.order_items.forEach((item: any) => {
-        text += `• ${item.service_name} | ${item.quantity} | Rp${item.price.toLocaleString('id-ID')}\n`;
+    textContent += `⏰ *Estimasi:* ${orderData?.estimated_completion ? new Date(orderData.estimated_completion).toLocaleString('id-ID') : '-'}\n`;
+    textContent += `${lineBreak}\n`;
+    textContent += ` *No Order:* ${getShortOrderId(orderData?.id) || '-'}\n`;
+    textContent += ` *Kasir:* ${orderData?.cashier_name || '-'}\n`;
+    textContent += `${lineBreak}\n`;
+    textContent += `*Item | Qty | Harga*\n`;
+    if (orderData?.order_items && Array.isArray(orderData.order_items)) {
+      orderData.order_items.forEach((item: any) => {
+        textContent += `• ${item.service_name} | ${item.quantity} | Rp${item.price.toLocaleString('id-ID')}\n`;
       });
     }
-    text += `${line}\n`;
-    text += `Subtotal: Rp${order?.total_price?.toLocaleString('id-ID') || '0'}\n`;
-    if (order?.discount) text += `Diskon: Rp${order.discount.toLocaleString('id-ID')}\n`;
-    text += `Total: Rp${(order?.total_price - (order?.discount || 0)).toLocaleString('id-ID')}\n`;
-    if (order?.amount_received) text += `Bayar: Rp${order.amount_received.toLocaleString('id-ID')}\n`;
-    if (order?.change) text += `Kembali: Rp${order.change.toLocaleString('id-ID')}\n`;
-    text += `${line}\n`;
-    text += `🙏 Terima kasih atas kepercayaan Anda!\n`;
-    text += `Info & tracking: ${tenant?.phone ? 'WA ' + tenant.phone : '-'}\n`;
-    return text;
+    textContent += `${lineBreak}\n`;
+    textContent += `Subtotal: Rp${orderData?.total_price?.toLocaleString('id-ID') || '0'}\n`;
+    if (orderData?.discount) textContent += `Diskon: Rp${orderData.discount.toLocaleString('id-ID')}\n`;
+    textContent += `Total: Rp${(orderData?.total_price - (orderData?.discount || 0)).toLocaleString('id-ID')}\n`;
+    if (orderData?.amount_received) textContent += `Bayar: Rp${orderData.amount_received.toLocaleString('id-ID')}\n`;
+    if (orderData?.change) textContent += `Kembali: Rp${orderData.change.toLocaleString('id-ID')}\n`;
+    textContent += `${lineBreak}\n`;
+    textContent += `🙏 Terima kasih atas kepercayaan Anda!\n`;
+    textContent += `Info & tracking: ${tenantData?.phone ? 'WA ' + tenantData.phone : '-'}\n`;
+    return textContent;
   }
 
   // Helper untuk format nomor WA ke 628xxxxxxxxxx
@@ -421,7 +753,7 @@ export default function OrderDetail() {
               (err: any) => { toast({ title: "Gagal share WA", description: err?.message || String(err) }); }
             );
           } catch (shareErr) {
-            console.error('Error saat menyimpan/share gambar:', shareErr);
+
             toast({ 
               title: "Gagal share", 
               description: "Terjadi kesalahan saat mencoba share via WhatsApp. Coba lagi nanti."
@@ -454,7 +786,7 @@ export default function OrderDetail() {
       // Tutup modal setelah share
       setShowShareWAPreview(false);
     } catch (err) {
-      console.error('Error screenshot:', err);
+
       toast({ title: "Gagal screenshot", description: err instanceof Error ? err.message : String(err) });
       setShowShareWAPreview(false);
     }
@@ -469,6 +801,7 @@ export default function OrderDetail() {
       shortId: getShortOrderId(order.id),
       customerName: order.customers?.name || "-",
       customerPhone: order.customers?.phone || "-",
+      customerAddress: order.customers?.address || "-",
       note: order.note || "",
       items: (order.order_items || []).map((item: any) => ({
         name: item.service_name,
@@ -484,7 +817,7 @@ export default function OrderDetail() {
     // Cek koneksi printer terlebih dahulu
     bluetoothSerial.isConnected(
       async () => {
-        console.log('[DEBUG] Printer sudah terkoneksi, langsung print label...');
+
         try {
           // Gunakan hook usePrintLabel untuk mencetak label
           printLabel(
@@ -494,21 +827,21 @@ export default function OrderDetail() {
             { 
               paperSize: '58mm',
               onSuccess: () => {
-                console.log('[DEBUG] Label berhasil di-print');
+
               },
               onError: (error) => {
-                console.error('[DEBUG] Gagal print label:', error);
+
                 setShowLabelBluetoothModal(true);
               }
             }
           );
         } catch (error) {
-          console.error('[DEBUG] Error saat mencetak label:', error);
+
           setShowLabelBluetoothModal(true);
         }
       },
       () => {
-        console.log('[DEBUG] Printer belum terkoneksi, tampilkan modal scan');
+
         setShowLabelBluetoothModal(true);
       }
     );
@@ -544,7 +877,7 @@ export default function OrderDetail() {
     // Cek koneksi printer terlebih dahulu
     bluetoothSerial.isConnected(
       async () => {
-        console.log('[DEBUG] Printer sudah terkoneksi, langsung print nota antar...');
+
         try {
           // Gunakan hook usePrintNotaAntar untuk mencetak nota antar
           printNotaAntar(
@@ -554,21 +887,21 @@ export default function OrderDetail() {
             { 
               paperSize: '58mm',
               onSuccess: () => {
-                console.log('[DEBUG] Nota antar berhasil di-print');
+
               },
               onError: (error) => {
-                console.error('[DEBUG] Gagal print nota antar:', error);
+
                 setShowNotaAntarBluetoothModal(true);
               }
             }
           );
         } catch (error) {
-          console.error('[DEBUG] Error saat mencetak nota antar:', error);
+
           setShowNotaAntarBluetoothModal(true);
         }
       },
       () => {
-        console.log('[DEBUG] Printer belum terkoneksi, tampilkan modal scan');
+
         setShowNotaAntarBluetoothModal(true);
       }
     );
@@ -614,10 +947,10 @@ export default function OrderDetail() {
       tenantStatus,
       {
         onSuccess: () => {
-          console.log('[DEBUG] PDF berhasil diunduh/disimpan');
+
         },
         onError: (error) => {
-          console.error('[DEBUG] Gagal mengunduh/menyimpan PDF:', error);
+
         }
       }
     );
@@ -626,11 +959,49 @@ export default function OrderDetail() {
   const handleUpdateStatus = async (newStatus: string) => {
     setStatusLoading(true);
     try {
+      // Update status order
       const { error } = await supabase
         .from("orders")
         .update({ status: newStatus })
         .eq("id", orderId);
       if (error) throw error;
+      
+      // Jika status completed, kosongkan slot rak
+      if (newStatus === 'completed') {
+        // Cari slot rak yang digunakan order ini
+        const { data: rackSlots } = await supabase
+          .from('rack_slots')
+          .select('id')
+          .eq('order_id', orderId)
+          .eq('occupied', true);
+        
+        if (rackSlots && rackSlots.length > 0) {
+          // Update semua slot rak yang digunakan order ini
+          const { error: rackError } = await supabase
+            .from('rack_slots')
+            .update({ 
+              occupied: false, 
+              order_id: null, 
+              assigned_at: null, 
+              due_date: null 
+            })
+            .eq('order_id', orderId);
+          
+          if (rackError) {
+            toast({ 
+              title: "Perhatian", 
+              description: "Status order diperbarui, tetapi gagal mengosongkan slot rak", 
+              variant: "destructive" 
+            });
+          } else {
+            // Reset state rak di UI
+            setRackSlot(null);
+            setRackLocation('');
+            setHasRackAssigned(false);
+          }
+        }
+      }
+      
       toast({ title: "Status order diperbarui", description: `Status diubah ke ${newStatus}` });
       fetchOrderDetail();
     } catch (error: any) {
@@ -653,6 +1024,7 @@ export default function OrderDetail() {
       shortId: getShortOrderId(order.id),
       customerName: order.customers?.name || "-",
       customerPhone: order.customers?.phone || "-",
+      customerAddress: order.customers?.address || "-", // Pastikan alamat pelanggan diteruskan
       cashierName: order.cashier_name || "-",
       items: (order.order_items || []).map((item: any) => ({
         name: item.service_name,
@@ -666,11 +1038,18 @@ export default function OrderDetail() {
       amountReceived: order.amount_received || order.total_price || 0,
       change: order.change || 0,
       date: order.created_at ? new Date(order.created_at).toLocaleString("id-ID") : "-",
+      estimatedCompletion: order.estimated_completion ? new Date(order.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' }) : "-", // Pastikan estimasi selesai diteruskan
+      isPriority: order.is_priority || false, // Pastikan isPriority diteruskan
+      deliveryType: order.delivery_type || "-",
       statusHistory: order.status_history?.map((sh: any) => ({
         status: sh.status,
         timestamp: new Date(sh.timestamp).toLocaleString("id-ID")
-      })) || []
+      })) || [],
+      status: order.status || "pending", // Tambahkan status yang dibutuhkan OrderData
+      timestamp: order.created_at ? new Date(order.created_at).toLocaleString("id-ID") : "-" // Tambahkan timestamp yang dibutuhkan OrderData
     };
+    
+    // Data sudah siap untuk dicetak
     
     connectToDevice(
       device,
@@ -709,7 +1088,7 @@ export default function OrderDetail() {
         description: "Lokasi rak berhasil diperbarui",
         variant: "default"
       });
-      fetchRackSlot(); // refresh tampilan
+      fetchRackSlot(newSlotId); // refresh tampilan
     } catch (error: any) {
       toast({
         title: "Gagal",
@@ -781,16 +1160,23 @@ export default function OrderDetail() {
           <div>{order.delivery_type === 'customer_come' ? 'Datang Langsung' : (order.delivery_type || '-')}</div>
           <div>Rak:</div>
           <div>
+            {/* Informasi rak */}
+            
             {rackSlot ? (
+              // Jika rackSlot sudah ada, tampilkan informasi rak
               <span className="text-sm font-semibold text-green-700">{rackSlot.rackName} {rackSlot.position}</span>
+            ) : hasRackAssigned ? (
+              // Jika hasRackAssigned true tapi rackSlot belum ada, tampilkan loading
+              <span className="text-sm text-gray-600">Memuat informasi rak...</span>
             ) : (
+              // Jika tidak ada rak, tampilkan tombol Pilih Rak
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowRackSelector(true)}
                   className="mt-1"
-                  disabled={!canUseRacks}
+                  disabled={!canUseRacks || hasRackAssigned}
                 >
                   Pilih Rak
                 </Button>
@@ -844,6 +1230,10 @@ export default function OrderDetail() {
                 </>
               )}
             </Button>
+            <Button onClick={handleShowStrukPreview} variant="outline">
+              <Eye className="h-4 w-4 mr-2" />
+              Preview Struk
+            </Button>
           </div>  
         </div>
         {/* Section tombol status */}
@@ -882,6 +1272,7 @@ export default function OrderDetail() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Preview Struk WhatsApp</DialogTitle>
+            <DialogDescription>Preview struk sebelum dibagikan via WhatsApp</DialogDescription>
           </DialogHeader>
           {order && tenant && (
             <StrukPreview 
@@ -889,6 +1280,7 @@ export default function OrderDetail() {
                 id: getShortOrderId(order.id),
                 customerName: order.customers?.name || "-",
                 customerPhone: order.customers?.phone || "-",
+                customerAddress: order.customers?.address || "-",
                 items: (order.order_items || []).map((item: any) => ({
                   name: item.service_name,
                   quantity: item.quantity,
@@ -901,6 +1293,14 @@ export default function OrderDetail() {
                 amountReceived: order.amount_received || order.total_price || 0,
                 change: order.change || 0,
                 date: order.created_at ? new Date(order.created_at).toLocaleString("id-ID") : "-",
+                // Tambahkan isPriority dari data order asli
+                isPriority: order.is_priority,
+                // Tambahkan deliveryType jika ada
+                deliveryType: order.delivery_type || "-",
+                // Tambahkan estimated_completion dari data order asli
+                estimated_completion: order.estimated_completion,
+                // Tambahkan juga estimatedCompletion yang sudah diformat untuk backward compatibility
+                estimatedCompletion: order.estimated_completion ? new Date(order.estimated_completion).toLocaleString("id-ID") : "-",
                 statusHistory: order.status_history?.map((sh: any) => ({
                   status: sh.status,
                   timestamp: new Date(sh.timestamp).toLocaleString("id-ID")
@@ -921,6 +1321,7 @@ export default function OrderDetail() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Pilih Printer untuk Label</DialogTitle>
+            <DialogDescription>Pilih printer label yang tersedia untuk mencetak label</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Button 
@@ -946,6 +1347,7 @@ export default function OrderDetail() {
                         shortId: getShortOrderId(order.id),
                         customerName: order.customers?.name || "-",
                         customerPhone: order.customers?.phone || "-",
+                        customerAddress: order.customers?.address || "-",
                         note: order.note || "",
                         items: (order.order_items || []).map((item: any) => ({
                           name: item.service_name,
@@ -958,30 +1360,49 @@ export default function OrderDetail() {
                         estimatedCompletion: order.estimated_completion ? new Date(order.estimated_completion).toLocaleString("id-ID", { dateStyle: 'short' }) : "-",
                       };
                       
+                      // Connect to the selected printer and print the label
                       connectLabelDevice(
-                        device, 
-                        mappedOrder, 
-                        tenant, 
+                        device,
+                        mappedOrder,
+                        tenant,
                         tenantStatus,
                         {
+                          paperSize: '58mm',
                           onSuccess: () => {
+                            toast({
+                              title: "Label berhasil dicetak",
+                              description: "Label telah berhasil dicetak ke printer",
+                            });
                             setShowLabelBluetoothModal(false);
+                          },
+                          onError: (error) => {
+                            toast({
+                              variant: "destructive",
+                              title: "Gagal mencetak label",
+                              description: error.message || "Terjadi kesalahan saat mencetak label",
+                            });
                           }
                         }
                       );
                     }}
-                    disabled={labelPrintLoading}
                   >
-                    {device.name || device.address}
+                    <div className="flex items-center justify-between w-full">
+                      <div className="text-left">
+                        <div className="font-medium">{device.name || 'Unknown Device'}</div>
+                        <div className="text-xs text-gray-500">{device.address}</div>
+                      </div>
+                      <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                        Pilih
+                      </div>
+                    </div>
                   </Button>
                 ))}
               </div>
-            ) : !scanningLabelPrinters && (
-              <p className="text-sm text-center text-muted-foreground">Tidak ada printer ditemukan. Silakan scan printer.</p>
+            ) : (
+              <div className="text-center text-gray-500 py-4">
+                {scanningLabelPrinters ? 'Mencari printer...' : 'Tidak ada printer ditemukan'}
+              </div>
             )}
-          </div>
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setShowLabelBluetoothModal(false)}>Tutup</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -991,6 +1412,7 @@ export default function OrderDetail() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Pilih Printer untuk Nota Antar</DialogTitle>
+            <DialogDescription>Pilih printer yang tersedia untuk mencetak nota antar</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Button 
@@ -1067,6 +1489,7 @@ export default function OrderDetail() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Pilih Printer Bluetooth</DialogTitle>
+            <DialogDescription>Pilih printer Bluetooth yang tersedia untuk mencetak struk</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="flex justify-end">
@@ -1113,6 +1536,7 @@ export default function OrderDetail() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Pilih Lokasi Rak</DialogTitle>
+            <DialogDescription>Pilih lokasi rak untuk menyimpan pesanan ini</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">

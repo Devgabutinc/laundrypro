@@ -1,9 +1,10 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext, useContext, useRef } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { updateFcmTokenToProfile } from '@/utils/pushNotifications';
 import { storeSession, getStoredSession, storeUserProfile, getStoredUserProfile, clearSession } from '@/utils/authStorage';
 import { storeSessionInCookie, getSessionFromCookie, storeProfileInCookie, getProfileFromCookie, clearAuthCookies } from '@/utils/cookieStorage';
+import { useAppLifecycle } from "./useAppLifecycle";
 
 type AuthContextType = {
   session: Session | null;
@@ -31,62 +32,227 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any | null>(null);
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [lastSyncTime, setLastSyncTime] = useState<number>(0);
+  const syncInProgressRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    // Improved profile fetching with retry mechanism dan penyimpanan lokal yang lebih kuat
-    const fetchProfile = async (userId: string) => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .single();
-          
-        if (!error && data) {
-          setProfile(data);
-          setBusinessId((data as any).business_id || null);
-          
-          // Simpan profil ke penyimpanan lokal yang lebih kuat
-          storeUserProfile(data);
-        } else {
-          console.warn('Error fetching profile:', error);
-          
-          // Coba gunakan data profil yang tersimpan
-          const storedProfile = getStoredUserProfile();
-          if (storedProfile && storedProfile.id === userId) {
-            console.log('Using stored profile data');
-            setProfile(storedProfile);
-            setBusinessId(storedProfile.business_id || null);
-            return;
-          }
-          
-          setProfile(null);
-          setBusinessId(null);
-        }
-      } catch (e) {
-        console.error('Exception during profile fetch:', e);
+  // Improved profile fetching with retry mechanism dan penyimpanan lokal yang lebih kuat
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
         
-        // Coba gunakan data profil yang tersimpan sebagai fallback
+      if (!error && data) {
+        setProfile(data);
+        setBusinessId((data as any).business_id || null);
+        
+        // Simpan profil ke penyimpanan lokal yang lebih kuat
+        storeUserProfile(data);
+        storeProfileInCookie(data);
+      } else {
+        // Error fetching profile
+        
+        // Coba gunakan data profil yang tersimpan
         const storedProfile = getStoredUserProfile();
-        if (storedProfile) {
-          console.log('Using stored profile data after error');
+        if (storedProfile && storedProfile.id === userId) {
+          // Using stored profile data
           setProfile(storedProfile);
           setBusinessId(storedProfile.business_id || null);
+          return;
+        }
+        
+        setProfile(null);
+        setBusinessId(null);
+      }
+    } catch (e) {
+      // Exception during profile fetch
+      
+      // Coba gunakan data profil yang tersimpan sebagai fallback
+      const storedProfile = getStoredUserProfile();
+      if (storedProfile) {
+        // Using stored profile data after error
+        setProfile(storedProfile);
+        setBusinessId(storedProfile.business_id || null);
+      } else {
+        setProfile(null);
+        setBusinessId(null);
+      }
+    }
+  };
+
+  // Función para sincronizar datos cuando la aplicación vuelve a primer plano
+  const syncDataOnResume = async () => {
+    // Sincronizando datos después de volver a primer plano
+    
+    // Evitar múltiples sincronizaciones simultáneas
+    if (syncInProgressRef.current) {
+      return;
+    }
+    
+    syncInProgressRef.current = true;
+    
+    try {
+      // Verificar si tenemos una sesión activa
+      if (!session) {
+        // No hay sesión activa, intentando recuperar
+        await refreshSession();
+      } else {
+        // Sesión activa encontrada, verificando validez
+        // Verificar si la sesión sigue siendo válida
+        const { data } = await supabase.auth.getSession();
+        
+        if (!data.session) {
+          // Sesión expirada, intentando recuperar
+          await refreshSession();
         } else {
-          setProfile(null);
-          setBusinessId(null);
+          // Sesión válida, actualizando datos
+          // La sesión es válida, actualizar datos del perfil
+          if (user?.id) {
+            await fetchProfile(user.id);
+            
+            // Reforzar el almacenamiento de la sesión
+            storeSession(data.session);
+            storeSessionInCookie(data.session);
+          }
         }
       }
-    };
+    } catch (error) {
+      // Error al sincronizar datos
+      
+      // Intento de recuperación final
+      try {
+        const cookieSession = getSessionFromCookie();
+        if (cookieSession && cookieSession.access_token && cookieSession.refresh_token) {
+          await supabase.auth.setSession({
+            access_token: cookieSession.access_token as string,
+            refresh_token: cookieSession.refresh_token as string
+          });
+        }
+      } catch (e) {
+        // Ignorar errores en la recuperación final
+      }
+    } finally {
+      setLastSyncTime(Date.now());
+      syncInProgressRef.current = false;
+    }
+  };
 
+  // Función para refrescar la sesión desde almacenamiento local o cookies
+  const refreshSession = async () => {
+    // Intentando refrescar sesión
+    
+    // Intentar recuperar sesión de cookies primero (más resistente)
+    const cookieSession = getSessionFromCookie();
+    if (cookieSession && cookieSession.access_token && cookieSession.refresh_token) {
+      // Recuperando sesión desde cookie
+      try {
+        const { data: { session: restoredSession }, error } = await supabase.auth.setSession({
+          access_token: cookieSession.access_token as string,
+          refresh_token: cookieSession.refresh_token as string
+        });
+        
+        if (!error && restoredSession) {
+          // Sesión restaurada exitosamente desde cookie
+          setSession(restoredSession);
+          setUser(restoredSession.user);
+          
+          // Actualizar almacenamiento local con la sesión restaurada
+          storeSession(restoredSession);
+          
+          // Recuperar datos del perfil
+          if (restoredSession.user) {
+            await fetchProfile(restoredSession.user.id);
+          }
+          return true;
+        }
+      } catch (e) {
+        // Error al restaurar sesión desde cookie
+      }
+    }
+    
+    // Si no se pudo recuperar de cookies, intentar desde localStorage
+    const localSession = getStoredSession();
+    if (localSession && localSession.access_token && localSession.refresh_token) {
+      // Recuperando sesión desde localStorage
+      try {
+        const { data: { session: restoredSession }, error } = await supabase.auth.setSession({
+          access_token: localSession.access_token,
+          refresh_token: localSession.refresh_token
+        });
+        
+        if (!error && restoredSession) {
+          // Sesión restaurada exitosamente desde localStorage
+          setSession(restoredSession);
+          setUser(restoredSession.user);
+          
+          // Actualizar cookies con la sesión restaurada
+          storeSessionInCookie(restoredSession);
+          
+          // Recuperar datos del perfil
+          if (restoredSession.user) {
+            await fetchProfile(restoredSession.user.id);
+          }
+          return true;
+        }
+      } catch (e) {
+        // Error al restaurar sesión desde localStorage
+      }
+    }
+    
+    return false;
+  };
+
+  // Integrar el hook de ciclo de vida de la aplicación
+  useAppLifecycle(
+    // Callback cuando la app vuelve a primer plano
+    () => {
+      // App resumed - ejecutando sincronización de datos
+      // Reducir el tiempo mínimo entre sincronizaciones a 5 segundos
+      // para asegurar una sincronización más frecuente
+      const now = Date.now();
+      if (now - lastSyncTime > 5000) {
+        // Usar setTimeout para dar tiempo a que la app se estabilice
+        setTimeout(() => {
+          syncDataOnResume();
+        }, 500);
+      } else {
+        // Sincronización omitida - última sincronización hace menos de 5 segundos
+      }
+    },
+    // Callback cuando la app pasa a segundo plano
+    () => {
+      // App paused - guardando estado actual
+      // Asegurarse de que la sesión actual esté almacenada en todas las ubicaciones
+      if (session) {
+        storeSession(session);
+        storeSessionInCookie(session);
+        
+        // Forzar almacenamiento en localStorage para mayor persistencia
+        try {
+          const sessionStr = JSON.stringify(session);
+          localStorage.setItem('supabase.auth.token', sessionStr);
+        } catch (e) {
+          // Ignorar errores de almacenamiento
+        }
+      }
+      if (profile) {
+        storeUserProfile(profile);
+        storeProfileInCookie(profile);
+      }
+    }
+  );
+
+  useEffect(() => {
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
-        console.log('Auth state changed:', event);
+        // Auth state changed
         
         // Simpan sesi ke penyimpanan lokal dan cookie
         if (currentSession) {
-          console.log('Storing session in local storage and cookie');
+          // Storing session in local storage and cookie
           storeSession(currentSession);
           storeSessionInCookie(currentSession);
         }
@@ -105,7 +271,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const cookieSession = getSessionFromCookie();
           
           if (!storedSession && !cookieSession) {
-            console.log('No session found in storage or cookie, clearing profile');
+            // No session found in storage or cookie, clearing profile
             setProfile(null);
             setBusinessId(null);
           }
@@ -125,12 +291,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         // Jika tidak berhasil, coba ambil dari cookie terlebih dahulu (lebih tahan terhadap clear history)
         if (error || !currentSession) {
-          console.log('No active Supabase session, trying to recover from cookie');
+          // No active Supabase session, trying to recover from cookie
           const cookieSession = getSessionFromCookie();
           
           // Jika berhasil mendapatkan sesi dari cookie, coba set ke Supabase
           if (cookieSession && cookieSession.access_token && cookieSession.refresh_token) {
-            console.log('Recovered session from cookie, setting in Supabase');
+            // Recovered session from cookie, setting in Supabase
             try {
               // Set session ke Supabase
               const { data: { session: restoredSession }, error: restoreError } = await supabase.auth.setSession({
@@ -139,24 +305,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               });
               
               if (restoreError) {
-                console.error('Error setting session from cookie:', restoreError);
+                // Error setting session from cookie
               } else if (restoredSession) {
-                console.log('Session restored successfully from cookie');
+                // Session restored successfully from cookie
                 currentSession = restoredSession;
                 
                 // Simpan sesi yang dipulihkan ke penyimpanan lokal
                 storeSession(restoredSession);
               }
             } catch (e) {
-              console.error('Exception setting session from cookie:', e);
+              // Exception setting session from cookie
             }
           } else {
             // Jika tidak ada di cookie, coba dari localStorage
-            console.log('No session in cookie, trying localStorage');
+            // No session in cookie, trying localStorage
             const localSession = getStoredSession();
             
             if (localSession && localSession.access_token && localSession.refresh_token) {
-              console.log('Recovered session from localStorage, setting in Supabase');
+              // Recovered session from localStorage, setting in Supabase
               try {
                 // Set session ke Supabase
                 const { data: { session: restoredSession }, error: restoreError } = await supabase.auth.setSession({
@@ -165,22 +331,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 });
                 
                 if (restoreError) {
-                  console.error('Error setting session from localStorage:', restoreError);
+                  // Error setting session from localStorage
                 } else if (restoredSession) {
-                  console.log('Session restored successfully from localStorage');
+                  // Session restored successfully from localStorage
                   currentSession = restoredSession;
                   
                   // Simpan sesi yang dipulihkan ke cookie juga
                   storeSessionInCookie(restoredSession);
                 }
               } catch (e) {
-                console.error('Exception setting session from localStorage:', e);
+                // Exception setting session from localStorage
               }
             }
           }
         } else if (currentSession) {
           // Simpan sesi yang valid ke penyimpanan lokal dan cookie
-          console.log('Active session found, storing in both localStorage and cookie');
+          // Active session found, storing in both localStorage and cookie
           storeSession(currentSession);
           storeSessionInCookie(currentSession);
         }
@@ -189,7 +355,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
-          console.log('Session user found, fetching profile');
+          // Session user found, fetching profile
           // Coba ambil profil dari database
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
@@ -198,19 +364,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             .single();
           
           if (profileError || !profileData) {
-            console.warn('Error fetching profile from database:', profileError);
+            // Error fetching profile from database
             
             // Coba ambil dari cookie
             const cookieProfile = getProfileFromCookie();
             if (cookieProfile && cookieProfile.id === currentSession.user.id) {
-              console.log('Using profile from cookie');
+              // Using profile from cookie
               setProfile(cookieProfile);
               setBusinessId(cookieProfile.business_id || null);
             } else {
               // Coba ambil dari localStorage
               const localProfile = getStoredUserProfile();
               if (localProfile && localProfile.id === currentSession.user.id) {
-                console.log('Using profile from localStorage');
+                // Using profile from localStorage
                 setProfile(localProfile);
                 setBusinessId(localProfile.business_id || null);
               } else {
@@ -220,7 +386,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
           } else {
             // Profil berhasil diambil dari database
-            console.log('Profile fetched successfully from database');
+            // Profile fetched successfully from database
             setProfile(profileData);
             setBusinessId(profileData.business_id || null);
             
@@ -233,21 +399,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const fcmToken = localStorage.getItem('fcm_token');
           if (fcmToken) updateFcmTokenToProfile(fcmToken);
         } else {
-          console.log('No user in session, clearing profile');
+          // No user in session, clearing profile
           setProfile(null);
           setBusinessId(null);
         }
       } catch (e) {
-        console.error('Exception during auth initialization:', e);
+        // Exception during auth initialization
         
         // Coba recovery dari cookie
         try {
-          console.log('Attempting final recovery from cookie after error');
+          // Attempting final recovery from cookie after error
           const cookieSession = getSessionFromCookie();
           const cookieProfile = getProfileFromCookie();
           
           if (cookieSession && cookieSession.user) {
-            console.log('Recovering session from cookie after error');
+            // Recovering session from cookie after error
             setSession(cookieSession as Session);
             setUser(cookieSession.user as User);
             
@@ -261,7 +427,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const localProfile = getStoredUserProfile();
             
             if (localSession && localSession.user) {
-              console.log('Recovering session from localStorage after error');
+              // Recovering session from localStorage after error
               setSession(localSession);
               setUser(localSession.user);
               

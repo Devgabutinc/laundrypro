@@ -228,11 +228,22 @@ export default function Dashboard() {
       if (!businessId || !session?.user?.id) return;
       try {
         // Fetch Nama Laundry
-        const { data: businessData } = await (supabase.from as any)("businesses")
+        // Fetch business data
+        const { data: businessDataArray, error: businessError } = await supabase
+          .from("businesses")
           .select("name")
-          .eq("id", businessId)
-          .single();
-        if (businessData?.name) setLaundryName(businessData.name);
+          .eq("id", businessId);
+        
+        if (businessError) {
+          // Handle error silently for production
+        } else if (businessDataArray && businessDataArray.length > 0) {
+          const businessData = businessDataArray[0];
+
+          setLaundryName(businessData.name);
+        } else {
+
+          setLaundryName('Laundry Pro');
+        }
 
         // Fetch Nama Pengguna
         const { data: profileData } = await supabase
@@ -410,12 +421,13 @@ export default function Dashboard() {
     100;
   
   // Prepare chart data
+  const isMobile = window.innerWidth < 600;
   const statusData = [
-    { name: "Diterima", count: orders.filter(order => order.status === "received").length },
-    { name: "Dicuci", count: orders.filter(order => order.status === "washing").length },
-    { name: "Disetrika", count: orders.filter(order => order.status === "ironing").length },
-    { name: "Siap Diambil", count: orders.filter(order => order.status === "ready").length },
-    { name: "Selesai", count: orders.filter(order => order.status === "completed").length }
+    { name: isMobile ? "Terima" : "Diterima", count: orders.filter(order => order.status === "received").length },
+    { name: isMobile ? "Cuci" : "Dicuci", count: orders.filter(order => order.status === "washing").length },
+    { name: isMobile ? "Setrika" : "Disetrika", count: orders.filter(order => order.status === "ironing").length },
+    { name: isMobile ? "Siap" : "Siap Diambil", count: orders.filter(order => order.status === "ready").length },
+    { name: isMobile ? "Selesai" : "Selesai", count: orders.filter(order => order.status === "completed").length }
   ];
 
   // Calculate last 7 days daily income
@@ -872,11 +884,29 @@ export default function Dashboard() {
           <CardContent className="p-0">
             <ChartContainer config={{ status: { color: '#8b5cf6' } }} className="h-[180px] sm:h-[220px]">
               <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 180 : 220}>
-                <BarChart data={statusData}>
-                  <XAxis dataKey="name" fontSize={12} />
-                  <YAxis allowDecimals={false} fontSize={12} />
+                <BarChart data={statusData} barSize={window.innerWidth < 600 ? 25 : 35}>
+                  <XAxis 
+                    dataKey="name" 
+                    fontSize={window.innerWidth < 600 ? 10 : 12}
+                    tick={{ fill: '#4B5563' }}
+                    tickMargin={5}
+                    interval={0}
+                  />
+                  <YAxis allowDecimals={false} fontSize={window.innerWidth < 600 ? 10 : 12} />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <Tooltip formatter={(value) => `${value} pesanan`} />
+                  <Tooltip 
+                    formatter={(value) => `${value} pesanan`}
+                    labelFormatter={(label) => {
+                      // Mengembalikan label lengkap di tooltip
+                      const statusMap = {
+                        "Terima": "Diterima",
+                        "Cuci": "Dicuci",
+                        "Setrika": "Disetrika",
+                        "Siap": "Siap Diambil"
+                      };
+                      return statusMap[label] || label;
+                    }}
+                  />
                   <Bar dataKey="count" name="Jumlah Pesanan" fill="#8b5cf6" />
                 </BarChart>
               </ResponsiveContainer>

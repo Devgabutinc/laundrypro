@@ -575,19 +575,19 @@ const Discussion = () => {
   );
 
   return (
-    <div className="container py-6 max-w-4xl mx-auto">
+    <div className="px-0 sm:px-4 py-2 sm:py-6 w-full max-w-4xl mx-auto">
       {/* Tidak perlu modal akses ditolak di sini, sudah ada di Dashboard */}
       {
-        <Card className="rounded-xl shadow-md border-0 bg-white">
-          <div className="flex flex-col h-[calc(100vh-2rem)]">
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-2">
-                <h4 className="text-base font-medium text-gray-600">Forum Diskusi Laundry</h4>
+        <Card className="rounded-none sm:rounded-xl shadow-md border-0 bg-white">
+          <div className="flex flex-col h-[calc(100vh-1rem)]">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <h4 className="text-sm sm:text-base font-medium text-gray-600">Forum Diskusi Laundry</h4>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setIsPolicyDialogOpen(true)}
-                  className="h-6 text-xs px-2 text-gray-500 hover:text-gray-700"
+                  className="h-6 text-xs px-1 sm:px-2 text-gray-500 hover:text-gray-700"
                 >
                   Peraturan
                 </Button>
@@ -597,33 +597,33 @@ const Discussion = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsNewThreadDialogOpen(true)}
-                className="h-8 text-xs px-2"
+                className="h-7 sm:h-8 text-xs px-2"
               >
                 Topik Baru
               </Button>
             </div>
 
-            <div className="relative px-4 py-2">
-              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <div className="relative px-3 sm:px-4 py-2">
+              <Search className="absolute left-5 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Cari diskusi atau nama usaha..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-10"
+                className="pl-8 sm:pl-9 h-9 sm:h-10 text-sm"
               />
             </div>
 
-            <ScrollArea className="flex-1 px-4">
-              <div className="space-y-3 py-2">
+            <ScrollArea className="flex-1 px-3 sm:px-4">
+              <div className="space-y-2 sm:space-y-3 py-2">
                 {filteredThreads.map((thread) => (
                   <div
                     key={thread.id}
-                    className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="p-2 sm:p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => navigate(`/discussion/${thread.id}`)}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <Avatar className="h-8 w-8 shrink-0">
+                      <div className="flex items-start gap-2 sm:gap-3 flex-1">
+                        <Avatar className="h-7 w-7 sm:h-8 sm:w-8 shrink-0">
                           {thread.profiles?.avatar_url ? (
                             <AvatarImage src={thread.profiles.avatar_url} alt={thread.user?.user_metadata?.full_name} />
                           ) : null}
@@ -656,7 +656,7 @@ const Discussion = () => {
                           setReportedItemId(thread.id);
                           setIsReportDialogOpen(true);
                         }}
-                        className="h-6 text-xs px-2 text-gray-500 hover:text-gray-700"
+                        className="h-6 text-xs px-1 sm:px-2 text-gray-500 hover:text-gray-700 hidden sm:flex"
                       >
                         Laporkan
                       </Button>
@@ -671,8 +671,8 @@ const Discussion = () => {
 
       {/* Modal Buat Topik Baru */}
       <Dialog open={isNewThreadDialogOpen} onOpenChange={setIsNewThreadDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="space-y-1">
+        <DialogContent>
+          <DialogHeader>
             <DialogTitle className="text-base font-medium">Buat Diskusi Baru</DialogTitle>
             <DialogDescription className="text-sm">
               Buat topik diskusi baru untuk didiskusikan dengan komunitas laundry
@@ -706,8 +706,8 @@ const Discussion = () => {
 
       {/* Dialog Peraturan Forum */}
       <Dialog open={isPolicyDialogOpen} onOpenChange={setIsPolicyDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="space-y-1">
+        <DialogContent>
+          <DialogHeader>
             <DialogTitle className="text-base font-medium">Peraturan Forum</DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[400px] p-4">
@@ -736,8 +736,8 @@ const Discussion = () => {
 
       {/* Dialog Report */}
       <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="space-y-1">
+        <DialogContent>
+          <DialogHeader>
             <DialogTitle className="text-base font-medium">
               Laporkan {reportType === 'thread' ? 'Diskusi' : 'Balasan'}
             </DialogTitle>

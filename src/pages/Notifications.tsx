@@ -249,7 +249,8 @@ const Notifications = () => {
       .replace(/\(estimasi\)/gi, estimasi)
       .replace(/\(tanggal\)/gi, tanggal)
       .replace(/\(telpon\)/gi, telpon)
-      .replace(/\(alamat\)/gi, alamat);
+      .replace(/\(alamat\)/gi, alamat)
+      .replace(/<br>/gi, "\n");
   };
 
   // Handle send notification
@@ -563,11 +564,12 @@ const Notifications = () => {
               rows={4}
             />
             <div className="text-xs text-muted-foreground">
-              Variabel yang bisa digunakan: (namacs), (noorder), (namatoko), (status), (estimasi), (tanggal), (telepon), (alamat)
+              Variabel yang bisa digunakan: (namacs), (noorder), (namatoko), (status), (estimasi), (tanggal), (telepon), (alamat)<br/>
+              Format: Gunakan <b>&lt;br&gt;</b> untuk baris baru
             </div>
             <div className="border rounded p-2 bg-gray-50 text-sm mt-2">
               <b>Preview:</b><br />
-              {substituteTemplate(templateText, {
+              <div dangerouslySetInnerHTML={{ __html: substituteTemplate(templateText, {
                 customerName: "Budi Santoso",
                 id: "17420af2-1016-4db1-a817-bd724b31bb9a",
                 status: "received",
@@ -575,7 +577,7 @@ const Notifications = () => {
                 createdAt: new Date(),
                 customerPhone: "08123456789",
                 address: "Jl. Contoh No. 1"
-              } as any, { businessName: tenant?.businessName || "LaundryPro" })}
+              } as any, { businessName: tenant?.businessName || "LaundryPro" }).replace(/\n/g, "<br/>") }}></div>
             </div>
             {templateError && <div className="text-xs text-red-500">{templateError}</div>}
             <DialogFooter className="gap-2">
@@ -665,11 +667,12 @@ const Notifications = () => {
               rows={4}
             />
             <div className="text-xs text-muted-foreground mt-2">
-              Variabel: (namacs), (noorder), (namatoko), (status), (estimasi), (tanggal), (telepon), (alamat)
+              Variabel: (namacs), (noorder), (namatoko), (status), (estimasi), (tanggal), (telepon), (alamat)<br/>
+              Format: Gunakan <b>&lt;br&gt;</b> untuk baris baru
             </div>
             <div className="border rounded p-2 bg-gray-50 text-sm mt-2">
               <b>Preview:</b><br />
-              {substituteTemplate(editTemplateText, {
+              <div dangerouslySetInnerHTML={{ __html: substituteTemplate(editTemplateText, {
                 customerName: "Budi Santoso",
                 id: "17420af2-1016-4db1-a817-bd724b31bb9a",
                 status: editTemplateName,
@@ -677,7 +680,7 @@ const Notifications = () => {
                 createdAt: new Date(),
                 customerPhone: "08123456789",
                 address: "Jl. Contoh No. 1"
-              } as any, { businessName: tenant?.businessName || "LaundryPro" })}
+              } as any, { businessName: tenant?.businessName || "LaundryPro" }).replace(/\n/g, "<br/>") }}></div>
             </div>
           </div>
           <ConfirmDialogFooter className="gap-2">

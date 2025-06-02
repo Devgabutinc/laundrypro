@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TenantContext } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,14 +30,17 @@ interface ReceiptSettings {
   custom_thank_you_message: string;
 }
 
-// Datos de ejemplo para la vista previa
+// Data contoh untuk preview struk
 const sampleOrder = {
   id: '12345678-1234-1234-1234-123456789012',
   customerName: 'Pelanggan Contoh',
   customerPhone: '081234567890',
+  customerAddress: 'Jl. Contoh No. 123',
   deliveryType: 'Datang Langsung',
   isPriority: 'Tidak',
+  // Tambahkan kedua format estimasi untuk kompatibilitas
   estimatedCompletion: '25 Mei 2025 14:00',
+  estimated_completion: '2025-05-25T14:00:00+07:00', // Format timestamp with timezone dari database
   cashierName: 'Kasir Demo',
   items: [
     { name: 'Cuci Setrika', quantity: 2, price: 15000 },
@@ -55,6 +59,7 @@ const ReceiptSettings: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { tenant } = useContext(TenantContext);
+  const { session } = useAuth();
   const tenantStatus = tenant?.status || 'free';
   const { hasAccess, loading: featureLoading, refreshFeatureAccess } = useFeature('receipt_customization');
   
@@ -88,7 +93,7 @@ const ReceiptSettings: React.FC = () => {
       // Esperar a que termine de cargar
       if (featureLoading) return;
       
-      console.log('Verificando acceso a receipt_customization:', { hasAccess, tenantStatus });
+
       
       // Si no tiene acceso, mostrar mensaje y redirigir
       if (!hasAccess) {
@@ -106,14 +111,27 @@ const ReceiptSettings: React.FC = () => {
   
   // Fungsi untuk upload gambar ke Supabase Storage
   const uploadImage = async (file: File, folder: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${folder}_${Date.now()}.${fileExt}`;
-    const { data, error } = await supabase.storage.from("images").upload(`${folder}/${fileName}`, file, { upsert: true });
-    if (error) throw error;
-    
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(`${folder}/${fileName}`);
-    return publicUrlData.publicUrl;
+    try {
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${folder}_${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage.from("images").upload(`${folder}/${fileName}`, file, { upsert: true });
+      
+      if (error) {
+
+        throw error;
+      }
+      
+
+      
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(`${folder}/${fileName}`);
+
+      return publicUrlData.publicUrl;
+    } catch (error) {
+
+      throw error;
+    }
   };
 
   // Fungsi untuk handle perubahan file
@@ -131,23 +149,29 @@ const ReceiptSettings: React.FC = () => {
   // Cargar configuraciones existentes
   useEffect(() => {
     const fetchSettings = async () => {
-      if (!tenant?.id) return;
+      if (!tenant?.id || !session) return;
       
       setLoading(true);
       try {
-        // Usar any para evitar errores de tipo ya que la tabla es nueva
-        const { data, error } = await supabase
-          .from('receipt_settings' as any)
-          .select('*')
-          .eq('business_id', tenant.id)
-          .single();
+        if (!tenant?.id) {
+
+          return;
+        }
         
-        if (error && error.code !== 'PGRST116') {
+
+
+        
+        const { data, error } = await supabase
+          .from('receipt_settings')
+          .select('*')
+          .eq('business_id', tenant.id);
+        
+        if (error) {
           throw error;
         }
         
-        if (data) {
-          setSettings(data);
+        if (data && data.length > 0) {
+          setSettings(data[0]);
         }
       } catch (error: any) {
         toast({
@@ -161,57 +185,118 @@ const ReceiptSettings: React.FC = () => {
     };
     
     fetchSettings();
-  }, [tenant?.id, toast]);
+  }, [tenant?.id, session, toast]);
   
   // Guardar configuraciones
   const handleSave = async () => {
-    if (!tenant?.id) return;
+    if (!tenant?.id || !session) {
+      toast({
+        title: 'Error',
+        description: 'Sesi tidak valid. Silakan login kembali.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     setSaving(true);
     try {
+
+      
       // Upload QR code jika ada
       let qrCodeUrl = settings.qr_code_url;
       if (qrCodeFile) {
+
         qrCodeUrl = await uploadImage(qrCodeFile, 'qr_codes');
+
       }
       
       let query;
       
+
+      
       // Verificar si ya existe una configuración
       const { data: existingSettings, error: settingsError } = await supabase
-        .from('receipt_settings' as any)
+        .from('receipt_settings')
         .select('id')
-        .eq('business_id', tenant.id)
-        .single();
+        .eq('business_id', tenant.id);
+        
+      // Check if we have any results
+      const firstSetting = existingSettings && existingSettings.length > 0 ? existingSettings[0] : null;
+        
+
       
-      if (settingsError && settingsError.code !== 'PGRST116') {
+      if (settingsError) {
         throw settingsError;
       }
       
-      if (existingSettings && 'id' in existingSettings) {
+      if (firstSetting && 'id' in firstSetting) {
+
         // Actualizar configuración existente
+        const updateData = {
+          header_text: settings.header_text,
+          footer_text: settings.footer_text,
+          show_logo: settings.show_logo,
+          show_address: settings.show_address,
+          show_phone: settings.show_phone,
+          show_customer_info: settings.show_customer_info,
+          show_cashier_name: settings.show_cashier_name,
+          custom_thank_you_message: settings.custom_thank_you_message,
+          show_qr_code: settings.show_qr_code,
+          qr_code_url: qrCodeUrl,
+          updated_at: new Date().toISOString()
+        };
+        
+
+        
         query = supabase
-          .from('receipt_settings' as any)
-          .update({
-            ...settings,
-            qr_code_url: qrCodeUrl,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', existingSettings.id);
+          .from('receipt_settings')
+          .update(updateData)
+          .eq('id', firstSetting.id);
       } else {
+
         // Crear nueva configuración
+        const insertData = {
+          header_text: settings.header_text || '',
+          footer_text: settings.footer_text || '',
+          show_logo: settings.show_logo,
+          show_address: settings.show_address,
+          show_phone: settings.show_phone,
+          show_customer_info: settings.show_customer_info,
+          show_cashier_name: settings.show_cashier_name,
+          custom_thank_you_message: settings.custom_thank_you_message || '',
+          show_qr_code: settings.show_qr_code,
+          qr_code_url: qrCodeUrl,
+          business_id: tenant.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+
+        
         query = supabase
-          .from('receipt_settings' as any)
-          .insert({
-            ...settings,
-            qr_code_url: qrCodeUrl,
-            business_id: tenant.id,
-          });
+          .from('receipt_settings')
+          .insert(insertData);
       }
       
-      const { error } = await query;
+      const { error, data: resultData } = await query;
       
-      if (error) throw error;
+
+      
+      if (error) {
+
+        throw error;
+      }
+      
+      // Refresh the data after successful save
+      const { data: refreshData, error: refreshError } = await supabase
+        .from('receipt_settings')
+        .select('*')
+        .eq('business_id', tenant.id);
+        
+      if (!refreshError && refreshData && refreshData.length > 0) {
+
+        setSettings(refreshData[0]);
+      }
       
       // Update settings dengan URL QR code baru
       setSettings(prev => ({

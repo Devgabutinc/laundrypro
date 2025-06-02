@@ -2,10 +2,33 @@
 // Hanya support browser/Capacitor dengan canvas
 
 export async function convertImageToEscposBytes(url: string, width: number = 384, logoWidth: number = 150): Promise<Uint8Array> {
+
+  // Handle Supabase storage URLs specifically
+  let imageUrl = url;
+  if (url.includes('supabase.co/storage')) {
+    // Make sure we're using the public URL format
+    if (!url.includes('/object/public/')) {
+      imageUrl = url.replace('/object/', '/object/public/');
+    }
+  }
+  
   return new Promise((resolve, reject) => {
     const img = new window.Image();
     img.crossOrigin = 'Anonymous';
+    
+    // Add timeout to prevent hanging
+    const timeout = setTimeout(() => {
+      console.error('[ERROR] Image loading timeout for URL:', imageUrl);
+      reject(new Error('Image loading timeout'));
+    }, 10000); // 10 second timeout
+    
     img.onload = () => {
+      clearTimeout(timeout);
+      // Skip processing if image is too small
+      if (img.width < 10 || img.height < 10) {
+        console.error('[ERROR] Image too small:', { width: img.width, height: img.height });
+        return reject(new Error('Image too small'));
+      }
       // Hitung tinggi proporsional logo
       const scale = logoWidth / img.width;
       const logoHeight = Math.floor(img.height * scale);
@@ -58,7 +81,47 @@ export async function convertImageToEscposBytes(url: string, width: number = 384
       }
       resolve(new Uint8Array(escpos));
     };
-    img.onerror = reject;
-    img.src = url;
+    img.onerror = (error) => {
+      clearTimeout(timeout);
+      console.error('[ERROR] Failed to load image:', imageUrl, error);
+      
+      // If it's a Supabase URL, try with a CORS proxy as fallback
+      if (imageUrl.includes('supabase.co/storage')) {
+        try {
+          // Use a CORS proxy service
+          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`;
+          
+          // Try again with proxy
+          const proxyImg = new window.Image();
+          proxyImg.crossOrigin = 'Anonymous';
+          
+          const proxyTimeout = setTimeout(() => {
+            console.error('[ERROR] Proxy image loading timeout');
+            reject(new Error('Proxy image loading timeout'));
+          }, 10000);
+          
+          proxyImg.onload = () => {
+            clearTimeout(proxyTimeout);
+            img.src = proxyImg.src; // This should trigger the original onload handler
+          };
+          
+          proxyImg.onerror = (proxyError) => {
+            clearTimeout(proxyTimeout);
+            console.error('[ERROR] Failed to load image via proxy:', proxyError);
+            reject(new Error('Failed to load image via proxy'));
+          };
+          
+          proxyImg.src = proxyUrl;
+        } catch (proxyError) {
+          console.error('[ERROR] Error setting up proxy:', proxyError);
+          reject(new Error('Failed to set up proxy'));
+        }
+      } else {
+        reject(new Error('Failed to load image'));
+      }
+    };
+    
+    // Try loading the image
+    img.src = imageUrl;
   });
 } 
